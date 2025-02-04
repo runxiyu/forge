@@ -1,0 +1,4 @@
+http {
+	net tcp
+	addr :8080
+}
