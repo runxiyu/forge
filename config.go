@@ -12,6 +12,9 @@ var config struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`
 	} `scfg:"http"`
+	Git struct {
+		Root string `scfg:"root"`
+	} `scfg:"git"`
 	DB struct {
 		Type string `scfg:"type"`
 		Conn string `scfg:"conn"`

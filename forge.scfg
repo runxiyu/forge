@@ -2,3 +2,7 @@ http {
 	net tcp
 	addr :8080
 }
+
+git {
+	root /srv/git
+}
