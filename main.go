@@ -25,6 +25,11 @@ func main() {
 	if err != nil {
 		clog.Fatal(1, "Loading templates: "+err.Error())
 	}
+	
+	err = serve_static()
+	if err != nil {
+		clog.Fatal(1, "Serving static: "+err.Error())
+	}
 
 	http.HandleFunc("/{$}", handle_index)
 	http.HandleFunc("/{project_name}/repos/{repo_name}/", handle_repo_index)

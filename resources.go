@@ -22,7 +22,7 @@ func serve_static() (err error) {
 	if err != nil {
 		return err
 	}
-	http.Handle("/static/",
+	http.Handle("/static/{name}",
 		http.StripPrefix(
 			"/static/",
 			http.FileServer(http.FS(static_fs)),
