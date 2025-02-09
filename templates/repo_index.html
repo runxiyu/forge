@@ -1,11 +1,9 @@
-{{ define "repo_index" }}
+{{- define "repo_index" -}}
 <!DOCTYPE html>
 <html>
 <head>
 <link rel="stylesheet" href="/static/style.css" />
-<title>
-{{ .project_name }}/repos/{{ .repo_name }}
-</title>
+<title>{{ .project_name }}/repos/{{ .repo_name }}</title>
 </head>
 <body class="repo-index">
 <table id="recent-commits">
@@ -18,14 +16,10 @@
 </tr>
 </thead>
 <tbody>
-{{ range .commits }}
+{{- range .commits }}
 <tr>
-<td class="commit-id">
-{{ slice .Hash.String 0 8 }}
-</td>
-<td class="commit-title">
-{{ .Message }}
-</td>
+<td class="commit-id">{{ slice .Hash.String 0 8 }}</td>
+<td class="commit-title">{{ .Message }}</td>
 <td class="commit-author">
 <a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
 </td>
@@ -33,14 +27,14 @@
 {{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
 </td>
 </tr>
-{{ end }}
+{{- end }}
 </tbody>
 </table>
 <div id="refs">
 </div>
 <div id="readme">
-{{ .readme }}
+{{ .readme -}}
 </div>
 </body>
 </html>
-{{ end }}
+{{- end -}}
