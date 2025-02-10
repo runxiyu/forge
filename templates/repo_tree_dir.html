@@ -1,0 +1,40 @@
+{{- define "repo_tree_dir" -}}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css" />
+<title>{{ .project_name }}/repos/{{ .repo_name }}/{{ .path }}</title>
+</head>
+<body class="repo-index">
+<div class="padding-wrapper">
+<table id="file-tree">
+<thead>
+<tr>
+<th scope="col">Mode</th>
+<th scope="col">Name</th>
+<th scope="col">Size</th>
+</tr>
+</thead>
+<tbody>
+{{- range .files }}
+<tr>
+<td class="file-mode">{{ .Mode }}</td>
+<td class="file-name">{{ .Name }}</td>
+<td class="file-size">{{ .Size }}</td>
+</tr>
+{{- end }}
+</tbody>
+</table>
+</div>
+<div class="padding-wrapper">
+<div id="refs">
+</div>
+</div>
+<div class="padding-wrapper">
+<div id="readme">
+{{ .readme -}}
+</div>
+</div>
+</body>
+</html>
+{{- end -}}
