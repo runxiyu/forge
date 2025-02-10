@@ -87,7 +87,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if raw_path_spec[len(raw_path_spec) - 1] != '/' {
+	if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec) - 1] != '/' {
 		http.Redirect(w, r, path.Base(path_spec) + "/", http.StatusSeeOther)
 		return
 	}
