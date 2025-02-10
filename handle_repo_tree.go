@@ -82,25 +82,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data["readme"] = render_readme_at_tree(tree)
-
-	display_git_tree := make([]display_git_tree_entry_t, 0)
-	for _, entry := range target.Entries {
-		display_git_tree_entry := display_git_tree_entry_t{}
-		os_mode, err := entry.Mode.ToOSFileMode()
-		if err != nil {
-			display_git_tree_entry.Mode = "x---"
-		} else {
-			display_git_tree_entry.Mode = os_mode.String()[:4]
-		}
-		display_git_tree_entry.Is_file = entry.Mode.IsFile()
-		display_git_tree_entry.Size, err = target.Size(entry.Name)
-		if err != nil {
-			display_git_tree_entry.Size = 0
-		}
-		display_git_tree_entry.Name = entry.Name
-		display_git_tree = append(display_git_tree, display_git_tree_entry)
-	}
-	data["files"] = display_git_tree
+	data["files"] = build_display_git_tree(tree)
 
 	err = templates.ExecuteTemplate(w, "repo_tree_dir", data)
 	if err != nil {
