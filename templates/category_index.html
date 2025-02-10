@@ -5,8 +5,11 @@
 <link rel="stylesheet" href="/static/style.css" />
 <title>{{ .category_name }}</title>
 </head>
-<body class="index">
+<body class="category-index">
 <div class="padding-wrapper">
+<h1>
+Repos in {{ .category_name }}
+</h1>
 <ul>
 {{- range .repos }}
 <li>
