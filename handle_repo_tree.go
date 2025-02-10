@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	chroma_formatters_html "github.com/alecthomas/chroma/v2/formatters/html"
+	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
+	chroma_styles "github.com/alecthomas/chroma/v2/styles"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
@@ -63,11 +66,27 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte("Error retrieving path: " + err.Error()))
 			return
 		}
-		data["file_contents"], err = file.Contents()
+		file_contents, err := file.Contents()
 		if err != nil {
 			_, _ = w.Write([]byte("Error reading file: " + err.Error()))
 			return
 		}
+		lexer := chroma_lexers.Match(path_spec)
+		if lexer == nil {
+			lexer = chroma_lexers.Fallback
+		}
+		iterator, err := lexer.Tokenise(nil, file_contents)
+		if err != nil {
+			_, _ = w.Write([]byte("Error rendering code: " + err.Error()))
+			return
+		}
+		var formatted_unencapsulated bytes.Buffer
+		style := chroma_styles.Get("emacs")
+		formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
+		formatter.Format(&formatted_unencapsulated, style, iterator)
+		formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
+		data["file_contents"] = formatted_encapsulated
+
 		err = templates.ExecuteTemplate(w, "repo_tree_file", data)
 		if err != nil {
 			_, _ = w.Write([]byte("Error rendering template: " + err.Error()))

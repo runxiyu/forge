@@ -20,7 +20,7 @@ a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
 	color: var(--link-color);
 }
-code {
+code:not(pre > code) {
 	background-color: var(--box-background-color);
 	border-radius: 2px;
 	padding: 2px;

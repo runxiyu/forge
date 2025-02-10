@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"path/filepath"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
