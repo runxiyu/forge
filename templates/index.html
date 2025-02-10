@@ -1,0 +1,20 @@
+{{- define "index" -}}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css" />
+<title>Forge</title>
+</head>
+<body class="index">
+<div class="padding-wrapper">
+<ul>
+{{- range .categories }}
+<li>
+<a href="{{ . }}/">{{ . }}</a>
+</li>
+{{- end }}
+</ul>
+</div>
+</body>
+</html>
+{{- end -}}
