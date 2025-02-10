@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-func handle_category_repos(w http.ResponseWriter, r *http.Request) {
+func handle_group_repos(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
-	category_name := r.PathValue("category_name")
-	data["category_name"] = category_name
-	entries, err := os.ReadDir(filepath.Join(config.Git.Root, category_name))
+	group_name := r.PathValue("group_name")
+	data["group_name"] = group_name
+	entries, err := os.ReadDir(filepath.Join(config.Git.Root, group_name))
 	if err != nil {
 		_, _ = w.Write([]byte("Error listing repos: " + err.Error()))
 		return
@@ -26,7 +26,7 @@ func handle_category_repos(w http.ResponseWriter, r *http.Request) {
 	}
 	data["repos"] = repos
 
-	err = templates.ExecuteTemplate(w, "category_repos", data)
+	err = templates.ExecuteTemplate(w, "group_repos", data)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

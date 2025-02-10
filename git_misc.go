@@ -11,8 +11,8 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
-func open_git_repo(category_name, repo_name string) (*git.Repository, error) {
-	return git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
+func open_git_repo(group_name, repo_name string) (*git.Repository, error) {
+	return git.PlainOpen(filepath.Join(config.Git.Root, group_name, repo_name+".git"))
 }
 
 func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {

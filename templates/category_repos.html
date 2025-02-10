@@ -1,14 +1,14 @@
-{{- define "category_repos" -}}
+{{- define "group_repos" -}}
 <!DOCTYPE html>
 <html>
 	<head>
 		{{ template "head_common" . }}
-		<title>Repos in {{ .category_name }} &ndash; Lindenii Forge</title>
+		<title>Repos in {{ .group_name }} &ndash; Lindenii Forge</title>
 	</head>
-	<body class="category-index">
+	<body class="group-index">
 		<div class="padding-wrapper">
 			<h1>
-			Repos in {{ .category_name }}
+			Repos in {{ .group_name }}
 			</h1>
 			<ul>
 				{{- range .repos }}
