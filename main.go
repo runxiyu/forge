@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		clog.Fatal(1, "Loading templates: "+err.Error())
 	}
-	
+
 	err = serve_static()
 	if err != nil {
 		clog.Fatal(1, "Serving static: "+err.Error())

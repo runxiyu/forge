@@ -2,14 +2,15 @@ package main
 
 import (
 	"bytes"
+	"html/template"
+	"net/http"
+	"path/filepath"
 	"strings"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/yuin/goldmark"
-	"html/template"
-	"net/http"
-	"path/filepath"
 )
 
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +89,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			display_git_tree_entry.Size = 0
 		}
-		display_git_tree_entry.Name = entry.Name 
+		display_git_tree_entry.Name = entry.Name
 		display_git_tree = append(display_git_tree, display_git_tree_entry)
 	}
 	data["files"] = display_git_tree
