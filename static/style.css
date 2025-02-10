@@ -7,7 +7,6 @@ html {
 	max-width: 50em;
 	margin: 0 auto;
 }
-
-#readme, #file-tree {
+.padding-wrapper > * {
 	width: 100%;
 }
