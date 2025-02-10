@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -13,7 +12,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 	// TODO: Sanitize path values
 	category_name, repo_name := r.PathValue("category_name"), r.PathValue("repo_name")
 	data["category_name"], data["repo_name"] = category_name, repo_name
-	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
+	repo, err := open_git_repo(category_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return

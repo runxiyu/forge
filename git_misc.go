@@ -1,6 +1,15 @@
 package main
 
-import "github.com/go-git/go-git/v5/plumbing/object"
+import (
+	"path/filepath"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+)
+
+func open_git_repo(category_name, repo_name string) (*git.Repository, error) {
+	return git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
+}
 
 func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 	display_git_tree := make([]display_git_tree_entry_t, 0)

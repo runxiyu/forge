@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"html/template"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	chroma_formatters_html "github.com/alecthomas/chroma/v2/formatters/html"
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
-	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
@@ -19,7 +17,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	// TODO: Sanitize path values
 	ref_name, category_name, repo_name, path_spec := r.PathValue("ref"), r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
 	data["category_name"], data["repo_name"], data["path_spec"] = category_name, repo_name, path_spec
-	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
+	repo, err := open_git_repo(category_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return
