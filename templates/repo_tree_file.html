@@ -11,6 +11,9 @@
 			/{{ .path_spec }}
 		</p>
 		{{ .file_contents }}
+		<footer>
+			{{ template "footer" . }}
+		</footer>
 	</body>
 </html>
 {{- end -}}

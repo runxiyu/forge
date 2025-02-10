@@ -1,6 +1,7 @@
 html {
 	font-family: sans-serif;
 	--link-color: hsl(320, 50%, 36%);
+	--light-text-color: hsl(0, 0%, 65%);
 	--darker-border-color: hsl(0, 0%, 72%);
 	--lighter-border-color: hsl(0, 0%, 85%);
 	--text-decoration-color: hsl(0, 0%, 72%);
@@ -10,11 +11,23 @@ html {
 html, code, pre {
 	font-size: 1rem; /* TODO: Not always correct */
 }
-
-.padding-wrapper {
+footer {
+	margin-top: 1rem;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
 	padding: 0 1rem;
-	max-width: 50em;
+	width: fit-content;
+	text-align: center;
+	color: var(--light-text-color);
+}
+footer a:link, footer a:visited {
+	color: inherit;
+}
+.padding-wrapper {
 	margin: 1rem auto;
+	max-width: 50em;
+	padding: 0 1rem;
 }
 .padding-wrapper > * {
 	width: 100%;
