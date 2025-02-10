@@ -81,7 +81,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var formatted_unencapsulated bytes.Buffer
-		style := chroma_styles.Get("xcode")
+		style := chroma_styles.Get("autumn")
 		formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
 		formatter.Format(&formatted_unencapsulated, style, iterator)
 		formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
