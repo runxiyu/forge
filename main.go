@@ -32,9 +32,9 @@ func main() {
 	}
 
 	http.HandleFunc("/{$}", handle_index)
-	http.HandleFunc("/{project_name}/{$}", handle_category_index)
-	http.HandleFunc("/{project_name}/repos/{repo_name}/{$}", handle_repo_index)
-	http.HandleFunc("/{project_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
+	http.HandleFunc("/{category_name}/{$}", handle_category_index)
+	http.HandleFunc("/{category_name}/repos/{repo_name}/{$}", handle_repo_index)
+	http.HandleFunc("/{category_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
 
 	listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if err != nil {

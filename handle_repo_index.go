@@ -15,9 +15,9 @@ import (
 func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	// TODO: Sanitize path values
-	project_name, repo_name := r.PathValue("project_name"), r.PathValue("repo_name")
-	data["project_name"], data["repo_name"] = project_name, repo_name
-	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, project_name, repo_name+".git"))
+	category_name, repo_name := r.PathValue("category_name"), r.PathValue("repo_name")
+	data["category_name"], data["repo_name"] = category_name, repo_name
+	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return

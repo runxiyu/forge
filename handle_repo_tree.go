@@ -16,9 +16,9 @@ import (
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	// TODO: Sanitize path values
-	project_name, repo_name, path_spec := r.PathValue("project_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
-	data["project_name"], data["repo_name"], data["path_spec"] = project_name, repo_name, path_spec
-	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, project_name, repo_name+".git"))
+	category_name, repo_name, path_spec := r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
+	data["category_name"], data["repo_name"], data["path_spec"] = category_name, repo_name, path_spec
+	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return

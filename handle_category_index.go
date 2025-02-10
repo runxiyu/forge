@@ -9,9 +9,9 @@ import (
 
 func handle_category_index(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
-	project_name := r.PathValue("project_name")
-	data["category_name"] = project_name
-	entries, err := os.ReadDir(filepath.Join(config.Git.Root, project_name))
+	category_name := r.PathValue("category_name")
+	data["category_name"] = category_name
+	entries, err := os.ReadDir(filepath.Join(config.Git.Root, category_name))
 	if err != nil {
 		_, _ = w.Write([]byte("Error listing repos: " + err.Error()))
 		return
