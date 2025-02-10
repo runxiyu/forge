@@ -42,10 +42,11 @@
 </tr>
 </thead>
 <tbody>
+{{- $ref := .ref }}
 {{- range .files }}
 <tr>
 <td class="file-mode">{{ .Mode }}</td>
-<td class="file-name">{{ .Name }}</td>
+<td class="file-name"><a href="tree/{{ $ref }}/{{ .Name }}">{{ .Name }}</a></td>
 <td class="file-size">{{ .Size }}</td>
 </tr>
 {{- end }}

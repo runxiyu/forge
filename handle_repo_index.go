@@ -27,6 +27,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error getting repo HEAD: " + err.Error()))
 		return
 	}
+	data["ref"] = head.Name().Short()
 	head_hash := head.Hash()
 	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})
 	if err != nil {
