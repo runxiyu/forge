@@ -62,6 +62,8 @@ The native API may be authenticated in the transport layer (e.g. TLS client
 certificates or UNIX domain socket authentication), via passwords, and via
 challenge-response mechanisms including SSH keys. SASL may be considered.
 
-The Web interface will have a dedicated login screen. Connections are set as keepalive, and sessions are tracked across a kept-alive connection; optionally, a user may click "remember me with a cookie" in the login screen.
+The Web interface will have a dedicated login screen. Connections are set as
+keepalive, and sessions are tracked across a kept-alive connection; optionally,
+a user may click "remember me with a cookie" in the login screen.
 
 PGP patch validation may be considered.
