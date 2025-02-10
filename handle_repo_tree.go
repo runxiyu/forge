@@ -88,7 +88,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		display_git_tree_entry := display_git_tree_entry_t{}
 		os_mode, err := entry.Mode.ToOSFileMode()
 		if err != nil {
-			display_git_tree_entry.Mode = "----"
+			display_git_tree_entry.Mode = "x---"
 		} else {
 			display_git_tree_entry.Mode = os_mode.String()[:4]
 		}
