@@ -10,7 +10,7 @@ func handle_index(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := os.ReadDir(config.Git.Root)
 	if err != nil {
-		w.Write([]byte("Error listing categories: " + err.Error()))
+		_, _ = w.Write([]byte("Error listing categories: " + err.Error()))
 		return
 	}
 
@@ -22,7 +22,7 @@ func handle_index(w http.ResponseWriter, r *http.Request) {
 
 	err = templates.ExecuteTemplate(w, "index", data)
 	if err != nil {
-		w.Write([]byte("Error rendering template: " + err.Error()))
+		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return
 	}
 }

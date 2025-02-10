@@ -40,5 +40,8 @@ func main() {
 		clog.Fatal(1, "Listening: "+err.Error())
 	}
 
-	http.Serve(listener, nil)
+	err = http.Serve(listener, nil)
+	if err != nil {
+		clog.Fatal(1, "Serving: "+err.Error())
+	}
 }
