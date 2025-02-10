@@ -7,11 +7,13 @@
 	</head>
 	<body class="repo-tree-dir">
 		<div class="padding-wrapper">
-			<p>
-				/{{ .path_spec }}/
-			</p>
 			<table id="file-tree">
 				<thead>
+					<tr>
+						<th colspan="3">
+							/{{ .path_spec }}/ on {{ .ref }}
+						</th>
+					</tr>
 					<tr>
 						<th scope="col">Mode</th>
 						<th scope="col">Name</th>
@@ -19,7 +21,6 @@
 					</tr>
 				</thead>
 				<tbody>
-					{{- $ref := .ref }}
 					{{- $path_spec := .path_spec }}
 					{{- range .files }}
 						<tr>
@@ -36,9 +37,24 @@
 			</div>
 		</div>
 		<div class="padding-wrapper">
-			<div id="readme">
-				{{ .readme -}}
-			</div>
+			{{ if .readme }}
+				<table id="readme">
+					<thead>
+						<tr>
+							<th>
+								README.md
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								{{ .readme -}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			{{ end }}
 		</div>
 	</body>
 </html>

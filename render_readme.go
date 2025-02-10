@@ -12,7 +12,7 @@ import (
 func render_readme_at_tree(tree *object.Tree) any {
 	readme_file, err := tree.File("README.md")
 	if err != nil {
-		return "There is no README available."
+		return ""
 	}
 	readme_file_contents, err := readme_file.Contents()
 	if err != nil {

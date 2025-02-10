@@ -10,6 +10,9 @@
 			<table id="recent-commits">
 				<thead>
 					<tr>
+						<th colspan="4">Recent Commits</th>
+					</tr>
+					<tr>
 						<th scope="col">ID</th>
 						<th scope="col">Title</th>
 						<th scope="col">Author</th>
@@ -36,6 +39,9 @@
 			<table id="file-tree">
 				<thead>
 					<tr>
+						<th colspan="3">/ on {{ .ref }}</th>
+					</tr>
+					<tr>
 						<th scope="col">Mode</th>
 						<th scope="col">Name</th>
 						<th scope="col">Size</th>
@@ -58,9 +64,24 @@
 			</div>
 		</div>
 		<div class="padding-wrapper">
-			<div id="readme">
-				{{ .readme -}}
-			</div>
+			{{ if .readme }}
+				<table id="readme">
+					<thead>
+						<tr>
+							<th>
+								README.md
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								{{ .readme -}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			{{ end }}
 		</div>
 	</body>
 </html>
