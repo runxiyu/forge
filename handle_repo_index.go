@@ -2,9 +2,6 @@ package main
 
 import (
 	"net/http"
-
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request) {
@@ -24,20 +21,10 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 	}
 	data["ref"] = head.Name().Short()
 	head_hash := head.Hash()
-	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})
+	recent_commits, err := get_recent_commits(repo, head_hash)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting repo commits: " + err.Error()))
+		_, _ = w.Write([]byte("Error getting recent commits: " + err.Error()))
 		return
-	}
-	recent_commits := make([]*object.Commit, 0)
-	defer commit_iter.Close()
-	for range 3 {
-		this_recent_commit, err := commit_iter.Next()
-		if err != nil {
-			_, _ = w.Write([]byte("Error getting a recent commit: " + err.Error()))
-			return
-		}
-		recent_commits = append(recent_commits, this_recent_commit)
 	}
 	data["commits"] = recent_commits
 	commit_object, err := repo.CommitObject(head_hash)
