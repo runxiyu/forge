@@ -2,7 +2,7 @@
 
 ## Organization
 
-URLs are like `https://forge.example.org/project_name/module_type/module_name`.
+URLs are like `https://forge.example.org/g/group_name/module_type/module_name`.
 
 The available `module_type`s are:
 * `repos` for version control
@@ -33,9 +33,35 @@ or something else that achieves a similar result.
 ## Ticket tracking
 
 Ticket tracking works like todo.sr.ht, though we also intend to support
-IMAP/JMAP/etc.
+IMAP/JMAP/etc to view their archives.
+
+Simple tracking should work for now. Directed acrylic graph and other
+dependency mechanisms may be considered in the far future.
+
+Should be possible to associated with MRs.
 
 ## Mailing lists
 
 Mailing lists are not designed to handle patchsets. Patchsets should be send to
 the corresponding repo, where they are turned into Lindenii patchsets.
+
+Mailing list messages are expected to be plain text. A subset of markdown shall
+be considered. No full-HTML emails are expected for normal traffic.
+
+## CI
+
+Not very sure how to ingerate this for now. Planned for the future.
+
+## Authentication and authorization
+
+Anonymous SSH read access should be possible for public repos. All other Git
+access should be done via SSH public keys. Custom SSH server implementation
+necessary due to OpenSSH limitations.
+
+The native API may be authenticated in the transport layer (e.g. TLS client
+certificates or UNIX domain socket authentication), via passwords, and via
+challenge-response mechanisms including SSH keys. SASL may be considered.
+
+The Web interface will have a dedicated login screen. Connections are set as keepalive, and sessions are tracked across a kept-alive connection; optionally, a user may click "remember me with a cookie" in the login screen.
+
+PGP patch validation may be considered.
