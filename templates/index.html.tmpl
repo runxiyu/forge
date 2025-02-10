@@ -3,15 +3,15 @@
 <html>
 	<head>
 		{{ template "head_common" . }}
-		<title>Categories &ndash; Lindenii Forge</title>
+		<title>Groups &ndash; Lindenii Forge</title>
 	</head>
 	<body class="index">
 		<div class="padding-wrapper">
 			<h1>
-				Categories
+				Groups
 			</h1>
 			<ul>
-				{{- range .categories }}
+				{{- range .groups }}
 					<li>
 						<a href="g/{{ . }}/repos/">{{ . }}</a>
 					</li>

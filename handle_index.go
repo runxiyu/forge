@@ -10,15 +10,15 @@ func handle_index(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := os.ReadDir(config.Git.Root)
 	if err != nil {
-		_, _ = w.Write([]byte("Error listing categories: " + err.Error()))
+		_, _ = w.Write([]byte("Error listing groups: " + err.Error()))
 		return
 	}
 
-	categories := []string{}
+	groups := []string{}
 	for _, entry := range entries {
-		categories = append(categories, entry.Name())
+		groups = append(groups, entry.Name())
 	}
-	data["categories"] = categories
+	data["groups"] = groups
 
 	err = templates.ExecuteTemplate(w, "index", data)
 	if err != nil {
