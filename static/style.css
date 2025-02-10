@@ -1,7 +1,8 @@
 html {
 	font-family: sans-serif;
 	--link-color: hsl(320, 50%, 36%);
-	--border-color: hsl(0, 0%, 72%);
+	--darker-border-color: hsl(0, 0%, 72%);
+	--lighter-border-color: hsl(0, 0%, 85%);
 	--text-decoration-color: hsl(0, 0%, 72%);
 	--darker-box-background-color: hsl(0, 0%, 92%);
 	--lighter-box-background-color: hsl(0, 0%, 95%);
@@ -28,13 +29,13 @@ code:not(pre > code) {
 	padding: 2px;
 }
 table {
-	border: var(--border-color) solid 1px;
+	border: var(--lighter-border-color) solid 1px;
 	border-spacing: 0px;
 	border-collapse: collapse;
 }
 td, th {
 	padding: 3px 5px;
-	border: var(--border-color) solid 1px;
+	border: var(--lighter-border-color) solid 1px;
 }
 th {
 	background-color: var(--lighter-box-background-color);
