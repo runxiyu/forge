@@ -32,6 +32,7 @@ func main() {
 	}
 
 	http.HandleFunc("/{$}", handle_index)
+	http.HandleFunc("/{project_name}/{$}", handle_category_index)
 	http.HandleFunc("/{project_name}/repos/{repo_name}/{$}", handle_repo_index)
 	http.HandleFunc("/{project_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
 

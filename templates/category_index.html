@@ -1,0 +1,20 @@
+{{- define "category_index" -}}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css" />
+<title>{{ .category_name }}</title>
+</head>
+<body class="index">
+<div class="padding-wrapper">
+<ul>
+{{- range .repos }}
+<li>
+<a href="repos/{{ . }}/">{{ . }}</a>
+</li>
+{{- end }}
+</ul>
+</div>
+</body>
+</html>
+{{- end -}}
