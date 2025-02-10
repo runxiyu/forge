@@ -1,23 +1,23 @@
 {{- define "category_index" -}}
 <!DOCTYPE html>
 <html>
-<head>
-<link rel="stylesheet" href="/static/style.css" />
-<title>{{ .category_name }}</title>
-</head>
-<body class="category-index">
-<div class="padding-wrapper">
-<h1>
-Repos in {{ .category_name }}
-</h1>
-<ul>
-{{- range .repos }}
-<li>
-<a href="repos/{{ . }}/">{{ . }}</a>
-</li>
-{{- end }}
-</ul>
-</div>
-</body>
+	<head>
+		<link rel="stylesheet" href="/static/style.css" />
+		<title>{{ .category_name }}</title>
+	</head>
+	<body class="category-index">
+		<div class="padding-wrapper">
+			<h1>
+			Repos in {{ .category_name }}
+			</h1>
+			<ul>
+				{{- range .repos }}
+					<li>
+						<a href="repos/{{ . }}/">{{ . }}</a>
+					</li>
+				{{- end }}
+			</ul>
+		</div>
+	</body>
 </html>
 {{- end -}}

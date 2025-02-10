@@ -1,67 +1,67 @@
 {{- define "repo_index" -}}
 <!DOCTYPE html>
 <html>
-<head>
-<link rel="stylesheet" href="/static/style.css" />
-<title>{{ .category_name }}/repos/{{ .repo_name }}</title>
-</head>
-<body class="repo-index">
-<div class="padding-wrapper">
-<table id="recent-commits">
-<thead>
-<tr>
-<th scope="col">ID</th>
-<th scope="col">Title</th>
-<th scope="col">Author</th>
-<th scope="col">Time</th>
-</tr>
-</thead>
-<tbody>
-{{- range .commits }}
-<tr>
-<td class="commit-id">{{ slice .Hash.String 0 8 }}</td>
-<td class="commit-title">{{ .Message | first_line }}</td>
-<td class="commit-author">
-<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
-</td>
-<td class="commit-time">
-{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
-</td>
-</tr>
-{{- end }}
-</tbody>
-</table>
-</div>
-<div class="padding-wrapper">
-<table id="file-tree">
-<thead>
-<tr>
-<th scope="col">Mode</th>
-<th scope="col">Name</th>
-<th scope="col">Size</th>
-</tr>
-</thead>
-<tbody>
-{{- $ref := .ref }}
-{{- range .files }}
-<tr>
-<td class="file-mode">{{ .Mode }}</td>
-<td class="file-name"><a href="tree/{{ $ref }}/{{ .Name }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
-<td class="file-size">{{ .Size }}</td>
-</tr>
-{{- end }}
-</tbody>
-</table>
-</div>
-<div class="padding-wrapper">
-<div id="refs">
-</div>
-</div>
-<div class="padding-wrapper">
-<div id="readme">
-{{ .readme -}}
-</div>
-</div>
-</body>
+	<head>
+		<link rel="stylesheet" href="/static/style.css" />
+		<title>{{ .category_name }}/repos/{{ .repo_name }}</title>
+	</head>
+	<body class="repo-index">
+		<div class="padding-wrapper">
+			<table id="recent-commits">
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Title</th>
+						<th scope="col">Author</th>
+						<th scope="col">Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- range .commits }}
+						<tr>
+							<td class="commit-id">{{ slice .Hash.String 0 8 }}</td>
+							<td class="commit-title">{{ .Message | first_line }}</td>
+							<td class="commit-author">
+								<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
+							</td>
+							<td class="commit-time">
+								{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
+							</td>
+						</tr>
+					{{- end }}
+				</tbody>
+			</table>
+		</div>
+		<div class="padding-wrapper">
+			<table id="file-tree">
+				<thead>
+					<tr>
+						<th scope="col">Mode</th>
+						<th scope="col">Name</th>
+						<th scope="col">Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- $ref := .ref }}
+					{{- range .files }}
+						<tr>
+							<td class="file-mode">{{ .Mode }}</td>
+							<td class="file-name"><a href="tree/{{ $ref }}/{{ .Name }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
+							<td class="file-size">{{ .Size }}</td>
+						</tr>
+					{{- end }}
+				</tbody>
+			</table>
+		</div>
+		<div class="padding-wrapper">
+			<div id="refs">
+			</div>
+		</div>
+		<div class="padding-wrapper">
+			<div id="readme">
+				{{ .readme -}}
+			</div>
+		</div>
+	</body>
 </html>
 {{- end -}}

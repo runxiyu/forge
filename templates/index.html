@@ -1,23 +1,23 @@
 {{- define "index" -}}
 <!DOCTYPE html>
 <html>
-<head>
-<link rel="stylesheet" href="/static/style.css" />
-<title>Forge</title>
-</head>
-<body class="index">
-<div class="padding-wrapper">
-<h1>
-Categories
-</h1>
-<ul>
-{{- range .categories }}
-<li>
-<a href="{{ . }}/">{{ . }}</a>
-</li>
-{{- end }}
-</ul>
-</div>
-</body>
+	<head>
+		<link rel="stylesheet" href="/static/style.css" />
+		<title>Forge</title>
+	</head>
+	<body class="index">
+		<div class="padding-wrapper">
+			<h1>
+				Categories
+			</h1>
+			<ul>
+				{{- range .categories }}
+					<li>
+						<a href="{{ . }}/">{{ . }}</a>
+					</li>
+				{{- end }}
+			</ul>
+		</div>
+	</body>
 </html>
 {{- end -}}
