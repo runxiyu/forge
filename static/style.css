@@ -37,5 +37,8 @@ td, th {
 	border: var(--border-color) solid 1px;
 }
 th {
+	background-color: var(--lighter-box-background-color);
+}
+tr.title-row > th {
 	background-color: var(--darker-box-background-color);
 }
