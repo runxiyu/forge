@@ -1,6 +1,9 @@
 html {
 	font-family: sans-serif;
 }
+html, code, pre {
+	font-size: 1rem;
+}
 
 .padding-wrapper {
 	padding: 0 1rem;
@@ -10,3 +13,4 @@ html {
 .padding-wrapper > * {
 	width: 100%;
 }
+
