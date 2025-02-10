@@ -1,7 +1,7 @@
 package main
 
 import (
-	"path/filepath"
+	"path"
 	"strings"
 )
 
@@ -11,5 +11,5 @@ func first_line(s string) string {
 }
 
 func base_name (s string) string {
-	return filepath.Base(s)
+	return path.Base(s)
 }
