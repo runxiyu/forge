@@ -11,6 +11,7 @@ import (
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/yuin/goldmark"
 )
@@ -18,20 +19,20 @@ import (
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	// TODO: Sanitize path values
-	category_name, repo_name, path_spec := r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
+	ref_name, category_name, repo_name, path_spec := r.PathValue("ref"), r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
 	data["category_name"], data["repo_name"], data["path_spec"] = category_name, repo_name, path_spec
 	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, category_name, repo_name+".git"))
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return
 	}
-	head, err := repo.Head()
+	ref, err := repo.Reference(plumbing.NewBranchReferenceName(ref_name), true)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting repo HEAD: " + err.Error()))
+		_, _ = w.Write([]byte("Error getting repo reference: " + err.Error()))
 		return
 	}
-	head_hash := head.Hash()
-	commit_object, err := repo.CommitObject(head_hash)
+	ref_hash := ref.Hash()
+	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
 		return
