@@ -6,6 +6,7 @@
 <title>{{ .project_name }}/repos/{{ .repo_name }}</title>
 </head>
 <body class="repo-index">
+<div class="padding-wrapper">
 <table id="recent-commits">
 <thead>
 <tr>
@@ -30,10 +31,11 @@
 {{- end }}
 </tbody>
 </table>
+</div>
+<div class="padding-wrapper">
 <table id="file-tree">
 <thead>
 <tr>
-<!--th scope="col">Blob/Tree ID</th-->
 <th scope="col">Mode</th>
 <th scope="col">Name</th>
 <th scope="col">Size</th>
@@ -49,10 +51,15 @@
 {{- end }}
 </tbody>
 </table>
+</div>
+<div class="padding-wrapper">
 <div id="refs">
 </div>
+</div>
+<div class="padding-wrapper">
 <div id="readme">
 {{ .readme -}}
+</div>
 </div>
 </body>
 </html>

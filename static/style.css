@@ -1,3 +1,13 @@
-.commit-id {
-	font-family: monospace;
+html {
+	font-family: sans-serif;
+}
+
+.padding-wrapper {
+	padding: 0 1rem;
+	max-width: 50em;
+	margin: 0 auto;
+}
+
+#readme, #file-tree {
+	width: 100%;
 }
