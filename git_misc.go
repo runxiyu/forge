@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"path/filepath"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -29,7 +30,7 @@ func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 		if err != nil {
 			display_git_tree_entry.Size = 0
 		}
-		display_git_tree_entry.Name = entry.Name
+		display_git_tree_entry.Name = strings.TrimPrefix(entry.Name, "/")
 		display_git_tree = append(display_git_tree, display_git_tree_entry)
 	}
 	return display_git_tree

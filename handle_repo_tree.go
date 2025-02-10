@@ -5,17 +5,20 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+	"path"
 
 	chroma_formatters_html "github.com/alecthomas/chroma/v2/formatters/html"
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	// TODO: Sanitize path values
-	ref_name, category_name, repo_name, path_spec := r.PathValue("ref"), r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
+	raw_path_spec := r.PathValue("rest")
+	ref_name, category_name, repo_name, path_spec := r.PathValue("ref"), r.PathValue("category_name"), r.PathValue("repo_name"), strings.TrimSuffix(raw_path_spec, "/")
 	data["ref"], data["category_name"], data["repo_name"], data["path_spec"] = ref_name, category_name, repo_name, path_spec
 	repo, err := open_git_repo(category_name, repo_name)
 	if err != nil {
@@ -39,43 +42,53 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	target, err := tree.Tree(path_spec)
-	if err != nil {
-		file, err := tree.File(path_spec)
+	var target *object.Tree
+	if path_spec == "" {
+		target = tree
+	} else {
+		target, err = tree.Tree(path_spec)
 		if err != nil {
-			_, _ = w.Write([]byte("Error retrieving path: " + err.Error()))
+			file, err := tree.File(path_spec)
+			if err != nil {
+				_, _ = w.Write([]byte("Error retrieving path: " + err.Error()))
+				return
+			}
+			file_contents, err := file.Contents()
+			if err != nil {
+				_, _ = w.Write([]byte("Error reading file: " + err.Error()))
+				return
+			}
+			lexer := chroma_lexers.Match(path_spec)
+			if lexer == nil {
+				lexer = chroma_lexers.Fallback
+			}
+			iterator, err := lexer.Tokenise(nil, file_contents)
+			if err != nil {
+				_, _ = w.Write([]byte("Error tokenizing code: " + err.Error()))
+				return
+			}
+			var formatted_unencapsulated bytes.Buffer
+			style := chroma_styles.Get("autumn")
+			formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
+			err = formatter.Format(&formatted_unencapsulated, style, iterator)
+			if err != nil {
+				_, _ = w.Write([]byte("Error formatting code: " + err.Error()))
+				return
+			}
+			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
+			data["file_contents"] = formatted_encapsulated
+	
+			err = templates.ExecuteTemplate(w, "repo_tree_file", data)
+			if err != nil {
+				_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+				return
+			}
 			return
 		}
-		file_contents, err := file.Contents()
-		if err != nil {
-			_, _ = w.Write([]byte("Error reading file: " + err.Error()))
-			return
-		}
-		lexer := chroma_lexers.Match(path_spec)
-		if lexer == nil {
-			lexer = chroma_lexers.Fallback
-		}
-		iterator, err := lexer.Tokenise(nil, file_contents)
-		if err != nil {
-			_, _ = w.Write([]byte("Error tokenizing code: " + err.Error()))
-			return
-		}
-		var formatted_unencapsulated bytes.Buffer
-		style := chroma_styles.Get("autumn")
-		formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
-		err = formatter.Format(&formatted_unencapsulated, style, iterator)
-		if err != nil {
-			_, _ = w.Write([]byte("Error formatting code: " + err.Error()))
-			return
-		}
-		formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
-		data["file_contents"] = formatted_encapsulated
+	}
 
-		err = templates.ExecuteTemplate(w, "repo_tree_file", data)
-		if err != nil {
-			_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
-			return
-		}
+	if raw_path_spec[len(raw_path_spec) - 1] != '/' {
+		http.Redirect(w, r, path.Base(path_spec) + "/", http.StatusSeeOther)
 		return
 	}
 

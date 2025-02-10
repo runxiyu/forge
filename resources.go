@@ -13,7 +13,10 @@ var resources_fs embed.FS
 var templates *template.Template
 
 func load_templates() (err error) {
-	templates, err = template.New("templates").Funcs(template.FuncMap{"first_line": first_line}).ParseFS(resources_fs, "templates/*")
+	templates, err = template.New("templates").Funcs(template.FuncMap{
+		"first_line": first_line,
+		"base_name":  base_name,
+	}).ParseFS(resources_fs, "templates/*")
 	return err
 }
 
