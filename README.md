@@ -9,7 +9,7 @@ The available `module_type`s are:
 * `tickets` for ticket trackers
 * `mail` for mailing lists
 
-## Version-controled repos
+## Version-controlled repos
 
 Currently we only support Git.
 
@@ -50,7 +50,7 @@ be considered. No full-HTML emails are expected for normal traffic.
 
 ## CI
 
-Not very sure how to ingerate this for now. Planned for the future.
+Not very sure how to integrate this for now. Planned for the future.
 
 ## Authentication and authorization
 
