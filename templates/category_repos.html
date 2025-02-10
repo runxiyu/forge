@@ -1,9 +1,9 @@
-{{- define "category_index" -}}
+{{- define "category_repos" -}}
 <!DOCTYPE html>
 <html>
 	<head>
 		{{ template "head_common" . }}
-		<title>{{ .category_name }} &ndash; Lindenii Forge</title>
+		<title>Repos in {{ .category_name }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="category-index">
 		<div class="padding-wrapper">
@@ -13,7 +13,7 @@
 			<ul>
 				{{- range .repos }}
 					<li>
-						<a href="repos/{{ . }}/">{{ . }}</a>
+						<a href="{{ . }}/">{{ . }}</a>
 					</li>
 				{{- end }}
 			</ul>

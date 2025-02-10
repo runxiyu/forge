@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func handle_category_index(w http.ResponseWriter, r *http.Request) {
+func handle_category_repos(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	category_name := r.PathValue("category_name")
 	data["category_name"] = category_name
@@ -26,7 +26,7 @@ func handle_category_index(w http.ResponseWriter, r *http.Request) {
 	}
 	data["repos"] = repos
 
-	err = templates.ExecuteTemplate(w, "category_index", data)
+	err = templates.ExecuteTemplate(w, "category_repos", data)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return
