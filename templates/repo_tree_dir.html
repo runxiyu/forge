@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="/static/style.css" />
+		{{ template "head_common" . }}
 		<title>{{ .category_name }}/repos/{{ .repo_name }}/{{ .path_spec }}</title>
 	</head>
 	<body class="repo-tree-dir">

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="/static/style.css" />
+		{{ template "head_common" . }}
 		<link rel="stylesheet" href="/static/chroma.css" />
 		<title>{{ .category_name }}/repos/{{ .repo_name }}/{{ .path_spec }}</title>
 	</head>
