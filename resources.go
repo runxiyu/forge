@@ -7,6 +7,21 @@ import (
 	"net/http"
 )
 
+//go:embed .gitignore LICENSE README.md
+//go:embed *.go go.mod go.sum
+//go:embed *.scfg
+//go:embed static/* templates/*
+var source_fs embed.FS
+
+func serve_source() {
+	http.Handle("/source/",
+		http.StripPrefix(
+			"/source/",
+			http.FileServer(http.FS(source_fs)),
+		),
+	)
+}
+
 //go:embed templates/* static/*
 var resources_fs embed.FS
 
@@ -25,7 +40,7 @@ func serve_static() (err error) {
 	if err != nil {
 		return err
 	}
-	http.Handle("/static/{name}",
+	http.Handle("/static/",
 		http.StripPrefix(
 			"/static/",
 			http.FileServer(http.FS(static_fs)),

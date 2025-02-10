@@ -31,6 +31,8 @@ func main() {
 		clog.Fatal(1, "Serving static: "+err.Error())
 	}
 
+	serve_source()
+
 	http.HandleFunc("/{$}", handle_index)
 	http.HandleFunc("/{category_name}/repos/{$}", handle_category_repos)
 	http.HandleFunc("/{category_name}/repos/{repo_name}/{$}", handle_repo_index)
