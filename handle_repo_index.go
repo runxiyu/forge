@@ -57,25 +57,25 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 	}
 	readme_file, err := tree.File("README.md")
 	if err != nil {
-		w.Write([]byte("Error getting file: " + err.Error()))
-		return
+		data["readme"] = "There is no README for this repository."
+	} else {
+		readme_file_contents, err := readme_file.Contents()
+		var readme_rendered_unsafe bytes.Buffer
+		err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
+		if err != nil {
+			readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
+			return
+		}
+		readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
+		data["readme"] = readme_rendered_safe
 	}
-	readme_file_contents, err := readme_file.Contents()
-	var readme_rendered_unsafe bytes.Buffer
-	err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
-	if err != nil {
-		readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
-		return
-	}
-	readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
-	data["readme"] = readme_rendered_safe
 
 	display_git_tree := make([]display_git_tree_entry_t, 0)
 	for _, entry := range tree.Entries {
 		display_git_tree_entry := display_git_tree_entry_t{}
 		os_mode, err := entry.Mode.ToOSFileMode()
 		if err != nil {
-			display_git_tree_entry.Mode = "----"
+			display_git_tree_entry.Mode = "x---"
 		} else {
 			display_git_tree_entry.Mode = os_mode.String()[:4]
 		}

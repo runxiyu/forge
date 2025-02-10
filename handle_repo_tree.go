@@ -78,7 +78,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 
 	readme_file, err := target.File("README.md")
 	if err != nil {
-		data["readme"] = ""
+		data["readme"] = "There is no README for this directory."
 	} else {
 		readme_file_contents, err := readme_file.Contents()
 		var readme_rendered_unsafe bytes.Buffer
