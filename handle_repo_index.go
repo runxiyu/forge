@@ -73,9 +73,9 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 		display_git_tree_entry := display_git_tree_entry_t{}
 		os_mode, err := entry.Mode.ToOSFileMode()
 		if err != nil {
-			display_git_tree_entry.Mode = "----------"
+			display_git_tree_entry.Mode = "----"
 		} else {
-			display_git_tree_entry.Mode = os_mode.String()
+			display_git_tree_entry.Mode = os_mode.String()[:4]
 		}
 		display_git_tree_entry.Is_file = entry.Mode.IsFile()
 		display_git_tree_entry.Size, err = tree.Size(entry.Name)
