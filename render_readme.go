@@ -9,7 +9,6 @@ import (
 	"github.com/yuin/goldmark"
 )
 
-
 func render_readme_at_tree(tree *object.Tree) any {
 	readme_file, err := tree.File("README.md")
 	if err != nil {
