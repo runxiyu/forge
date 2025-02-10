@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"strings"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
@@ -14,8 +15,8 @@ import (
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	// TODO: Sanitize path values
-	project_name, repo_name := r.PathValue("project_name"), r.PathValue("repo_name")
-	data["project_name"], data["repo_name"] = project_name, repo_name
+	project_name, repo_name, path_spec := r.PathValue("project_name"), r.PathValue("repo_name"), strings.TrimSuffix(r.PathValue("rest"), "/")
+	data["project_name"], data["repo_name"], data["path_spec"] = project_name, repo_name, path_spec
 	repo, err := git.PlainOpen(filepath.Join(config.Git.Root, project_name, repo_name+".git"))
 	if err != nil {
 		w.Write([]byte("Error opening repo: " + err.Error()))
@@ -53,20 +54,25 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error getting file tree: " + err.Error()))
 		return
 	}
+	tree, err = tree.Tree(path_spec)
+	if err != nil {
+		w.Write([]byte("Error getting subtree: " + err.Error()))
+		return
+	}
 	readme_file, err := tree.File("README.md")
 	if err != nil {
-		w.Write([]byte("Error getting file: " + err.Error()))
-		return
+		data["readme"] = ""
+	} else {
+		readme_file_contents, err := readme_file.Contents()
+		var readme_rendered_unsafe bytes.Buffer
+		err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
+		if err != nil {
+			readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
+			return
+		}
+		readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
+		data["readme"] = readme_rendered_safe
 	}
-	readme_file_contents, err := readme_file.Contents()
-	var readme_rendered_unsafe bytes.Buffer
-	err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
-	if err != nil {
-		readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
-		return
-	}
-	readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
-	data["readme"] = readme_rendered_safe
 
 	display_git_tree := make([]display_git_tree_entry_t, 0)
 	for _, entry := range tree.Entries {
