@@ -11,7 +11,6 @@ import (
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/yuin/goldmark"
 )
@@ -32,22 +31,6 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	head_hash := head.Hash()
-	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})
-	if err != nil {
-		_, _ = w.Write([]byte("Error getting repo commits: " + err.Error()))
-		return
-	}
-	recent_commits := make([]*object.Commit, 0)
-	defer commit_iter.Close()
-	for range 3 {
-		this_recent_commit, err := commit_iter.Next()
-		if err != nil {
-			_, _ = w.Write([]byte("Error getting a recent commit: " + err.Error()))
-			return
-		}
-		recent_commits = append(recent_commits, this_recent_commit)
-	}
-	data["commits"] = recent_commits
 	commit_object, err := repo.CommitObject(head_hash)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
