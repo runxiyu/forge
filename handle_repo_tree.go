@@ -55,12 +55,28 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error getting file tree: " + err.Error()))
 		return
 	}
-	tree, err = tree.Tree(path_spec)
+
+	target, err := tree.Tree(path_spec)
 	if err != nil {
-		w.Write([]byte("Error getting subtree: " + err.Error()))
+		file, err := tree.File(path_spec)
+		if err != nil {
+			w.Write([]byte("Error retrieving path: " + err.Error()))
+			return
+		}
+		data["file_contents"], err = file.Contents()
+		if err != nil {
+			w.Write([]byte("Error reading file: " + err.Error()))
+			return
+		}
+		err = templates.ExecuteTemplate(w, "repo_tree_file", data)
+		if err != nil {
+			w.Write([]byte("Error rendering template: " + err.Error()))
+			return
+		}
 		return
 	}
-	readme_file, err := tree.File("README.md")
+
+	readme_file, err := target.File("README.md")
 	if err != nil {
 		data["readme"] = ""
 	} else {
@@ -69,14 +85,13 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
 		if err != nil {
 			readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
-			return
 		}
 		readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
 		data["readme"] = readme_rendered_safe
 	}
 
 	display_git_tree := make([]display_git_tree_entry_t, 0)
-	for _, entry := range tree.Entries {
+	for _, entry := range target.Entries {
 		display_git_tree_entry := display_git_tree_entry_t{}
 		os_mode, err := entry.Mode.ToOSFileMode()
 		if err != nil {
@@ -85,7 +100,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 			display_git_tree_entry.Mode = os_mode.String()[:4]
 		}
 		display_git_tree_entry.Is_file = entry.Mode.IsFile()
-		display_git_tree_entry.Size, err = tree.Size(entry.Name)
+		display_git_tree_entry.Size, err = target.Size(entry.Name)
 		if err != nil {
 			display_git_tree_entry.Size = 0
 		}

@@ -1,0 +1,15 @@
+{{- define "repo_tree_file" -}}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css" />
+<title>{{ .project_name }}/repos/{{ .repo_name }}/{{ .path_spec }}</title>
+</head>
+<body class="repo-index">
+<p>
+/{{ .path_spec }}
+</p>
+<pre>{{ .file_contents }}</pre>
+</body>
+</html>
+{{- end -}}
