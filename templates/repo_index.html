@@ -20,7 +20,7 @@
 {{- range .commits }}
 <tr>
 <td class="commit-id">{{ slice .Hash.String 0 8 }}</td>
-<td class="commit-title">{{ .Message }}</td>
+<td class="commit-title">{{ .Message | first_line }}</td>
 <td class="commit-author">
 <a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
 </td>
