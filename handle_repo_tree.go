@@ -61,13 +61,17 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		}
 		iterator, err := lexer.Tokenise(nil, file_contents)
 		if err != nil {
-			_, _ = w.Write([]byte("Error rendering code: " + err.Error()))
+			_, _ = w.Write([]byte("Error tokenizing code: " + err.Error()))
 			return
 		}
 		var formatted_unencapsulated bytes.Buffer
 		style := chroma_styles.Get("autumn")
 		formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
-		formatter.Format(&formatted_unencapsulated, style, iterator)
+		err = formatter.Format(&formatted_unencapsulated, style, iterator)
+		if err != nil {
+			_, _ = w.Write([]byte("Error formatting code: " + err.Error()))
+			return
+		}
 		formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
 		data["file_contents"] = formatted_encapsulated
 
