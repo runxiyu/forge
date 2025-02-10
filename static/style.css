@@ -1,5 +1,8 @@
 html {
 	font-family: sans-serif;
+	--link-color: #7c3e66;
+	--text-decoration-color: #b8b8b8;
+	--box-background-color: #e6e6e6;
 }
 html, code, pre {
 	font-size: 1rem;
@@ -13,4 +16,12 @@ html, code, pre {
 .padding-wrapper > * {
 	width: 100%;
 }
-
+a:link, a:visited {
+	text-decoration-color: var(--text-decoration-color);
+	color: var(--link-color);
+}
+code {
+	background-color: var(--box-background-color);
+	border-radius: 2px;
+	padding: 2px;
+}
