@@ -68,6 +68,25 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 	readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
 	data["readme"] = readme_rendered_safe
 
+	display_git_tree := make([]display_git_tree_entry_t, 0)
+	for _, entry := range tree.Entries {
+		display_git_tree_entry := display_git_tree_entry_t{}
+		os_mode, err := entry.Mode.ToOSFileMode()
+		if err != nil {
+			display_git_tree_entry.Mode = "----------"
+		} else {
+			display_git_tree_entry.Mode = os_mode.String()
+		}
+		display_git_tree_entry.Is_file = entry.Mode.IsFile()
+		display_git_tree_entry.Size, err = tree.Size(entry.Name)
+		if err != nil {
+			display_git_tree_entry.Size = 0
+		}
+		display_git_tree_entry.Name = entry.Name 
+		display_git_tree = append(display_git_tree, display_git_tree_entry)
+	}
+	data["files"] = display_git_tree
+
 	err = templates.ExecuteTemplate(w, "repo_index", data)
 	if err != nil {
 		w.Write([]byte("Error rendering template: " + err.Error()))

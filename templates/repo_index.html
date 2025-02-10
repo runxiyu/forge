@@ -30,6 +30,25 @@
 {{- end }}
 </tbody>
 </table>
+<table id="file-tree">
+<thead>
+<tr>
+<!--th scope="col">Blob/Tree ID</th-->
+<th scope="col">Mode</th>
+<th scope="col">Name</th>
+<th scope="col">Size</th>
+</tr>
+</thead>
+<tbody>
+{{- range .files }}
+<tr>
+<td class="file-mode">{{ .Mode }}</td>
+<td class="file-name">{{ .Name }}</td>
+<td class="file-size">{{ .Size }}</td>
+</tr>
+{{- end }}
+</tbody>
+</table>
 <div id="refs">
 </div>
 <div id="readme">
