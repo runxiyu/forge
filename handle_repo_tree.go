@@ -12,8 +12,6 @@ import (
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/microcosm-cc/bluemonday"
-	"github.com/yuin/goldmark"
 )
 
 func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
@@ -83,23 +81,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	readme_file, err := target.File("README.md")
-	if err != nil {
-		data["readme"] = "There is no README for this directory."
-	} else {
-		readme_file_contents, err := readme_file.Contents()
-		if err != nil {
-			data["readme"] = "There is no README for this directory."
-		} else {
-			var readme_rendered_unsafe bytes.Buffer
-			err = goldmark.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
-			if err != nil {
-				readme_rendered_unsafe.WriteString("Unable to render README: " + err.Error())
-			}
-			readme_rendered_safe := template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
-			data["readme"] = readme_rendered_safe
-		}
-	}
+	data["readme"] = render_readme_at_tree(tree)
 
 	display_git_tree := make([]display_git_tree_entry_t, 0)
 	for _, entry := range target.Entries {
