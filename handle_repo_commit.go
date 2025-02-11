@@ -81,6 +81,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	data["patch"] = patch
 
 	// TODO: Remove unnecessary context
+	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
 	usable_file_patches := make([]usable_file_patch, 0)
 	for _, file_patch := range patch.FilePatches() {
 		from, to := file_patch.Files()
