@@ -49,7 +49,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
-				http.Redirect(w, r, "../" + path_spec, http.StatusSeeOther)
+				http.Redirect(w, r, "../"+path_spec, http.StatusSeeOther)
 				return
 			}
 			file_contents, err := file.Contents()
