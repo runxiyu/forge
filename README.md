@@ -15,6 +15,17 @@ The available `module_type`s are:
 
 Group and subgroup names may not be `:`.
 
+## Protocols and user interfaces
+
+The following should be roughly equivalent in functionality:
+* Web interface
+* Custom TLS-based API
+* HTTP GraphQL API
+
+The following shall function where they make sense:
+* User-friendly SSH interface
+* Email interface
+
 ## Version-controlled repos
 
 Currently we only support Git.
@@ -26,7 +37,7 @@ Each version-controlled repo ("main repo") has an area for merge requests
 changes from a Git ref ("source ref") into a branch in the main repo
 ("destination branch").
 
-When creating a MR from the API, the Web interface, email, or SSH, it shall be
+When creating a MR from the API, the web interface, email, or SSH, it shall be
 possible to create a special source ref, hosted in the main repo as a branch
 with a branch name that begins with `merge_requests/`. Unsolicited pushes to
 `merge_requests/` will automatically open a MR, returning instructions to edit
@@ -68,7 +79,7 @@ The native API may be authenticated in the transport layer (e.g. TLS client
 certificates or UNIX domain socket authentication), via passwords, and via
 challenge-response mechanisms including SSH keys. SASL may be considered.
 
-The Web interface will have a dedicated login screen. Connections are set as
+The web interface will have a dedicated login screen. Connections are set as
 keepalive, and sessions are tracked across a kept-alive connection; optionally,
 a user may click "remember me with a cookie" in the login screen.
 
