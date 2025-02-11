@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
+	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
 type usable_file_patch struct {
@@ -67,6 +69,12 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	usable_file_patches := make([]usable_file_patch, 0)
 	for _, file_patch := range patch.FilePatches() {
 		from, to := file_patch.Files()
+		if from == nil {
+			from = fake_diff_file_null
+		}
+		if to == nil {
+			to = fake_diff_file_null
+		}
 		usable_file_patch := usable_file_patch{
 			Chunks: file_patch.Chunks(),
 			From:   from,
@@ -81,4 +89,24 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return
 	}
+}
+
+type fake_diff_file struct {
+	hash plumbing.Hash
+	mode filemode.FileMode
+	path string
+}
+func (f fake_diff_file) Hash() plumbing.Hash {
+	return f.hash
+}
+func (f fake_diff_file) Mode() filemode.FileMode {
+	return f.mode
+}
+func (f fake_diff_file) Path() string {
+	return f.path
+}
+var fake_diff_file_null = fake_diff_file{
+	hash: plumbing.NewHash("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"),
+	mode: misc.First_or_panic(filemode.New("100644")),
+	path: "NULL",
 }
