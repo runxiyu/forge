@@ -10,10 +10,9 @@
 			<table id="recent-commits">
 				<thead>
 					<tr class="title-row">
-						<th colspan="4">Recent Commits (<a href="log/{{ .ref }}/">see all</a>)</th>
+						<th colspan="3">Recent Commits (<a href="log/{{ .ref }}/">see all</a>)</th>
 					</tr>
 					<tr>
-						<th scope="col">ID</th>
 						<th scope="col">Title</th>
 						<th scope="col">Author</th>
 						<th scope="col">Time</th>
@@ -22,7 +21,6 @@
 				<tbody>
 					{{- range .commits }}
 						<tr>
-							<td class="commit-id">{{ slice .Hash.String 0 8 }}</td>
 							<td class="commit-title">{{ .Message | first_line }}</td>
 							<td class="commit-author">
 								<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
