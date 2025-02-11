@@ -39,7 +39,7 @@ func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 
 var err_get_recent_commits = errors.New("Error getting recent commits:")
 
-func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash) (recent_commits []*object.Commit, err error) {
+func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, n int) (recent_commits []*object.Commit, err error) {
 	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})
 	if err != nil {
 		err = misc.Wrap_one_error(err_get_recent_commits, err)
@@ -47,15 +47,28 @@ func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash) (recent_c
 	}
 	recent_commits = make([]*object.Commit, 0)
 	defer commit_iter.Close()
-	for range 3 {
-		this_recent_commit, err := commit_iter.Next()
-		if errors.Is(err, io.EOF) {
-			return recent_commits, nil
-		} else if err != nil {
-			err = misc.Wrap_one_error(err_get_recent_commits, err)
-			return nil, err
+	if n < 0 {
+		for {
+			this_recent_commit, err := commit_iter.Next()
+			if errors.Is(err, io.EOF) {
+				return recent_commits, nil
+			} else if err != nil {
+				err = misc.Wrap_one_error(err_get_recent_commits, err)
+				return nil, err
+			}
+			recent_commits = append(recent_commits, this_recent_commit)
 		}
-		recent_commits = append(recent_commits, this_recent_commit)
+	} else {
+		for range n {
+			this_recent_commit, err := commit_iter.Next()
+			if errors.Is(err, io.EOF) {
+				return recent_commits, nil
+			} else if err != nil {
+				err = misc.Wrap_one_error(err_get_recent_commits, err)
+				return nil, err
+			}
+			recent_commits = append(recent_commits, this_recent_commit)
+		}
 	}
 	return
 }

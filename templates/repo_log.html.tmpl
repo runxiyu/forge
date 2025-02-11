@@ -1,0 +1,41 @@
+{{- define "repo_log" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ template "head_common" . }}
+		<title>Log of {{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
+	</head>
+	<body class="repo-index">
+		<table id="recent-commits">
+			<thead>
+				<tr class="title-row">
+					<th colspan="4">Commits on {{ .ref }}</th>
+				</tr>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Title</th>
+					<th scope="col">Author</th>
+					<th scope="col">Time</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{- range .commits }}
+					<tr>
+						<td class="commit-id">{{ .Hash.String }}</td>
+						<td class="commit-title">{{ .Message | first_line }}</td>
+						<td class="commit-author">
+							<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
+						</td>
+						<td class="commit-time">
+							{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
+						</td>
+					</tr>
+				{{- end }}
+			</tbody>
+		</table>
+		<footer>
+			{{ template "footer" . }}
+		</footer>
+	</body>
+</html>
+{{- end -}}
