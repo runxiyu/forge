@@ -53,9 +53,9 @@
 					<input type="checkbox" id="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-toggle toggle-on-toggle">
 					<label for="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-header toggle-on-header">
 						<span>
-							--- a/<a href="../../tree/{{ .From.Path }}?commit={{ $parent_commit_object.Hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
+							--- a/<a href="../tree/{{ .From.Path }}?commit={{ $parent_commit_object.Hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
 							<br />
-							+++ b/<a href="../../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
+							+++ b/<a href="../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
 						</span>
 					</label>
 					<div class="file-content toggle-on-content scroll">

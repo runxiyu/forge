@@ -8,7 +8,7 @@
 	</head>
 	<body class="repo-tree-file">
 		<p>
-			/{{ .path_spec }} (<a href="/g/{{ .group_name }}/repos/{{ .repo_name }}/raw/{{ .ref }}/{{ .path_spec }}">raw</a>)
+			/{{ .path_spec }} (<a href="/g/{{ .group_name }}/repos/{{ .repo_name }}/raw/{{ .path_spec }}?{{ .ref_type }}={{ .ref }}">raw</a>)
 		</p>
 		{{ .file_contents }}
 		<footer>

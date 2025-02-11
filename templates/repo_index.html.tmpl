@@ -42,7 +42,7 @@
 					{{- range .files }}
 						<tr>
 							<td class="file-mode">{{ .Mode }}</td>
-							<td class="file-name"><a href="tree/{{ $ref }}/{{ .Name }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
+							<td class="file-name"><a href="tree/{{ .Name }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
 							<td class="file-size">{{ .Size }}</td>
 						</tr>
 					{{- end }}

@@ -36,8 +36,8 @@ func main() {
 	http.HandleFunc("/{$}", handle_index)
 	http.HandleFunc("/g/{group_name}/repos/{$}", handle_group_repos)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/{$}", handle_repo_index)
-	http.HandleFunc("/g/{group_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
-	http.HandleFunc("/g/{group_name}/repos/{repo_name}/raw/{ref}/{rest...}", handle_repo_raw)
+	http.HandleFunc("/g/{group_name}/repos/{repo_name}/tree/{rest...}", handle_repo_tree)
+	http.HandleFunc("/g/{group_name}/repos/{repo_name}/raw/{rest...}", handle_repo_raw)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/log/{ref}/", handle_repo_log)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/commit/{commit_id}", handle_repo_commit)
 
