@@ -39,9 +39,9 @@ CREATE TABLE emails (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	list_id INTEGER NOT NULL REFERENCES mailing_lists(id) ON DELETE CASCADE,
 	title TEXT NOT NULL,
-	from TEXT NOT NULL,
-	date TIMESTAMP,
-	content BYTEA
+	sender TEXT NOT NULL,
+	date TIMESTAMP NOT NULL,
+	content BYTEA NOT NULL
 );
 
 CREATE TABLE merge_requests (
@@ -51,8 +51,7 @@ CREATE TABLE merge_requests (
 	source_ref TEXT NOT NULL,
 	destination_branch TEXT NOT NULL,
 	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	created_at TIMESTAMP NOT NULL,
 	mailing_list_id INT UNIQUE REFERENCES mailing_lists(id) ON DELETE CASCADE
 );
 
