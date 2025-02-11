@@ -4,7 +4,14 @@ import (
 	"net/http"
 
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/format/diff"
 )
+
+type usable_file_patch struct {
+	From   diff.File
+	To     diff.File
+	Chunks []diff.Chunk
+}
 
 func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
@@ -38,12 +45,17 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	}
 	data["patch"] = patch
 
-	/*
-		for _, file_patch := range patch.FilePatches() {
-			for _, chunk := range file_patch.Chunks() {
-			}
+	usable_file_patches := make([]usable_file_patch, 0)
+	for _, file_patch := range patch.FilePatches() {
+		from, to := file_patch.Files()
+		usable_file_patch := usable_file_patch{
+			Chunks: file_patch.Chunks(),
+			From:   from,
+			To:     to,
 		}
-	*/
+		usable_file_patches = append(usable_file_patches, usable_file_patch)
+	}
+	data["file_patches"] = usable_file_patches
 
 	err = templates.ExecuteTemplate(w, "repo_commit", data)
 	if err != nil {

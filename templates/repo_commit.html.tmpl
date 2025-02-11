@@ -42,9 +42,22 @@
 			</table>
 		</div>
 		<div class="padding-wrapper scroll">
-			<pre>{{ .patch }}</pre>
-			<p>
-			</p>
+			{{ range .file_patches }}
+				<div class="file-patch">
+					{{ .From.Path }} {{ .From.Mode }} &rarr; {{ .To.Path }} {{ .To.Mode }}
+					{{ range .Chunks }}
+						{{ if eq .Type 0 }}
+							<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
+						{{ else if eq .Type 1 }}
+							<pre class="chunk chunk-addition">{{ .Content }}</pre>
+						{{ else if eq .Type 2 }}
+							<pre class="chunk chunk-deletion">{{ .Content }}</pre>
+						{{ else }}
+							<pre class="chunk chunk-unknown">{{ .Content }}</pre>
+						{{ end }}
+					{{ end }}
+				</div>
+			{{ end }}
 		</div>
 		<footer>
 			{{ template "footer" . }}

@@ -88,7 +88,7 @@ td#readme > *:first-child {
 .commit-id {
 	font-family: monospace;
 }
-pre, .scroll {
+.scroll {
 	overflow-x: auto;
 }
 .toggle-table-off, .toggle-table-on {
@@ -111,4 +111,16 @@ pre, .scroll {
 }
 .toggle-table-on:checked + table > tbody {
 	display: table-row-group;
+}
+.chunk-unchanged {
+	color: grey;
+}
+.chunk-addition {
+	color: green;
+}
+.chunk-deletion {
+	color: red;
+}
+.chunk-unknown {
+	color: yellow;
 }
