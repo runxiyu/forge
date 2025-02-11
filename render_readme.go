@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"html"
 	"html/template"
+	"strings"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/niklasfasching/go-org/org"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 )
@@ -36,6 +38,19 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
 		}
 		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
+	}
+
+	readme_file, err = tree.File("README.org")
+	if err == nil {
+		readme_file_contents, err := readme_file.Contents()
+		if err != nil {
+			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
+		}
+		org_html, err := org.New().Parse(strings.NewReader(readme_file_contents), readme_filename).Write(org.NewHTMLWriter())
+		if err != nil {
+			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
+		}
+		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(org_html))
 	}
 
 	return "", ""
