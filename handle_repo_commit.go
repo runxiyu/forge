@@ -42,7 +42,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	commit_id_string := commit_object.Hash.String()
 
 	if commit_id_string != commit_id_specified_string {
-		http.Redirect(w, r, commit_id_string, http.StatusSeeOther)  
+		http.Redirect(w, r, commit_id_string, http.StatusSeeOther)
 		return
 	}
 

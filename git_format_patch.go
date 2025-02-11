@@ -56,4 +56,3 @@ func format_patch_from_commit(commit *object.Commit) (string, error) {
 
 	return buf.String(), nil
 }
-

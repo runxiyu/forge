@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	err_getting_tag_reference = errors.New("Error getting tag reference")
+	err_getting_tag_reference    = errors.New("Error getting tag reference")
 	err_getting_branch_reference = errors.New("Error getting branch reference")
-	err_getting_head = errors.New("Error getting HEAD")
+	err_getting_head             = errors.New("Error getting HEAD")
 )
 
 func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, ret_err error) {
