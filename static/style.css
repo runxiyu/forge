@@ -118,6 +118,11 @@ td#readme > *:first-child {
 .chunk-addition {
 	color: green;
 }
+@media (prefers-color-scheme: dark) {
+	.chunk-addition {
+		color: lime;
+	}
+}
 .chunk-deletion {
 	color: red;
 }
@@ -149,6 +154,9 @@ pre.chunk {
 }
 .file-patch + .file-patch {
 	margin-top: 0.5rem;
+}
+.file-content, .file-header {
+	padding: 3px 5px;
 }
 .file-header {
 	font-family: monospace;
