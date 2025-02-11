@@ -4,6 +4,7 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
+	"io"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -48,7 +49,9 @@ func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash) (recent_c
 	defer commit_iter.Close()
 	for range 3 {
 		this_recent_commit, err := commit_iter.Next()
-		if err != nil {
+		if errors.Is(err, io.EOF) {
+			return recent_commits, nil
+		} else if err != nil {
 			err = misc.Wrap_one_error(err_get_recent_commits, err)
 			return nil, err
 		}
