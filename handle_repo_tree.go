@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"html/template"
 	"net/http"
-	"strings"
 	"path"
+	"strings"
 
 	chroma_formatters_html "github.com/alecthomas/chroma/v2/formatters/html"
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
@@ -77,7 +77,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 			}
 			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
 			data["file_contents"] = formatted_encapsulated
-	
+
 			err = templates.ExecuteTemplate(w, "repo_tree_file", data)
 			if err != nil {
 				_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
@@ -87,8 +87,8 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec) - 1] != '/' {
-		http.Redirect(w, r, path.Base(path_spec) + "/", http.StatusSeeOther)
+	if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] != '/' {
+		http.Redirect(w, r, path.Base(path_spec)+"/", http.StatusSeeOther)
 		return
 	}
 

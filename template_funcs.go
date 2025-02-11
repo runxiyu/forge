@@ -10,6 +10,6 @@ func first_line(s string) string {
 	return before
 }
 
-func base_name (s string) string {
+func base_name(s string) string {
 	return path.Base(s)
 }
