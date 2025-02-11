@@ -37,6 +37,7 @@ func main() {
 	http.HandleFunc("/g/{group_name}/repos/{$}", handle_group_repos)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/{$}", handle_repo_index)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
+	http.HandleFunc("/g/{group_name}/repos/{repo_name}/raw/{ref}/{rest...}", handle_repo_raw)
 
 	listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if err != nil {
