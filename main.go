@@ -39,7 +39,7 @@ func main() {
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/tree/{ref}/{rest...}", handle_repo_tree)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/raw/{ref}/{rest...}", handle_repo_raw)
 	http.HandleFunc("/g/{group_name}/repos/{repo_name}/log/{ref}/", handle_repo_log)
-	http.HandleFunc("/g/{group_name}/repos/{repo_name}/commit/{commit_id}/", handle_repo_commit)
+	http.HandleFunc("/g/{group_name}/repos/{repo_name}/commit/{commit_id}", handle_repo_commit)
 
 	listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if err != nil {

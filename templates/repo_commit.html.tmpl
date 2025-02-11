@@ -38,6 +38,10 @@
 						<th scope="row">Message</th>
 						<td><pre>{{ .commit_object.Message }}</pre></td>
 					</tr>
+					<tr>
+						<th scope="row">Actions</th>
+						<td><pre><a href="{{ .commit_object.Hash }}.patch">Get as Patch</a></pre></td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
