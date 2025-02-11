@@ -6,10 +6,9 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// TODO: I probably shouldn't include *all* commitsh here...
+// TODO: I probably shouldn't include *all* commits here...
 func handle_repo_log(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
-	// TODO: Sanitize path values
 	group_name, repo_name, ref_name := r.PathValue("group_name"), r.PathValue("repo_name"), r.PathValue("ref")
 	data["group_name"], data["repo_name"], data["ref"] = group_name, repo_name, ref_name
 	repo, err := open_git_repo(group_name, repo_name)

@@ -11,7 +11,6 @@ import (
 
 func handle_repo_raw(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
-	// TODO: Sanitize path values
 	raw_path_spec := r.PathValue("rest")
 	group_name, repo_name, path_spec := r.PathValue("group_name"), r.PathValue("repo_name"), strings.TrimSuffix(raw_path_spec, "/")
 
