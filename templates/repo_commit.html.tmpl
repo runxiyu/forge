@@ -41,21 +41,32 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="padding-wrapper scroll">
+		<div class="padding-wrapper">
+			{{ $parent_commit_object := .parent_commit_object }}
+			{{ $commit_object := .commit_object }}
 			{{ range .file_patches }}
-				<div class="file-patch">
-					{{ .From.Path }} {{ .From.Mode }} &rarr; {{ .To.Path }} {{ .To.Mode }}
-					{{ range .Chunks }}
-						{{ if eq .Type 0 }}
-							<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
-						{{ else if eq .Type 1 }}
-							<pre class="chunk chunk-addition">{{ .Content }}</pre>
-						{{ else if eq .Type 2 }}
-							<pre class="chunk chunk-deletion">{{ .Content }}</pre>
-						{{ else }}
-							<pre class="chunk chunk-unknown">{{ .Content }}</pre>
+				<div class="file-patch toggle-on-wrapper">
+					<input type="checkbox" id="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-toggle toggle-on-toggle">
+					<label for="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-header toggle-on-header">
+						<span>
+							--- a/<a href="../../tree/{{ .From.Path }}?commit={{ $parent_commit_object.Hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
+							<br />
+							+++ b/<a href="../../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
+						</span>
+					</label>
+					<div class="file-content toggle-on-content scroll">
+						{{ range .Chunks }}
+							{{ if eq .Type 0 }}
+								<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
+							{{ else if eq .Type 1 }}
+								<pre class="chunk chunk-addition">{{ .Content }}</pre>
+							{{ else if eq .Type 2 }}
+								<pre class="chunk chunk-deletion">{{ .Content }}</pre>
+							{{ else }}
+								<pre class="chunk chunk-unknown">{{ .Content }}</pre>
+							{{ end }}
 						{{ end }}
-					{{ end }}
+					</div>
 				</div>
 			{{ end }}
 		</div>

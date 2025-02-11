@@ -100,7 +100,7 @@ td#readme > *:first-child {
 .toggle-table-off + table > thead > tr > th > label, .toggle-table-on + table > thead > tr > th > label {
 	width: 100%;
 	display: inline-block;
-	padding: 3px 1px;
+	padding: 3px 0;
 	cursor: pointer;
 }
 .toggle-table-off:checked + table > tbody {
@@ -123,4 +123,33 @@ td#readme > *:first-child {
 }
 .chunk-unknown {
 	color: yellow;
+}
+pre.chunk {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.toggle-on-wrapper {
+	border: var(--lighter-border-color) solid 1px;
+}
+.toggle-on-toggle {
+	display: none;
+}
+.toggle-on-header {
+	cursor: pointer;
+	display: block;
+	width: 100%;
+	border-bottom: var(--lighter-border-color) solid 1px;
+	background-color: var(--lighter-box-background-color);
+}
+.toggle-on-content {
+	display: none;
+}
+.toggle-on-toggle:checked + .toggle-on-header + .toggle-on-content {
+	display: block;
+}
+.file-patch + .file-patch {
+	margin-top: 0.5rem;
+}
+.file-header {
+	font-family: monospace;
 }
