@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
@@ -71,7 +71,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		data["parent_commit_hash"] = parent_commit_object.Hash.String()
-	
+
 		patch, err = parent_commit_object.Patch(commit_object)
 		if err != nil {
 			_, _ = w.Write([]byte("Error getting patch of commit: " + err.Error()))
@@ -111,15 +111,19 @@ type fake_diff_file struct {
 	mode filemode.FileMode
 	path string
 }
+
 func (f fake_diff_file) Hash() plumbing.Hash {
 	return f.hash
 }
+
 func (f fake_diff_file) Mode() filemode.FileMode {
 	return f.mode
 }
+
 func (f fake_diff_file) Path() string {
 	return f.path
 }
+
 var fake_diff_file_null = fake_diff_file{
 	hash: plumbing.NewHash("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"),
 	mode: misc.First_or_panic(filemode.New("100644")),
