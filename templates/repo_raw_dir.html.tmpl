@@ -6,6 +6,9 @@
 		<title>{{ .group_name }}/repos/{{ .repo_name }}/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-raw-dir">
+		<header>
+			{{ template "repo_header" . }}
+		</header>
 		<div class="padding-wrapper scroll">
 			<table id="file-tree" class="wide">
 				<thead>

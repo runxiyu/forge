@@ -6,6 +6,9 @@
 		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-index">
+		<header>
+			{{ template "repo_header" . }}
+		</header>
 		<div class="padding-wrapper scroll">
 			<input id="toggle-table-recent-commits" type="checkbox" class="toggle-table-off" />
 			<table id="recent-commits" class="wide">

@@ -6,6 +6,9 @@
 		<title>Log of {{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-log">
+		<header>
+			{{ template "repo_header" . }}
+		</header>
 		<table id="commits" class="wide">
 			<thead>
 				<tr class="title-row">

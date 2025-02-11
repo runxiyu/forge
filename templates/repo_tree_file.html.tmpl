@@ -7,6 +7,9 @@
 		<title>{{ .group_name }}/repos/{{ .repo_name }}/{{ .path_spec }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-tree-file">
+		<header>
+			{{ template "repo_header" . }}
+		</header>
 		<p>
 			/{{ .path_spec }} (<a href="/g/{{ .group_name }}/repos/{{ .repo_name }}/raw/{{ .path_spec }}?{{ .ref_type }}={{ .ref }}">raw</a>)
 		</p>

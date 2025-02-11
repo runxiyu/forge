@@ -6,6 +6,9 @@
 		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-commit">
+		<header>
+			{{ template "repo_header" . }}
+		</header>
 		<div class="padding-wrapper scroll">
 			<table id="commit-info-table">
 				<thead>
