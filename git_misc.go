@@ -13,6 +13,9 @@ import (
 )
 
 var err_unsafe_path = errors.New("Unsafe path")
+var err_getting_commit_tree = errors.New("Error getting commit tree")
+var err_getting_patch_of_commit = errors.New("Error getting patch of commit")
+var err_getting_parent_commit_object = errors.New("Error getting parent commit object")
 
 func open_git_repo(group_name, repo_name string) (*git.Repository, error) {
 	group_name, group_name_ok := misc.Sanitize_path(group_name)
@@ -81,4 +84,31 @@ func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of
 		}
 	}
 	return recent_commits, err
+}
+
+func get_patch_from_commit(commit_object *object.Commit) (parent_commit_hash plumbing.Hash, patch *object.Patch, ret_err error) {
+	parent_commit_object, err := commit_object.Parent(0)
+	if errors.Is(err, object.ErrParentNotFound) {
+		commit_tree, err := commit_object.Tree()
+		if err != nil {
+			ret_err = misc.Wrap_one_error(err_getting_commit_tree, err)
+			return
+		}
+		patch, err = (&object.Tree{}).Patch(commit_tree)
+		if err != nil {
+			ret_err = misc.Wrap_one_error(err_getting_patch_of_commit, err)
+			return
+		}
+	} else if err != nil {
+		ret_err = misc.Wrap_one_error(err_getting_parent_commit_object, err)
+		return
+	} else {
+		parent_commit_hash = parent_commit_object.Hash
+		patch, err = parent_commit_object.Patch(commit_object)
+		if err != nil {
+			ret_err = misc.Wrap_one_error(err_getting_patch_of_commit, err)
+			return
+		}
+	}
+	return
 }

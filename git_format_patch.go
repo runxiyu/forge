@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -11,18 +10,10 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
-var err_get_patch = errors.New("Failed to get patch from commit")
-
 func format_patch_from_commit(commit *object.Commit) (string, error) {
-	parent, err := commit.Parent(0)
+	_, patch, err := get_patch_from_commit(commit)
 	if err != nil {
-		return "", err
-	}
-
-	var patch *object.Patch
-	patch, err = parent.Patch(commit)
-	if err != nil {
-		return "", misc.Wrap_one_error(err_get_patch, err)
+		return "", misc.Wrap_one_error(err_getting_patch_of_commit, err)
 	}
 
 	var buf bytes.Buffer
