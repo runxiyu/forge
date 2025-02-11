@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
@@ -51,17 +53,30 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	data["commit_object"] = commit_object
 	data["commit_id"] = commit_id_string
 
+	var patch *object.Patch
 	parent_commit_object, err := commit_object.Parent(0)
-	if err != nil {
+	if errors.Is(err, object.ErrParentNotFound) {
+		commit_tree, err := commit_object.Tree()
+		if err != nil {
+			_, _ = w.Write([]byte("Error getting commit tree (for comparing against an empty tree): " + err.Error()))
+			return
+		}
+		patch, err = (&object.Tree{}).Patch(commit_tree)
+		if err != nil {
+			_, _ = w.Write([]byte("Error getting patch of commit: " + err.Error()))
+			return
+		}
+	} else if err != nil {
 		_, _ = w.Write([]byte("Error getting parent commit object: " + err.Error()))
 		return
-	}
-	data["parent_commit_object"] = parent_commit_object
-
-	patch, err := parent_commit_object.Patch(commit_object)
-	if err != nil {
-		_, _ = w.Write([]byte("Error getting patch of commit: " + err.Error()))
-		return
+	} else {
+		data["parent_commit_hash"] = parent_commit_object.Hash.String()
+	
+		patch, err = parent_commit_object.Patch(commit_object)
+		if err != nil {
+			_, _ = w.Write([]byte("Error getting patch of commit: " + err.Error()))
+			return
+		}
 	}
 	data["patch"] = patch
 
