@@ -11,7 +11,7 @@
 			{{ template "repo_header" . }}
 		</header>
 		<p>
-			/{{ .path_spec }} (<a href="/g/{{ .group_name }}/repos/{{ .repo_name }}/raw/{{ .path_spec }}?{{ .ref_type }}={{ .ref }}">raw</a>)
+			/{{ .path_spec }} (<a href="/g/{{ .group_name }}/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if not (eq .ref_type "head") }}?{{ .ref_type }}={{ .ref }}{{ end }}">raw</a>)
 		</p>
 		{{ .file_contents }}
 		<footer>
