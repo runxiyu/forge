@@ -12,7 +12,17 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
+var err_unsafe_path = errors.New("Unsafe path")
+
 func open_git_repo(group_name, repo_name string) (*git.Repository, error) {
+	group_name, group_name_ok := misc.Sanitize_path(group_name)
+	if !group_name_ok {
+		return nil, err_unsafe_path
+	}
+	repo_name, repo_name_ok := misc.Sanitize_path(repo_name)
+	if !repo_name_ok {
+		return nil, err_unsafe_path
+	}
 	return git.PlainOpen(filepath.Join(config.Git.Root, group_name, repo_name+".git"))
 }
 

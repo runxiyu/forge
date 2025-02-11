@@ -7,7 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/yuin/goldmark v1.7.8
-	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250211092501-f6937cf286bb
+	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250211092902-f64ead6a659e
 )
 
 require (
