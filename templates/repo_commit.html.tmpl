@@ -1,0 +1,44 @@
+{{- define "repo_commit" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ template "head_common" . }}
+		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
+	</head>
+	<body class="repo-commit">
+		<div class="padding-wrapper">
+			<table id="commit-info-table">
+				<thead>
+					<tr class="title-row">
+						<th colspan="2">Commit {{ .commit_id }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">Author</th>
+						<td>{{ .commit_object.Author.Name }} &lt;<a href="mailto:{{ .commit_object.Author.Email }}">{{ .commit_object.Author.Email }}</a>&gt;</td>
+					</tr>
+					<tr>
+						<th scope="row">Author Date</th>
+						<td>{{ .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Committer</th>
+						<td>{{ .commit_object.Committer.Name }} &lt;<a href="mailto:{{ .commit_object.Committer.Email }}">{{ .commit_object.Committer.Email }}</a>&gt;</td>
+					</tr>
+					<tr>
+						<th scope="row">Committer Date</th>
+						<td>{{ .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
+					</tr>
+				</tbody>
+			</table>
+			<pre>{{ .patch }}</pre>
+			<p>
+			</p>
+		</div>
+		<footer>
+			{{ template "footer" . }}
+		</footer>
+	</body>
+</html>
+{{- end -}}

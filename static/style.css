@@ -49,6 +49,10 @@ footer a:link, footer a:visited {
 .padding-wrapper > * {
 	width: 100%;
 }
+.padding-wrapper > table {
+	width: auto;
+	max-width: 100%;
+}
 a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
 	color: var(--link-color);
@@ -69,6 +73,9 @@ td, th {
 }
 th {
 	background-color: var(--lighter-box-background-color);
+}
+th[scope=row] {
+	text-align: left;
 }
 tr.title-row > th {
 	background-color: var(--darker-box-background-color);
