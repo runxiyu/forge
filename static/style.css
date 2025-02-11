@@ -26,7 +26,7 @@ footer a:link, footer a:visited {
 }
 .padding-wrapper {
 	margin: 1rem auto;
-	max-width: 50em;
+	max-width: 60rem;
 	padding: 0 1rem;
 }
 .padding-wrapper > * {
