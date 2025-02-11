@@ -10,10 +10,14 @@
 			<table id="commit-info-table">
 				<thead>
 					<tr class="title-row">
-						<th colspan="2">Commit {{ .commit_id }}</th>
+						<th colspan="2">Commit Info</th>
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<th scope="row">ID</th>
+						<td>{{ .commit_id }}</td>
+					</tr>
 					<tr>
 						<th scope="row">Author</th>
 						<td>{{ .commit_object.Author.Name }} &lt;<a href="mailto:{{ .commit_object.Author.Email }}">{{ .commit_object.Author.Email }}</a>&gt;</td>
@@ -29,6 +33,10 @@
 					<tr>
 						<th scope="row">Committer Date</th>
 						<td>{{ .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Message</th>
+						<td><pre>{{ .commit_object.Message }}</pre></td>
 					</tr>
 				</tbody>
 			</table>
