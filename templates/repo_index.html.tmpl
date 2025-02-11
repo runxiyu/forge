@@ -6,8 +6,8 @@
 		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
 	</head>
 	<body class="repo-index">
-		<div class="padding-wrapper">
-			<table id="recent-commits">
+		<div class="padding-wrapper scroll">
+			<table id="recent-commits" class="wide">
 				<thead>
 					<tr class="title-row">
 						<th colspan="3">Recent Commits (<a href="log/{{ .ref }}/">see all</a>)</th>
@@ -33,8 +33,8 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="padding-wrapper">
-			<table id="file-tree">
+		<div class="padding-wrapper scroll">
+			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">
 						<th colspan="3">/ on {{ .ref }}</th>
@@ -63,7 +63,7 @@
 		</div>
 		<div class="padding-wrapper">
 			{{ if .readme }}
-				<table>
+				<table class="wide">
 					<thead>
 						<tr class="title-row">
 							<th>
