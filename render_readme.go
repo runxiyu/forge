@@ -10,6 +10,8 @@ import (
 	"github.com/yuin/goldmark/extension"
 )
 
+var markdown_converter = goldmark.New(goldmark.WithExtensions(extension.GFM))
+
 func render_readme_at_tree(tree *object.Tree) any {
 	readme_file, err := tree.File("README.md")
 	if err != nil {
@@ -20,14 +22,8 @@ func render_readme_at_tree(tree *object.Tree) any {
 		return "Unable to fetch contents of README: " + err.Error()
 	}
 
-	md := goldmark.New(
-		goldmark.WithExtensions(
-			extension.GFM,
-		),
-	)
-
 	var readme_rendered_unsafe bytes.Buffer
-	err = md.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
+	err = markdown_converter.Convert([]byte(readme_file_contents), &readme_rendered_unsafe)
 	if err != nil {
 		return "Unable to render README: " + err.Error()
 	}
