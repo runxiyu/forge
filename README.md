@@ -2,12 +2,18 @@
 
 ## Organization
 
-URLs are like `https://forge.example.org/g/group_name/module_type/module_name`.
+Misc URLs (for hosting stylesheets, scipts, the login page, etc.) are like
+`https://forge.example.org/:/functionality...`.
+
+Contentful URLs are like
+`https://forge.example.org/group_name/subgroup_name.../:/module_type/module_name`.
 
 The available `module_type`s are:
 * `repos` for version control
 * `tickets` for ticket trackers
 * `mail` for mailing lists
+
+Group and subgroup names may not be `:`.
 
 ## Version-controlled repos
 
