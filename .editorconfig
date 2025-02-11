@@ -7,14 +7,6 @@ indent_style = tab
 indent_size = 8
 tab_size = 8
 
-[*.html.tmpl]
-tab_size = 4
-indent_size = 4
-
-[*.js]
-tab_size = 4
-indent_size = 4
-
 [*.py]
 indent_style = space
 indent_size = 4
