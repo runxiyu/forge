@@ -91,3 +91,24 @@ td#readme > *:first-child {
 pre, .scroll {
 	overflow-x: auto;
 }
+.toggle-table-off, .toggle-table-on {
+	display: none;
+}
+.toggle-table-off + table > thead > tr > th, .toggle-table-on + table > thead > tr > th {
+	padding: 0;
+}
+.toggle-table-off + table > thead > tr > th > label, .toggle-table-on + table > thead > tr > th > label {
+	width: 100%;
+	display: inline-block;
+	padding: 3px 1px;
+	cursor: pointer;
+}
+.toggle-table-off:checked + table > tbody {
+	display: none;
+}
+.toggle-table-on + table > tbody {
+	display: none;
+}
+.toggle-table-on:checked + table > tbody {
+	display: table-row-group;
+}
