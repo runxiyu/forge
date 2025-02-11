@@ -103,7 +103,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data["readme"] = render_readme_at_tree(target)
+	data["readme_filename"], data["readme"] = render_readme_at_tree(target)
 	data["files"] = build_display_git_tree(target)
 
 	err = templates.ExecuteTemplate(w, "repo_tree_dir", data)

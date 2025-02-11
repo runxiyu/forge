@@ -22,25 +22,12 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ref_hash := ref.Hash()
-	recent_commits, err := get_recent_commits(repo, ref_hash, -1)
+	commits, err := get_recent_commits(repo, ref_hash, -1)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting recent commits: " + err.Error()))
 		return
 	}
-	data["commits"] = recent_commits
-	commit_object, err := repo.CommitObject(ref_hash)
-	if err != nil {
-		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
-		return
-	}
-	tree, err := commit_object.Tree()
-	if err != nil {
-		_, _ = w.Write([]byte("Error getting file tree: " + err.Error()))
-		return
-	}
-
-	data["readme"] = render_readme_at_tree(tree)
-	data["files"] = build_display_git_tree(tree)
+	data["commits"] = commits
 
 	err = templates.ExecuteTemplate(w, "repo_log", data)
 	if err != nil {

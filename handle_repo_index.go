@@ -37,7 +37,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data["readme"] = render_readme_at_tree(tree)
+	data["readme_filename"], data["readme"] = render_readme_at_tree(tree)
 	data["files"] = build_display_git_tree(tree)
 
 	err = templates.ExecuteTemplate(w, "repo_index", data)
