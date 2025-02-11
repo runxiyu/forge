@@ -79,3 +79,7 @@ th[scope=row] {
 tr.title-row > th {
 	background-color: var(--darker-box-background-color);
 }
+
+.commit-id {
+	font-family: monospace;
+}
