@@ -82,7 +82,12 @@ tr.title-row > th {
 td > pre {
 	margin: 0;
 }
-
+td#readme > *:last-child {
+	margin-bottom: 0;
+}
+td#readme > *:first-child {
+	margin-top: 0;
+}
 .commit-id {
 	font-family: monospace;
 }
