@@ -33,6 +33,7 @@ func load_config(path string) (err error) {
 	if err != nil {
 		return err
 	}
+	defer config_file.Close()
 
 	decoder := scfg.NewDecoder(bufio.NewReader(config_file))
 	err = decoder.Decode(&config)
