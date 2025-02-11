@@ -52,6 +52,10 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request) {
 	data["commit_id"] = commit_id_string
 
 	parent_commit_hash, patch, err := get_patch_from_commit(commit_object)
+	if err != nil {
+		_, _ = w.Write([]byte("Error getting patch from commit: " + err.Error()))
+		return
+	}
 	data["parent_commit_hash"] = parent_commit_hash.String()
 	data["patch"] = patch
 
