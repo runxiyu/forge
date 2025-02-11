@@ -1,5 +1,9 @@
 html {
 	font-family: sans-serif;
+	background-color: var(--background-color);
+	color: var(--text-color);
+	--background-color: hsl(0, 0%, 100%);
+	--text-color: hsl(0, 0%, 0%);
 	--link-color: hsl(320, 50%, 36%);
 	--light-text-color: hsl(0, 0%, 45%);
 	--darker-border-color: hsl(0, 0%, 72%);
@@ -7,6 +11,19 @@ html {
 	--text-decoration-color: hsl(0, 0%, 72%);
 	--darker-box-background-color: hsl(0, 0%, 92%);
 	--lighter-box-background-color: hsl(0, 0%, 95%);
+}
+@media (prefers-color-scheme: dark) {
+	html {
+		--background-color: hsl(0, 0%, 0%);
+		--text-color: hsl(0, 0%, 100%);
+		--link-color: hsl(320, 50%, 64%);
+		--light-text-color: hsl(0, 0%, 78%);
+		--darker-border-color: hsl(0, 0%, 35%);
+		--lighter-border-color: hsl(0, 0%, 25%);
+		--text-decoration-color: hsl(0, 0%, 30%);
+		--darker-box-background-color: hsl(0, 0%, 20%);
+		--lighter-box-background-color: hsl(0, 0%, 15%);
+	}
 }
 html, code, pre {
 	font-size: 1rem; /* TODO: Not always correct */
