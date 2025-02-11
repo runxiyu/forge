@@ -143,8 +143,11 @@ pre.chunk {
 	cursor: pointer;
 	display: block;
 	width: 100%;
-	border-bottom: var(--lighter-border-color) solid 1px;
 	background-color: var(--lighter-box-background-color);
+}
+.toggle-on-header > span {
+	padding: 3px 5px;
+	display: inline-block;
 }
 .toggle-on-content {
 	display: none;
@@ -155,7 +158,7 @@ pre.chunk {
 .file-patch + .file-patch {
 	margin-top: 0.5rem;
 }
-.file-content, .file-header {
+.file-content {
 	padding: 3px 5px;
 }
 .file-header {
