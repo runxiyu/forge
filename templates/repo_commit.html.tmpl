@@ -56,9 +56,17 @@
 					<input type="checkbox" id="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-toggle toggle-on-toggle">
 					<label for="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-header toggle-on-header">
 						<span>
-							--- a/<a href="../tree/{{ .From.Path }}?commit={{ $parent_commit_hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
+							{{ if eq .From.Path "" }}
+								--- /dev/null
+							{{ else }}
+								--- a/<a href="../tree/{{ .From.Path }}?commit={{ $parent_commit_hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
+							{{ end }}
 							<br />
-							+++ b/<a href="../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
+							{{ if eq .To.Path "" }}
+								+++ /dev/null
+							{{ else }}
+								+++ b/<a href="../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
+							{{ end }}
 						</span>
 					</label>
 					<div class="file-content toggle-on-content scroll">

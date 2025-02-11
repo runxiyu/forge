@@ -127,5 +127,5 @@ func (f fake_diff_file) Path() string {
 var fake_diff_file_null = fake_diff_file{
 	hash: plumbing.NewHash("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"),
 	mode: misc.First_or_panic(filemode.New("100644")),
-	path: "NULL",
+	path: "",
 }
