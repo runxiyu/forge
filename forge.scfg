@@ -3,6 +3,11 @@ http {
 	addr :8080
 }
 
+db {
+	type postgres
+	conn postgresql:///lindenii-forge?host=/var/run/postgresql
+}
+
 git {
 	root /srv/git
 }
