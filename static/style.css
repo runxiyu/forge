@@ -50,8 +50,7 @@ footer a:link, footer a:visited {
 	width: 100%;
 }
 .padding-wrapper > table {
-	width: auto;
-	max-width: 100%;
+	width: 100%;
 }
 a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
