@@ -29,7 +29,6 @@ func format_patch_from_commit(commit *object.Commit) (string, error) {
 	fmt.Fprintf(&buf, "Subject: [PATCH] %s\n\n", commit_msg_title)
 
 	if commit_msg_details != "" {
-		fmt.Println("fdsafsad")
 		commit_msg_details_first_line, commit_msg_details_rest, _ := strings.Cut(commit_msg_details, "\n")
 		if strings.TrimSpace(commit_msg_details_first_line) == "" {
 			commit_msg_details = commit_msg_details_rest
