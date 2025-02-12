@@ -72,7 +72,7 @@ func serve_ssh() error {
 
 	server.AddHostKey(hostKey)
 
-	listener, err := net.Listen("tcp", ":2222")
+	listener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 	if err != nil {
 		return err
 	}
