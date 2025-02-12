@@ -15,10 +15,19 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	non_empty_last_segments_len := len(segments)
+	dir_mode := false
+	if segments[len(segments)-1] == "" {
+		non_empty_last_segments_len--
+		dir_mode = true
+	}
 
 	if segments[0] == ":" {
 		if len(segments) < 2 {
 			http.Error(w, "Blank system endpoint", http.StatusNotFound)
+			return
+		} else if len(segments) == 2 && !dir_mode {
+			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 			return
 		}
 
@@ -33,6 +42,18 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	params := make(map[string]any)
+	params["global"] = global_data
+	var _user_id int
+	_user_id, params["username"], err = get_user_info_from_request(r)
+	if _user_id == 0 {
+		params["user_id"] = ""
+	} else {
+		params["user_id"] = string(_user_id)
+	}
+
+	fmt.Printf("%#v\n", params)
+
 	separator_index := -1
 	for i, part := range segments {
 		if part == ":" {
@@ -40,18 +61,10 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	non_empty_last_segments_len := len(segments)
-	dir_mode := false
-	if segments[len(segments)-1] == "" {
-		non_empty_last_segments_len--
-		dir_mode = true
-	}
 
-	params := make(map[string]string)
-	_ = params
 	switch {
 	case non_empty_last_segments_len == 0:
-		handle_index(w, r)
+		handle_index(w, r, params)
 	case separator_index == -1:
 		http.Error(w, "Group indexing hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+1:

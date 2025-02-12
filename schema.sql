@@ -51,6 +51,12 @@ CREATE TABLE users (
 	password TEXT NOT NULL
 );
 
+CREATE TABLE sessions (
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	session_id TEXT NOT NULL,
+	PRIMARY KEY (user_id, session_id)
+);
+
 CREATE TABLE merge_requests (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,

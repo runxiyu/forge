@@ -5,11 +5,8 @@ import (
 	"net/url"
 )
 
-func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	data := make(map[string]any)
-	data["global"] = global_data
-	group_name, repo_name := params["group_name"], params["repo_name"]
-	data["group_name"], data["repo_name"] = group_name, repo_name
+func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
@@ -20,14 +17,14 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		_, _ = w.Write([]byte("Error getting repo HEAD: " + err.Error()))
 		return
 	}
-	data["ref"] = head.Name().Short()
+	params["ref"] = head.Name().Short()
 	head_hash := head.Hash()
 	recent_commits, err := get_recent_commits(repo, head_hash, 3)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting recent commits: " + err.Error()))
 		return
 	}
-	data["commits"] = recent_commits
+	params["commits"] = recent_commits
 	commit_object, err := repo.CommitObject(head_hash)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
@@ -39,12 +36,12 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		return
 	}
 
-	data["readme_filename"], data["readme"] = render_readme_at_tree(tree)
-	data["files"] = build_display_git_tree(tree)
+	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
+	params["files"] = build_display_git_tree(tree)
 
-	data["clone_url"] = "ssh://" + r.Host + "/" + url.PathEscape(params["group_name"]) + "/:/repos/" + url.PathEscape(params["repo_name"])
+	params["clone_url"] = "ssh://" + r.Host + "/" + url.PathEscape(group_name) + "/:/repos/" + url.PathEscape(repo_name)
 
-	err = templates.ExecuteTemplate(w, "repo_index", data)
+	err = templates.ExecuteTemplate(w, "repo_index", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

@@ -4,10 +4,7 @@ import (
 	"net/http"
 )
 
-func handle_index(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]any)
-	data["global"] = global_data
-
+func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	rows, err := database.Query(r.Context(), "SELECT name FROM groups")
 	if err != nil {
 		_, _ = w.Write([]byte("Error querying groups: " + err.Error()))
@@ -30,9 +27,9 @@ func handle_index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data["groups"] = groups
+	params["groups"] = groups
 
-	err = templates.ExecuteTemplate(w, "index", data)
+	err = templates.ExecuteTemplate(w, "index", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

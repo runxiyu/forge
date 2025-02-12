@@ -16,11 +16,8 @@ type usable_file_patch struct {
 	Chunks []diff.Chunk
 }
 
-func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	data := make(map[string]any)
-	data["global"] = global_data
-	group_name, repo_name, commit_id_specified_string := params["group_name"], params["repo_name"], params["commit_id"]
-	data["group_name"], data["repo_name"] = group_name, repo_name
+func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	group_name, repo_name, commit_id_specified_string := params["group_name"].(string), params["repo_name"].(string), params["commit_id"].(string)
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
@@ -49,16 +46,16 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 		return
 	}
 
-	data["commit_object"] = commit_object
-	data["commit_id"] = commit_id_string
+	params["commit_object"] = commit_object
+	params["commit_id"] = commit_id_string
 
 	parent_commit_hash, patch, err := get_patch_from_commit(commit_object)
 	if err != nil {
 		_, _ = w.Write([]byte("Error getting patch from commit: " + err.Error()))
 		return
 	}
-	data["parent_commit_hash"] = parent_commit_hash.String()
-	data["patch"] = patch
+	params["parent_commit_hash"] = parent_commit_hash.String()
+	params["patch"] = patch
 
 	// TODO: Remove unnecessary context
 	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
@@ -78,9 +75,9 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 		}
 		usable_file_patches = append(usable_file_patches, usable_file_patch)
 	}
-	data["file_patches"] = usable_file_patches
+	params["file_patches"] = usable_file_patches
 
-	err = templates.ExecuteTemplate(w, "repo_commit", data)
+	err = templates.ExecuteTemplate(w, "repo_commit", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

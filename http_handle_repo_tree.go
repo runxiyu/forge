@@ -14,11 +14,9 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	data := make(map[string]any)
-	data["global"] = global_data
-	raw_path_spec := params["rest"]
-	group_name, repo_name, path_spec := params["group_name"], params["repo_name"], strings.TrimSuffix(raw_path_spec, "/")
+func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	raw_path_spec := params["rest"].(string)
+	group_name, repo_name, path_spec := params["group_name"].(string), params["repo_name"].(string), strings.TrimSuffix(raw_path_spec, "/")
 	ref_type, ref_name, err := get_param_ref_and_type(r)
 	if err != nil {
 		if errors.Is(err, err_no_ref_spec) {
@@ -28,7 +26,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			return
 		}
 	}
-	data["ref_type"], data["ref"], data["group_name"], data["repo_name"], data["path_spec"] = ref_type, ref_name, group_name, repo_name, path_spec
+	params["ref_type"], params["ref"], params["path_spec"] = ref_type, ref_name, path_spec
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
@@ -88,9 +86,9 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 				return
 			}
 			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
-			data["file_contents"] = formatted_encapsulated
+			params["file_contents"] = formatted_encapsulated
 
-			err = templates.ExecuteTemplate(w, "repo_tree_file", data)
+			err = templates.ExecuteTemplate(w, "repo_tree_file", params)
 			if err != nil {
 				_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 				return
@@ -104,10 +102,10 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 		return
 	}
 
-	data["readme_filename"], data["readme"] = render_readme_at_tree(target)
-	data["files"] = build_display_git_tree(target)
+	params["readme_filename"], params["readme"] = render_readme_at_tree(target)
+	params["files"] = build_display_git_tree(target)
 
-	err = templates.ExecuteTemplate(w, "repo_tree_dir", data)
+	err = templates.ExecuteTemplate(w, "repo_tree_dir", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

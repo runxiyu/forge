@@ -4,11 +4,8 @@ import (
 	"net/http"
 )
 
-func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	data := make(map[string]any)
-	data["global"] = global_data
+func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	group_name := params["group_name"]
-	data["group_name"] = group_name
 
 	var names []string
 	rows, err := database.Query(r.Context(), "SELECT r.name FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1;", group_name)
@@ -32,9 +29,9 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 		return
 	}
 
-	data["repos"] = names
+	params["repos"] = names
 
-	err = templates.ExecuteTemplate(w, "group_repos", data)
+	err = templates.ExecuteTemplate(w, "group_repos", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return

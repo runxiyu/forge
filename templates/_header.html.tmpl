@@ -1,0 +1,12 @@
+{{- define "header" -}}
+<div>
+	<a href="/">Lindenii Forge</a>
+</div>
+<div>
+	{{ if ne .user_id "" }}
+		<a href="/:/user/{{ .user_id }}">{{ .username }}</a>
+	{{ else }}
+		<a href="/:/login/">Login</a>
+	{{ end }}
+</div>
+{{- end -}}

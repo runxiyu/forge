@@ -7,11 +7,8 @@ import (
 )
 
 // TODO: I probably shouldn't include *all* commits here...
-func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	data := make(map[string]any)
-	data["global"] = global_data
-	group_name, repo_name, ref_name := params["group_name"], params["repo_name"], params["ref"]
-	data["group_name"], data["repo_name"], data["ref"] = group_name, repo_name, ref_name
+func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	group_name, repo_name, ref_name := params["group_name"].(string), params["repo_name"].(string), params["ref"].(string)
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
@@ -28,9 +25,9 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]s
 		_, _ = w.Write([]byte("Error getting recent commits: " + err.Error()))
 		return
 	}
-	data["commits"] = commits
+	params["commits"] = commits
 
-	err = templates.ExecuteTemplate(w, "repo_log", data)
+	err = templates.ExecuteTemplate(w, "repo_log", params)
 	if err != nil {
 		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
 		return
