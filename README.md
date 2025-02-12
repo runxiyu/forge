@@ -72,8 +72,8 @@ Not very sure how to integrate this for now. Planned for the future.
 ## Authentication and authorization
 
 Anonymous SSH read access should be possible for public repos. All other Git
-access should be done via SSH public keys. Custom SSH server implementation
-necessary due to OpenSSH limitations.
+access should be done via SSH public keys. We use a baked-in SSH
+implementation.
 
 The native API may be authenticated in the transport layer (e.g. TLS client
 certificates or UNIX domain socket authentication), via passwords, and via
