@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	err_unsafe_path                  = errors.New("Unsafe path")
 	err_getting_commit_tree          = errors.New("Error getting commit tree")
 	err_getting_patch_of_commit      = errors.New("Error getting patch of commit")
 	err_getting_parent_commit_object = errors.New("Error getting parent commit object")
