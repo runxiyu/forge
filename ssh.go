@@ -12,12 +12,12 @@ import (
 )
 
 func serve_ssh() error {
-	hostKeyBytes, err := os.ReadFile(config.SSH.Key)
+	host_key_bytes, err := os.ReadFile(config.SSH.Key)
 	if err != nil {
 		return err
 	}
 
-	hostKey, err := go_ssh.ParsePrivateKey(hostKeyBytes)
+	host_key, err := go_ssh.ParsePrivateKey(host_key_bytes)
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func serve_ssh() error {
 				return
 			}
 			err = proc.Wait()
-			if exitError, ok := err.(*exec.ExitError); ok {
-				fmt.Fprintln(session.Stderr(), "Process exited with error", exitError.ExitCode())
+			if exit_error, ok := err.(*exec.ExitError); ok {
+				fmt.Fprintln(session.Stderr(), "Process exited with error", exit_error.ExitCode())
 			} else if err != nil {
 				fmt.Fprintln(session.Stderr(), "Error while waiting for process:", err)
 			}
@@ -70,7 +70,7 @@ func serve_ssh() error {
 		KeyboardInteractiveHandler: func(ctx glider_ssh.Context, challenge go_ssh.KeyboardInteractiveChallenge) bool { return true },
 	}
 
-	server.AddHostKey(hostKey)
+	server.AddHostKey(host_key)
 
 	listener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 	if err != nil {
