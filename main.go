@@ -31,6 +31,11 @@ func main() {
 		clog.Fatal(1, "Listening: "+err.Error())
 	}
 
+	err = serve_ssh()
+	if err != nil {
+		clog.Fatal(1, "Listening SSH: "+err.Error())
+	}
+
 	err = http.Serve(listener, &http_router_t{})
 	if err != nil {
 		clog.Fatal(1, "Serving: "+err.Error())

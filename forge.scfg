@@ -3,6 +3,12 @@ http {
 	addr :8080
 }
 
+ssh {
+	net ssh
+	addr :2222
+	key /etc/ssh/ssh_host_ed25519_key
+}
+
 db {
 	type postgres
 	conn postgresql:///lindenii-forge?host=/var/run/postgresql

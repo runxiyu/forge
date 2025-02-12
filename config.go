@@ -19,6 +19,11 @@ var config struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`
 	} `scfg:"http"`
+	SSH struct {
+		Net  string `scfg:"net"`
+		Addr string `scfg:"addr"`
+		Key  string `scfg:"key"`
+	} `scfg:"ssh"`
 	Git struct {
 		Root string `scfg:"root"`
 	} `scfg:"git"`
