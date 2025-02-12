@@ -31,6 +31,14 @@ func open_git_repo(group_name, repo_name string) (*git.Repository, error) {
 	return git.PlainOpen(filepath.Join(config.Git.Root, group_name, repo_name+".git"))
 }
 
+type display_git_tree_entry_t struct {
+	Name       string
+	Mode       string
+	Size       int64
+	Is_file    bool
+	Is_subtree bool
+}
+
 func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 	display_git_tree := make([]display_git_tree_entry_t, 0)
 	for _, entry := range tree.Entries {
