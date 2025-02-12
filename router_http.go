@@ -28,7 +28,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "source":
 			source_handler.ServeHTTP(w, r)
 		default:
-			fmt.Fprintln(w, "Unknown system module type:", segments[1])
+			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
 		}
 		return
 	}
@@ -53,9 +53,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case non_empty_last_segments_len == 0:
 		handle_index(w, r)
 	case separator_index == -1:
-		fmt.Fprintln(w, "Group indexing hasn't been implemented yet")
+		http.Error(w, "Group indexing hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+1:
-		fmt.Fprintln(w, "Group root hasn't been implemented yet")
+		http.Error(w, "Group root hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+2:
 		module_type := segments[separator_index+1]
 		params["group_name"] = segments[0]
@@ -63,7 +63,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "repos":
 			handle_group_repos(w, r, params)
 		default:
-			fmt.Fprintln(w, "Unknown module type:", module_type)
+			http.Error(w, fmt.Sprintf("Unknown module type: %s", module_type), http.StatusNotFound)
 		}
 	default:
 		module_type := segments[separator_index+1]
@@ -91,7 +91,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				handle_repo_raw(w, r, params)
 			case "log":
 				if non_empty_last_segments_len != separator_index+5 {
-					fmt.Fprintln(w, "Too many parameters")
+					http.Error(w, "Too many parameters", http.StatusBadRequest)
 					return
 				}
 				if dir_mode {
@@ -107,11 +107,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				params["commit_id"] = segments[separator_index+4]
 				handle_repo_commit(w, r, params)
+			default:
+				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repo_feature), http.StatusNotFound)
 			}
 		default:
-			fmt.Fprintln(w, "Unknown module type:", module_type)
+			http.Error(w, fmt.Sprintf("Unknown module type: %s", module_type), http.StatusNotFound)
 		}
 	}
 }
 
 var err_bad_request = errors.New("Bad Request")
+
