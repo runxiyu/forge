@@ -57,6 +57,10 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case non_empty_last_segments_len == separator_index+1:
 		http.Error(w, "Group root hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+2:
+		if !dir_mode {
+			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+			return
+		}
 		module_type := segments[separator_index+1]
 		params["group_name"] = segments[0]
 		switch module_type {
