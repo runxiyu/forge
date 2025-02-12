@@ -16,12 +16,12 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(segments) < 2 {
-		http.Error(w, "Blank system endpoint", http.StatusNotFound)
-		return
-	}
-
 	if segments[0] == ":" {
+		if len(segments) < 2 {
+			http.Error(w, "Blank system endpoint", http.StatusNotFound)
+			return
+		}
+
 		switch segments[1] {
 		case "static":
 			static_handler.ServeHTTP(w, r)
