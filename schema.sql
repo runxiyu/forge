@@ -44,6 +44,13 @@ CREATE TABLE emails (
 	content BYTEA NOT NULL
 );
 
+CREATE TABLE users (
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	username TEXT NOT NULL UNIQUE,
+	password_algorithm TEXT NOT NULL CHECK (password_algorithm in ('argon2id')),
+	password TEXT NOT NULL
+);
+
 CREATE TABLE merge_requests (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,
@@ -53,13 +60,6 @@ CREATE TABLE merge_requests (
 	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
 	created_at TIMESTAMP NOT NULL,
 	mailing_list_id INT UNIQUE REFERENCES mailing_lists(id) ON DELETE CASCADE
-);
-
-CREATE TABLE users (
-	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	username TEXT NOT NULL UNIQUE,
-	password_algorithm TEXT NOT NULL CHECK (password_algorithm in ('argon2id')),
-	password TEXT NOT NULL
 );
 
 CREATE TABLE ssh_public_keys (
