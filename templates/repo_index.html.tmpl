@@ -9,6 +9,21 @@
 		<header>
 			{{ template "repo_header" . }}
 		</header>
+		<div class="padding-wrapper">
+			<table id="repo-info-table">
+				<thead>
+					<tr class="title-row">
+						<th colspan="2">Repo Info</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">Clone</th>
+						<td><code>git clone {{ .clone_url }}</code></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		<div class="padding-wrapper scroll">
 			<input id="toggle-table-recent-commits" type="checkbox" class="toggle-table-off" />
 			<table id="recent-commits" class="wide">

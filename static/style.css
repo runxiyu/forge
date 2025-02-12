@@ -50,7 +50,7 @@ a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
 	color: var(--link-color);
 }
-code:not(pre > code) {
+#readme code:not(pre > code) {
 	background-color: var(--lighter-box-background-color);
 	border-radius: 2px;
 	padding: 2px;
