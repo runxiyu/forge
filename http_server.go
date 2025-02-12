@@ -34,12 +34,11 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		switch segments[1] {
 		case "static":
 			static_handler.ServeHTTP(w, r)
+			return
 		case "source":
 			source_handler.ServeHTTP(w, r)
-		default:
-			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
+			return
 		}
-		return
 	}
 
 	params := make(map[string]any)
@@ -50,6 +49,17 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		params["user_id"] = ""
 	} else {
 		params["user_id"] = string(_user_id)
+	}
+
+	if segments[0] == ":" {
+		switch segments[1] {
+		case "login":
+			handle_login(w, r, params)
+			return
+		default:
+			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
+			return
+		}
 	}
 
 	fmt.Printf("%#v\n", params)

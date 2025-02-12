@@ -11,6 +11,10 @@ html {
 	--text-decoration-color: hsl(0, 0%, 72%);
 	--darker-box-background-color: hsl(0, 0%, 92%);
 	--lighter-box-background-color: hsl(0, 0%, 95%);
+	--primary-color: hsl(320, 50%, 36%);
+	--primary-color-contrast: hsl(320, 0%, 100%);
+	--danger-color: hsl(0, 50%, 36%);
+	--danger-color-contrast: hsl(0, 0%, 100%);
 }
 @media (prefers-color-scheme: dark) {
 	html {
@@ -67,7 +71,7 @@ td, th {
 	padding: 3px 5px;
 	border: var(--lighter-border-color) solid 1px;
 }
-th {
+th, thead, tfoot {
 	background-color: var(--lighter-box-background-color);
 }
 th[scope=row] {
@@ -163,4 +167,71 @@ pre.chunk {
 }
 .file-header {
 	font-family: monospace;
+}
+
+textarea {
+	box-sizing: border-box;
+	background-color: var(--lighter-box-background-color);
+	resize: vertical;
+}
+textarea,
+input[type=text],
+input[type=password] {
+	font-family: sans-serif;
+	font-size: smaller;
+	background-color: var(--lighter-box-background-color);
+	color: var(--text-color);
+	border: none;
+	padding: 0.3rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+td.tdinput, th.tdinput {
+	padding: 0;
+}
+td.tdinput textarea,
+td.tdinput input[type=text],
+td.tdinput input[type=password],
+th.tdinput textarea,
+th.tdinput input[type=text],
+th.tdinput input[type=password] {
+	background-color: transparent;
+}
+.btn-primary {
+	background: var(--primary-color);
+	color: var(--primary-color-contrast);
+	border: var(--lighter-border-color) 1px solid;
+	font-weight: bold;
+}
+.btn-danger {
+	background: var(--danger-color);
+	color: var(--danger-color-contrast);
+	border: var(--lighter-border-color) 1px solid;
+	font-weight: bold;
+}
+.btn-white {
+	background: var(--primary-color-contrast);
+	color: var(--primary-color);
+	border: var(--lighter-border-color) 1px solid;
+}
+.btn-normal,
+input[type=file]::file-selector-button {
+	background: var(--lighter-box-background-color);
+	border: var(--lighter-border-color) 1px solid !important;
+	color: var(--light-text-color);
+}
+.btn, .btn-white, .btn-danger, .btn-normal, .btn-primary,
+input[type=submit],
+input[type=file]::file-selector-button {
+	display: inline-block;
+	width: auto;
+	min-width: fit-content;
+	border-radius: 0;
+	padding: .1rem .75rem;
+	font-size: 0.9rem;
+	transition: background .1s linear;
+	cursor: pointer;
+}
+a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
+	text-decoration: none;
 }
