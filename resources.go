@@ -13,12 +13,12 @@ import (
 //go:embed static/* templates/*
 var source_fs embed.FS
 
-func serve_source() {
-	http.Handle("/source/",
-		http.StripPrefix(
-			"/source/",
-			http.FileServer(http.FS(source_fs)),
-		),
+var source_handler http.Handler
+
+func init() {
+	source_handler = http.StripPrefix(
+		"/:/source/",
+		http.FileServer(http.FS(source_fs)),
 	)
 }
 
@@ -35,16 +35,12 @@ func load_templates() (err error) {
 	return err
 }
 
-func serve_static() (err error) {
+var static_handler http.Handler
+func init() {
 	static_fs, err := fs.Sub(resources_fs, "static")
 	if err != nil {
-		return err
+		panic(err)
 	}
-	http.Handle("/static/",
-		http.StripPrefix(
-			"/static/",
-			http.FileServer(http.FS(static_fs)),
-		),
-	)
-	return nil
+	static_handler = http.StripPrefix("/:/static/", http.FileServer(http.FS(static_fs)))
 }
+

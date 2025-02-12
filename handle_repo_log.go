@@ -7,9 +7,9 @@ import (
 )
 
 // TODO: I probably shouldn't include *all* commits here...
-func handle_repo_log(w http.ResponseWriter, r *http.Request) {
+func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
-	group_name, repo_name, ref_name := r.PathValue("group_name"), r.PathValue("repo_name"), r.PathValue("ref")
+	group_name, repo_name, ref_name := params["group_name"], params["repo_name"], params["ref"]
 	data["group_name"], data["repo_name"], data["ref"] = group_name, repo_name, ref_name
 	repo, err := open_git_repo(group_name, repo_name)
 	if err != nil {

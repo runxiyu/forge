@@ -4,9 +4,9 @@ import (
 	"net/http"
 )
 
-func handle_repo_index(w http.ResponseWriter, r *http.Request) {
+func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
-	group_name, repo_name := r.PathValue("group_name"), r.PathValue("repo_name")
+	group_name, repo_name := params["group_name"], params["repo_name"]
 	data["group_name"], data["repo_name"] = group_name, repo_name
 	repo, err := open_git_repo(group_name, repo_name)
 	if err != nil {

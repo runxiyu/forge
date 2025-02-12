@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func handle_group_repos(w http.ResponseWriter, r *http.Request) {
+func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
-	group_name := r.PathValue("group_name")
+	group_name := params["group_name"]
 	data["group_name"] = group_name
 	entries, err := os.ReadDir(filepath.Join(config.Git.Root, group_name))
 	if err != nil {

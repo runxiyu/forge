@@ -9,10 +9,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func handle_repo_raw(w http.ResponseWriter, r *http.Request) {
+func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
-	raw_path_spec := r.PathValue("rest")
-	group_name, repo_name, path_spec := r.PathValue("group_name"), r.PathValue("repo_name"), strings.TrimSuffix(raw_path_spec, "/")
+	raw_path_spec := params["rest"]
+	group_name, repo_name, path_spec := params["group_name"], params["repo_name"], strings.TrimSuffix(raw_path_spec, "/")
 
 	ref_type, ref_name, err := get_param_ref_and_type(r)
 	if err != nil {
