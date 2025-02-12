@@ -2,29 +2,36 @@ package main
 
 import (
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
 	group_name := params["group_name"]
 	data["group_name"] = group_name
-	entries, err := os.ReadDir(filepath.Join(config.Git.Root, group_name))
+
+	var names []string
+	rows, err := database.Query(r.Context(), "SELECT r.name FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1;", group_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error listing repos: " + err.Error()))
+		_, _ = w.Write([]byte("Error getting groups: " + err.Error()))
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			_, _ = w.Write([]byte("Error scanning row: " + err.Error()))
+			return
+		}
+		names = append(names, name)
+	}
+
+	if err := rows.Err(); err != nil {
+		_, _ = w.Write([]byte("Error iterating over rows: " + err.Error()))
 		return
 	}
 
-	repos := []string{}
-	for _, entry := range entries {
-		this_name := entry.Name()
-		if strings.HasSuffix(this_name, ".git") {
-			repos = append(repos, strings.TrimSuffix(this_name, ".git"))
-		}
-	}
-	data["repos"] = repos
+	data["repos"] = names
 
 	err = templates.ExecuteTemplate(w, "group_repos", data)
 	if err != nil {

@@ -8,7 +8,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	data := make(map[string]any)
 	group_name, repo_name := params["group_name"], params["repo_name"]
 	data["group_name"], data["repo_name"] = group_name, repo_name
-	repo, err := open_git_repo(group_name, repo_name)
+	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return

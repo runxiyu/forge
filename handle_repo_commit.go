@@ -20,7 +20,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	data := make(map[string]any)
 	group_name, repo_name, commit_id_specified_string := params["group_name"], params["repo_name"], params["commit_id"]
 	data["group_name"], data["repo_name"] = group_name, repo_name
-	repo, err := open_git_repo(group_name, repo_name)
+	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
 		return

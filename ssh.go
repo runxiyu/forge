@@ -43,12 +43,18 @@ func serve_ssh() error {
 				return
 			}
 
-			proc := exec.CommandContext(session.Context(), cmd[0], "/home/runxiyu/git/forge.git")
+			fs_path, err := get_repo_path_from_ssh_path(session.Context(), cmd[1])
+			if err != nil {
+				fmt.Fprintln(session.Stderr(), "Error while getting repo path:", err)
+				return
+			}
+
+			proc := exec.CommandContext(session.Context(), cmd[0], fs_path)
 			proc.Stdin = session
 			proc.Stdout = session
 			proc.Stderr = session.Stderr()
 
-			err := proc.Start()
+			err = proc.Start()
 			if err != nil {
 				fmt.Fprintln(session.Stderr(), "Error while starting process:", err)
 				return

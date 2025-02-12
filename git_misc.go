@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"io"
-	"path/filepath"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -19,16 +19,13 @@ var (
 	err_getting_parent_commit_object = errors.New("Error getting parent commit object")
 )
 
-func open_git_repo(group_name, repo_name string) (*git.Repository, error) {
-	group_name, group_name_ok := misc.Sanitize_path(group_name)
-	if !group_name_ok {
-		return nil, err_unsafe_path
+func open_git_repo(ctx context.Context, group_name, repo_name string) (*git.Repository, error) {
+	var fs_path string
+	err := database.QueryRow(ctx, "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path)
+	if err != nil {
+		return nil, err
 	}
-	repo_name, repo_name_ok := misc.Sanitize_path(repo_name)
-	if !repo_name_ok {
-		return nil, err_unsafe_path
-	}
-	return git.PlainOpen(filepath.Join(config.Git.Root, group_name, repo_name+".git"))
+	return git.PlainOpen(fs_path)
 }
 
 type display_git_tree_entry_t struct {
