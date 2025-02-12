@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -9,30 +10,30 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
+		fmt.Fprintln(w, "Error opening repo:", err.Error())
 		return
 	}
 	head, err := repo.Head()
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting repo HEAD: " + err.Error()))
+		fmt.Fprintln(w, "Error getting repo HEAD:", err.Error())
 		return
 	}
 	params["ref"] = head.Name().Short()
 	head_hash := head.Hash()
 	recent_commits, err := get_recent_commits(repo, head_hash, 3)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting recent commits: " + err.Error()))
+		fmt.Fprintln(w, "Error getting recent commits:", err.Error())
 		return
 	}
 	params["commits"] = recent_commits
 	commit_object, err := repo.CommitObject(head_hash)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
+		fmt.Fprintln(w, "Error getting commit object:", err.Error())
 		return
 	}
 	tree, err := commit_object.Tree()
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting file tree: " + err.Error()))
+		fmt.Fprintln(w, "Error getting file tree:", err.Error())
 		return
 	}
 
@@ -43,7 +44,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 
 	err = templates.ExecuteTemplate(w, "repo_index", params)
 	if err != nil {
-		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+		fmt.Fprintln(w, "Error rendering template:", err.Error())
 		return
 	}
 }

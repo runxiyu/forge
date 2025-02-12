@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"errors"
 	"net/http"
 	"path"
@@ -18,7 +19,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 		if errors.Is(err, err_no_ref_spec) {
 			ref_type = "head"
 		} else {
-			_, _ = w.Write([]byte("Error querying ref type: " + err.Error()))
+			fmt.Fprintln(w, "Error querying ref type:", err.Error())
 			return
 		}
 	}
@@ -27,24 +28,24 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
+		fmt.Fprintln(w, "Error opening repo:", err.Error())
 		return
 	}
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting ref hash: " + err.Error()))
+		fmt.Fprintln(w, "Error getting ref hash:", err.Error())
 		return
 	}
 
 	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
+		fmt.Fprintln(w, "Error getting commit object:", err.Error())
 		return
 	}
 	tree, err := commit_object.Tree()
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting file tree: " + err.Error()))
+		fmt.Fprintln(w, "Error getting file tree:", err.Error())
 		return
 	}
 
@@ -56,7 +57,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 		if err != nil {
 			file, err := tree.File(path_spec)
 			if err != nil {
-				_, _ = w.Write([]byte("Error retrieving path: " + err.Error()))
+				fmt.Fprintln(w, "Error retrieving path:", err.Error())
 				return
 			}
 			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
@@ -65,10 +66,10 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 			}
 			file_contents, err := file.Contents()
 			if err != nil {
-				_, _ = w.Write([]byte("Error reading file: " + err.Error()))
+				fmt.Fprintln(w, "Error reading file:", err.Error())
 				return
 			}
-			_, _ = w.Write([]byte(file_contents))
+			fmt.Fprintln(w, file_contents)
 			return
 		}
 	}
@@ -82,7 +83,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	err = templates.ExecuteTemplate(w, "repo_raw_dir", params)
 	if err != nil {
-		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+		fmt.Fprintln(w, "Error rendering template:", err.Error())
 		return
 	}
 }

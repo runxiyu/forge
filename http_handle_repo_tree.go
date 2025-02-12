@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -22,29 +23,29 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 		if errors.Is(err, err_no_ref_spec) {
 			ref_type = "head"
 		} else {
-			_, _ = w.Write([]byte("Error querying ref type: " + err.Error()))
+			fmt.Fprintln(w, "Error querying ref type:", err.Error())
 			return
 		}
 	}
 	params["ref_type"], params["ref"], params["path_spec"] = ref_type, ref_name, path_spec
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error opening repo: " + err.Error()))
+		fmt.Fprintln(w, "Error opening repo:", err.Error())
 		return
 	}
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting ref hash: " + err.Error()))
+		fmt.Fprintln(w, "Error getting ref hash:", err.Error())
 		return
 	}
 	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting commit object: " + err.Error()))
+		fmt.Fprintln(w, "Error getting commit object:", err.Error())
 		return
 	}
 	tree, err := commit_object.Tree()
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting file tree: " + err.Error()))
+		fmt.Fprintln(w, "Error getting file tree:", err.Error())
 		return
 	}
 
@@ -56,7 +57,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 		if err != nil {
 			file, err := tree.File(path_spec)
 			if err != nil {
-				_, _ = w.Write([]byte("Error retrieving path: " + err.Error()))
+				fmt.Fprintln(w, "Error retrieving path:", err.Error())
 				return
 			}
 			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
@@ -65,7 +66,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			}
 			file_contents, err := file.Contents()
 			if err != nil {
-				_, _ = w.Write([]byte("Error reading file: " + err.Error()))
+				fmt.Fprintln(w, "Error reading file:", err.Error())
 				return
 			}
 			lexer := chroma_lexers.Match(path_spec)
@@ -74,7 +75,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			}
 			iterator, err := lexer.Tokenise(nil, file_contents)
 			if err != nil {
-				_, _ = w.Write([]byte("Error tokenizing code: " + err.Error()))
+				fmt.Fprintln(w, "Error tokenizing code:", err.Error())
 				return
 			}
 			var formatted_unencapsulated bytes.Buffer
@@ -82,7 +83,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
 			err = formatter.Format(&formatted_unencapsulated, style, iterator)
 			if err != nil {
-				_, _ = w.Write([]byte("Error formatting code: " + err.Error()))
+				fmt.Fprintln(w, "Error formatting code:", err.Error())
 				return
 			}
 			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
@@ -90,7 +91,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 
 			err = templates.ExecuteTemplate(w, "repo_tree_file", params)
 			if err != nil {
-				_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+				fmt.Fprintln(w, "Error rendering template:", err.Error())
 				return
 			}
 			return
@@ -107,7 +108,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 
 	err = templates.ExecuteTemplate(w, "repo_tree_dir", params)
 	if err != nil {
-		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+		fmt.Fprintln(w, "Error rendering template:", err.Error())
 		return
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -10,7 +11,7 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 	var names []string
 	rows, err := database.Query(r.Context(), "SELECT r.name FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1;", group_name)
 	if err != nil {
-		_, _ = w.Write([]byte("Error getting groups: " + err.Error()))
+		fmt.Fprintln(w, "Error getting groups:", err.Error())
 		return
 	}
 	defer rows.Close()
@@ -18,14 +19,14 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
-			_, _ = w.Write([]byte("Error scanning row: " + err.Error()))
+			fmt.Fprintln(w, "Error scanning row:", err.Error())
 			return
 		}
 		names = append(names, name)
 	}
 
 	if err := rows.Err(); err != nil {
-		_, _ = w.Write([]byte("Error iterating over rows: " + err.Error()))
+		fmt.Fprintln(w, "Error iterating over rows:", err.Error())
 		return
 	}
 
@@ -33,7 +34,7 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 
 	err = templates.ExecuteTemplate(w, "group_repos", params)
 	if err != nil {
-		_, _ = w.Write([]byte("Error rendering template: " + err.Error()))
+		fmt.Fprintln(w, "Error rendering template:", err.Error())
 		return
 	}
 }
