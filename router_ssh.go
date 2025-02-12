@@ -14,7 +14,7 @@ func get_repo_path_from_ssh_path(ctx context.Context, ssh_path string) (repo_pat
 
 	for i, segment := range segments {
 		var err error
-		segments[i], err = url.QueryUnescape(segment)
+		segments[i], err = url.PathUnescape(segment)
 		if err != nil {
 			return "", err
 		}
