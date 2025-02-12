@@ -6,6 +6,7 @@ import (
 
 func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
+	data["global"] = global_data
 	group_name := params["group_name"]
 	data["group_name"] = group_name
 

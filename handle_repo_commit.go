@@ -18,6 +18,7 @@ type usable_file_patch struct {
 
 func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
+	data["global"] = global_data
 	group_name, repo_name, commit_id_specified_string := params["group_name"], params["repo_name"], params["commit_id"]
 	data["group_name"], data["repo_name"] = group_name, repo_name
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)

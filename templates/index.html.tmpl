@@ -3,13 +3,14 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>Groups &ndash; Lindenii Forge</title>
+		<title>Index &ndash; Lindenii Forge</title>
 	</head>
 	<body class="index">
 		<div class="padding-wrapper">
-			<h1>
+			<h1>Lindenii Forge</h1>
+			<h2>
 				Groups
-			</h1>
+			</h2>
 			<ul>
 				{{- range .groups }}
 					<li>
@@ -17,6 +18,21 @@
 					</li>
 				{{- end }}
 			</ul>
+			<h2>
+				Info
+			</h2>
+			<table class="wide">
+				<tbody>
+					<tr>
+						<th scope="row">SSH Public Key</th>
+						<td><code>{{ .global.server_public_key_string }}</code></td>
+					</tr>
+					<tr>
+						<th scope="row">SSH Fingerprint</th>
+						<td><code>{{ .global.server_public_key_fingerprint }}</code></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 		<footer>
 			{{ template "footer" . }}

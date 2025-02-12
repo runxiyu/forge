@@ -11,6 +11,10 @@ import (
 	go_ssh "golang.org/x/crypto/ssh"
 )
 
+var server_public_key_string string
+var server_public_key_fingerprint string
+var server_public_key go_ssh.PublicKey
+
 func serve_ssh() error {
 	host_key_bytes, err := os.ReadFile(config.SSH.Key)
 	if err != nil {
@@ -21,6 +25,10 @@ func serve_ssh() error {
 	if err != nil {
 		return err
 	}
+
+	server_public_key = host_key.PublicKey()
+	server_public_key_string = string(go_ssh.MarshalAuthorizedKey(server_public_key))
+	server_public_key_fingerprint = string(go_ssh.FingerprintSHA256(server_public_key))
 
 	server := &glider_ssh.Server{
 		Handler: func(session glider_ssh.Session) {

@@ -6,6 +6,7 @@ import (
 
 func handle_index(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
+	data["global"] = global_data
 
 	rows, err := database.Query(r.Context(), "SELECT name FROM groups")
 	if err != nil {

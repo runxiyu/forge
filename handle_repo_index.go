@@ -7,6 +7,7 @@ import (
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
+	data["global"] = global_data
 	group_name, repo_name := params["group_name"], params["repo_name"]
 	data["group_name"], data["repo_name"] = group_name, repo_name
 	repo, err := open_git_repo(r.Context(), group_name, repo_name)
@@ -41,7 +42,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	data["readme_filename"], data["readme"] = render_readme_at_tree(tree)
 	data["files"] = build_display_git_tree(tree)
 
-	data["clone_url"] = "ssh://" + r.Host + "/" + url.PathEscape(params["group_name"]) + "/:/repos/" + url.PathEscape(params["repo_name"]) 
+	data["clone_url"] = "ssh://" + r.Host + "/" + url.PathEscape(params["group_name"]) + "/:/repos/" + url.PathEscape(params["repo_name"])
 
 	err = templates.ExecuteTemplate(w, "repo_index", data)
 	if err != nil {

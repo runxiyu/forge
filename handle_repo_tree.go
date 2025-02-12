@@ -16,6 +16,7 @@ import (
 
 func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	data := make(map[string]any)
+	data["global"] = global_data
 	raw_path_spec := params["rest"]
 	group_name, repo_name, path_spec := params["group_name"], params["repo_name"], strings.TrimSuffix(raw_path_spec, "/")
 	ref_type, ref_name, err := get_param_ref_and_type(r)
