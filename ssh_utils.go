@@ -11,9 +11,11 @@ import (
 	go_ssh "golang.org/x/crypto/ssh"
 )
 
-var server_public_key_string string
-var server_public_key_fingerprint string
-var server_public_key go_ssh.PublicKey
+var (
+	server_public_key_string      string
+	server_public_key_fingerprint string
+	server_public_key             go_ssh.PublicKey
+)
 
 func serve_ssh() error {
 	host_key_bytes, err := os.ReadFile(config.SSH.Key)
