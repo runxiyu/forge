@@ -47,7 +47,6 @@ CREATE TABLE emails (
 CREATE TABLE users (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username TEXT NOT NULL UNIQUE,
-	password_algorithm TEXT NOT NULL CHECK (password_algorithm in ('argon2id')),
 	password TEXT NOT NULL
 );
 

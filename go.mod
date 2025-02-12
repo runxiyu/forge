@@ -4,6 +4,7 @@ go 1.23.5
 
 require (
 	github.com/alecthomas/chroma/v2 v2.15.0
+	github.com/alexedwards/argon2id v1.0.0
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/jackc/pgx/v5 v5.7.2
