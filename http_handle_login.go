@@ -57,6 +57,11 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	}
 
 	cookie_value, err := random_urlsafe_string(16)
+	if err != nil {
+		http.Error(w, "Error getting random string: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	now := time.Now()
 	expiry := now.Add(time.Duration(config.HTTP.CookieExpiry) * time.Second)
 
