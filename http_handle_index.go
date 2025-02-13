@@ -12,20 +12,14 @@ func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any)
 	}
 	defer rows.Close()
 
-	groups := []struct {
-		Name        string
-		Description string
-	}{}
+	groups := []name_desc_t{}
 	for rows.Next() {
 		var groupName, groupDescription string
 		if err := rows.Scan(&groupName, &groupDescription); err != nil {
 			http.Error(w, "Error scanning group: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		groups = append(groups, struct {
-			Name        string
-			Description string
-		}{groupName, groupDescription})
+		groups = append(groups, name_desc_t{groupName, groupDescription})
 	}
 
 	if err := rows.Err(); err != nil {

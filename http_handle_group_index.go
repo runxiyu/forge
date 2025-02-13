@@ -14,20 +14,14 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 	}
 	defer rows.Close()
 
-	repos := []struct {
-		Name        string
-		Description string
-	}{}
+	repos := []name_desc_t{}
 	for rows.Next() {
 		var repoName, repoDescription string
 		if err := rows.Scan(&repoName, &repoDescription); err != nil {
 			http.Error(w, "Error scanning repo: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		repos = append(repos, struct {
-			Name        string
-			Description string
-		}{repoName, repoDescription})
+		repos = append(repos, name_desc_t{repoName, repoDescription})
 	}
 	params["repos"] = repos
 
