@@ -21,7 +21,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	group_name, repo_name, commit_id_specified_string := params["group_name"].(string), params["repo_name"].(string), params["commit_id"].(string)
 	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		fmt.Fprintln(w, "Error opening repo:", err.Error())
+		http.Error(w, "Error opening repo:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["repo_description"] = description
@@ -29,13 +29,13 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	commit_id := plumbing.NewHash(commit_id_specified_string_without_suffix)
 	commit_object, err := repo.CommitObject(commit_id)
 	if err != nil {
-		fmt.Fprintln(w, "Error getting commit object:", err.Error())
+		http.Error(w, "Error getting commit object:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if commit_id_specified_string_without_suffix != commit_id_specified_string {
 		patch, err := format_patch_from_commit(commit_object)
 		if err != nil {
-			fmt.Fprintln(w, "Error formatting patch:", err.Error())
+			http.Error(w, "Error formatting patch:: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprintln(w, patch)
@@ -53,13 +53,13 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 
 	parent_commit_hash, patch, err := get_patch_from_commit(commit_object)
 	if err != nil {
-		fmt.Fprintln(w, "Error getting patch from commit:", err.Error())
+		http.Error(w, "Error getting patch from commit:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["parent_commit_hash"] = parent_commit_hash.String()
 	params["patch"] = patch
 
-	// TODO: Remove unnecessary context                                          
+	// TODO: Remove unnecessary context
 	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
 	usable_file_patches := make([]usable_file_patch, 0)
 	for _, file_patch := range patch.FilePatches() {
@@ -81,7 +81,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 
 	err = templates.ExecuteTemplate(w, "repo_commit", params)
 	if err != nil {
-		fmt.Fprintln(w, "Error rendering template:", err.Error())
+		http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

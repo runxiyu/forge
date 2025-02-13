@@ -16,9 +16,9 @@ var err_unsupported_database_type = errors.New("Unsupported database type")
 
 var config struct {
 	HTTP struct {
-		Net  string `scfg:"net"`
-		Addr string `scfg:"addr"`
-		CookieExpiry int `scfg:"cookie_expiry"`
+		Net          string `scfg:"net"`
+		Addr         string `scfg:"addr"`
+		CookieExpiry int    `scfg:"cookie_expiry"`
 	} `scfg:"http"`
 	SSH struct {
 		Net  string `scfg:"net"`

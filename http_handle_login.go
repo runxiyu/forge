@@ -16,7 +16,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	if r.Method != "POST" {
 		err := templates.ExecuteTemplate(w, "login", params)
 		if err != nil {
-			fmt.Fprintln(w, "Error rendering template:", err.Error())
+			http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -32,17 +32,17 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 			params["login_error"] = "Unknown username"
 			err := templates.ExecuteTemplate(w, "login", params)
 			if err != nil {
-				fmt.Fprintln(w, "Error rendering template:", err.Error())
+				http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
 			}
 			return
 		}
-		fmt.Fprintln(w, "Error querying user information:", err.Error())
+		http.Error(w, "Error querying user information:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	match, err := argon2id.ComparePasswordAndHash(password, password_hash)
 	if err != nil {
-		fmt.Fprintln(w, "Error comparing password and hash:", err.Error())
+		http.Error(w, "Error comparing password and hash:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -50,7 +50,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 		params["login_error"] = "Invalid password"
 		err := templates.ExecuteTemplate(w, "login", params)
 		if err != nil {
-			fmt.Fprintln(w, "Error rendering template:", err.Error())
+			http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		return
@@ -75,7 +75,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 
 	_, err = database.Exec(r.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", user_id, cookie_value)
 	if err != nil {
-		fmt.Fprintln(w, "Error inserting session:", err.Error())
+		http.Error(w, "Error inserting session:: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
