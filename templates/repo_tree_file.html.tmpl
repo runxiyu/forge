@@ -8,9 +8,6 @@
 	</head>
 	<body class="repo-tree-file">
 		{{ template "header" . }}
-		<header>
-			{{ template "repo_header" . }}
-		</header>
 		<p>
 			/{{ .path_spec }} (<a href="/{{ .group_name }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if not (eq .ref_type "head") }}?{{ .ref_type }}={{ .ref }}{{ end }}">raw</a>)
 		</p>
