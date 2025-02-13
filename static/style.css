@@ -29,6 +29,9 @@ html {
 		--lighter-box-background-color: hsl(0, 0%, 15%);
 	}
 }
+body {
+	margin: 0;
+}
 html, code, pre {
 	font-size: 1rem; /* TODO: Not always correct */
 }
@@ -234,4 +237,20 @@ input[type=file]::file-selector-button {
 }
 a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
 	text-decoration: none;
+}
+header#main-header {
+	background-color: var(--lighter-box-background-color);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+}
+
+header#main-header > div#main-header-forge-title {
+	flex-grow: 1; /* Allows title to take up remaining space */
+}
+
+header#main-header > div#main-header-user {
+	display: flex;
+	align-items: center; /* Ensures user section is vertically aligned */
 }
