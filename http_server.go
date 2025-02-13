@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 type http_router_t struct{}
@@ -49,7 +49,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	params := make(map[string]any)
 	params["global"] = global_data
-	var _user_id int  // 0 for none
+	var _user_id int // 0 for none
 	_user_id, params["username"], err = get_user_info_from_request(r)
 	if errors.Is(err, http.ErrNoCookie) {
 	} else if errors.Is(err, pgx.ErrNoRows) {
