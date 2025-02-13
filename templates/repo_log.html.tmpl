@@ -7,33 +7,35 @@
 	</head>
 	<body class="repo-log">
 		{{ template "header" . }}
-		<table id="commits" class="wide">
-			<thead>
-				<tr class="title-row">
-					<th colspan="4">Commits on {{ .ref }}</th>
-				</tr>
-				<tr>
-					<th scope="col">ID</th>
-					<th scope="col">Title</th>
-					<th scope="col">Author</th>
-					<th scope="col">Time</th>
-				</tr>
-			</thead>
-			<tbody>
-				{{- range .commits }}
-					<tr>
-						<td class="commit-id"><a href="../commit/{{ .ID }}">{{ .ID }}</a></td>
-						<td class="commit-title">{{ .Message | first_line }}</td>
-						<td class="commit-author">
-							<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
-						</td>
-						<td class="commit-time">
-							{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
-						</td>
+		<div class="scroll">
+			<table id="commits" class="wide">
+				<thead>
+					<tr class="title-row">
+						<th colspan="4">Commits on {{ .ref }}</th>
 					</tr>
-				{{- end }}
-			</tbody>
-		</table>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Title</th>
+						<th scope="col">Author</th>
+						<th scope="col">Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- range .commits }}
+						<tr>
+							<td class="commit-id"><a href="../commit/{{ .ID }}">{{ .ID }}</a></td>
+							<td class="commit-title">{{ .Message | first_line }}</td>
+							<td class="commit-author">
+								<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
+							</td>
+							<td class="commit-time">
+								{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
+							</td>
+						</tr>
+					{{- end }}
+				</tbody>
+			</table>
+		</div>
 		<footer>
 			{{ template "footer" . }}
 		</footer>
