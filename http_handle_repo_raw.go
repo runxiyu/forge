@@ -26,11 +26,12 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	params["ref_type"], params["ref"], params["path_spec"] = ref_type, ref_name, path_spec
 
-	repo, err := open_git_repo(r.Context(), group_name, repo_name)
+	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		fmt.Fprintln(w, "Error opening repo:", err.Error())
 		return
 	}
+	params["repo_description"] = description
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
 	if err != nil {

@@ -8,11 +8,12 @@ import (
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
-	repo, err := open_git_repo(r.Context(), group_name, repo_name)
+	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		fmt.Fprintln(w, "Error opening repo:", err.Error())
 		return
 	}
+	params["repo_description"] = description
 	head, err := repo.Head()
 	if err != nil {
 		fmt.Fprintln(w, "Error getting repo HEAD:", err.Error())

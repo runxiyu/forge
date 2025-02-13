@@ -18,13 +18,14 @@ var (
 	err_getting_parent_commit_object = errors.New("Error getting parent commit object")
 )
 
-func open_git_repo(ctx context.Context, group_name, repo_name string) (*git.Repository, error) {
+func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, err error) {
 	var fs_path string
-	err := database.QueryRow(ctx, "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path)
+	err = database.QueryRow(ctx, "SELECT r.filesystem_path, r.description FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	return git.PlainOpen(fs_path)
+	repo, err = git.PlainOpen(fs_path)
+	return
 }
 
 type display_git_tree_entry_t struct {

@@ -16,9 +16,19 @@
 				</thead>
 				<tbody>
 					<tr>
+						<th scope="row">Name</th>
+						<td>{{ .repo_name }}</td>
+					</tr>
+					<tr>
 						<th scope="row">Clone</th>
 						<td><code>git clone {{ .clone_url }}</code></td>
 					</tr>
+					{{ if .repo_description }}
+						<tr>
+							<th scope="row">Description</th>
+							<td>{{ .repo_description }}</td>
+						</tr>
+					{{ end }}
 				</tbody>
 			</table>
 		</div>
