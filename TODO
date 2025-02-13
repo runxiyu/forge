@@ -1,6 +1,7 @@
 * User account management
 * Web interface to create repos and groups
 * Merge requests
+* Fix diff view
 * Subgroups
 * API
 * Email integration
