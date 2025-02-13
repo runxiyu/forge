@@ -6,11 +6,15 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 type http_router_t struct{}
 
 func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	clog.Debug("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
+
 	segments, _, err := parse_request_uri(r.RequestURI)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

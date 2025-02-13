@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 
 	glider_ssh "github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
@@ -39,7 +40,8 @@ func serve_ssh(listener net.Listener) error {
 			if client_public_key != nil {
 				client_public_key_string = string(go_ssh.MarshalAuthorizedKey(client_public_key))
 			}
-			_ = client_public_key_string
+
+			clog.Debug("Incoming SSH: " + session.RemoteAddr().String() + " " + strings.TrimSuffix(client_public_key_string, "\n") + " " + session.RawCommand())
 
 			cmd := session.Command()
 
