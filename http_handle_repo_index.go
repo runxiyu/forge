@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"net/url"
 )
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -40,7 +39,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
 	params["files"] = build_display_git_tree(tree)
 
-	params["clone_url"] = "ssh://" + r.Host + "/" + url.PathEscape(group_name) + "/:/repos/" + url.PathEscape(repo_name)
+	params["clone_url"] = generate_ssh_remote_url(group_name, repo_name)
 
 	err = templates.ExecuteTemplate(w, "repo_index", params)
 	if err != nil {

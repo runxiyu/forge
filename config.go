@@ -24,6 +24,7 @@ var config struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`
 		Key  string `scfg:"key"`
+		Root string `scfg:"root"`
 	} `scfg:"ssh"`
 	Git struct {
 		Root string `scfg:"root"`
