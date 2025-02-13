@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 type http_router_t struct{}
@@ -48,7 +49,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _user_id == 0 {
 		params["user_id"] = ""
 	} else {
-		params["user_id"] = string(_user_id)
+		params["user_id"] = strconv.Itoa(_user_id)
 	}
 
 	if segments[0] == ":" {
@@ -56,13 +57,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "login":
 			handle_login(w, r, params)
 			return
+		case "users":
+			handle_users(w, r, params)
+			return
 		default:
 			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
 			return
 		}
 	}
-
-	fmt.Printf("%#v\n", params)
 
 	separator_index := -1
 	for i, part := range segments {

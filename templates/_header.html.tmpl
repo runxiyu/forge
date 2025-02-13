@@ -4,7 +4,7 @@
 </div>
 <div>
 	{{ if ne .user_id "" }}
-		<a href="/:/user/{{ .user_id }}">{{ .username }}</a>
+		<a href="/:/users/{{ .user_id }}">{{ .username }}</a>
 	{{ else }}
 		<a href="/:/login/">Login</a>
 	{{ end }}
