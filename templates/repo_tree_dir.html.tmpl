@@ -18,10 +18,12 @@
 				</thead>
 				<tbody>
 					{{- $path_spec := .path_spec }}
+					{{- $ref := .ref }}
+					{{- $ref_type := .ref_type }}
 					{{- range .files }}
 						<tr>
 							<td class="file-mode">{{ .Mode }}</td>
-							<td class="file-name"><a href="{{ .Name }}{{ if not .Is_file }}/{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
+							<td class="file-name"><a href="{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
 							<td class="file-size">{{ .Size }}</td>
 						</tr>
 					{{- end }}
