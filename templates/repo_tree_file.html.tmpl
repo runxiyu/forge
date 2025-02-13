@@ -8,10 +8,12 @@
 	</head>
 	<body class="repo-tree-file">
 		{{ template "header" . }}
-		<p>
-			/{{ .path_spec }} (<a href="/{{ .group_name }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if not (eq .ref_type "head") }}?{{ .ref_type }}={{ .ref }}{{ end }}">raw</a>)
-		</p>
-		{{ .file_contents }}
+		<div class="padding">
+			<p>
+				/{{ .path_spec }} (<a href="/{{ .group_name }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if not (eq .ref_type "head") }}?{{ .ref_type }}={{ .ref }}{{ end }}">raw</a>)
+			</p>
+			{{ .file_contents }}
+		</div>
 		<footer>
 			{{ template "footer" . }}
 		</footer>

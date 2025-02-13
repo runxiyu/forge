@@ -53,6 +53,9 @@ footer a:link, footer a:visited {
 	max-width: 60rem;
 	padding: 0 5px;
 }
+.padding {
+	padding: 0 5px;
+}
 a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
 	color: var(--link-color);
