@@ -17,7 +17,7 @@ var (
 	server_public_key             go_ssh.PublicKey
 )
 
-func serve_ssh() error {
+func serve_ssh(listener net.Listener) error {
 	host_key_bytes, err := os.ReadFile(config.SSH.Key)
 	if err != nil {
 		return err
@@ -81,11 +81,6 @@ func serve_ssh() error {
 	}
 
 	server.AddHostKey(host_key)
-
-	listener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
-	if err != nil {
-		return err
-	}
 
 	go func() {
 		err = server.Serve(listener)
