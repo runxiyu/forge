@@ -26,4 +26,3 @@ func query_list[T any](ctx context.Context, query string, args ...any) ([]T, err
 
 	return result, nil
 }
-

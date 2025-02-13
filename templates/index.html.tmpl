@@ -8,21 +8,37 @@
 	<body class="index">
 		{{ template "header" . }}
 		<div class="padding-wrapper">
-			<h1>Lindenii Forge</h1>
-			<h2>
-				Groups
-			</h2>
-			<ul>
-				{{- range .groups }}
-					<li>
-						<a href="{{ . }}/:/repos/">{{ . }}</a>
-					</li>
-				{{- end }}
-			</ul>
-			<h2>
-				Info
-			</h2>
 			<table class="wide">
+				<thead>
+					<tr>
+						<th colspan="2" class="title-row">
+							Groups
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- range .groups }}
+						<tr>
+							<td>
+								<a href="{{ .Name }}/:/repos/">{{ .Name }}</a>
+							</td>
+							<td>
+								{{ .Description }}
+							</td>
+						</tr>
+					{{- end }}
+				</tbody>
+			</table>
+		</div>
+		<div class="padding-wrapper">
+			<table class="wide">
+				<thead>
+					<tr>
+						<th colspan="2" class="title-row">
+							Info
+						</th>
+					</tr>
+				</thead>
 				<tbody>
 					<tr>
 						<th scope="row">SSH Public Key</th>
