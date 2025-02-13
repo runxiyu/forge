@@ -22,31 +22,31 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 		if errors.Is(err, err_no_ref_spec) {
 			ref_type = "head"
 		} else {
-			http.Error(w, "Error querying ref type:: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 	params["ref_type"], params["ref"], params["path_spec"] = ref_type, ref_name, path_spec
 	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		http.Error(w, "Error opening repo:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["repo_description"] = description
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
 	if err != nil {
-		http.Error(w, "Error getting ref hash:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
-		http.Error(w, "Error getting commit object:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	tree, err := commit_object.Tree()
 	if err != nil {
-		http.Error(w, "Error getting file tree:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -58,7 +58,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 		if err != nil {
 			file, err := tree.File(path_spec)
 			if err != nil {
-				http.Error(w, "Error retrieving path:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
@@ -67,7 +67,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			}
 			file_contents, err := file.Contents()
 			if err != nil {
-				http.Error(w, "Error reading file:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			lexer := chroma_lexers.Match(path_spec)
@@ -76,7 +76,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			}
 			iterator, err := lexer.Tokenise(nil, file_contents)
 			if err != nil {
-				http.Error(w, "Error tokenizing code:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error tokenizing code: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			var formatted_unencapsulated bytes.Buffer
@@ -84,7 +84,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			formatter := chroma_formatters_html.New(chroma_formatters_html.WithClasses(true), chroma_formatters_html.TabWidth(8))
 			err = formatter.Format(&formatted_unencapsulated, style, iterator)
 			if err != nil {
-				http.Error(w, "Error formatting code:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error formatting code: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
@@ -92,7 +92,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 
 			err = templates.ExecuteTemplate(w, "repo_tree_file", params)
 			if err != nil {
-				http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			return
@@ -109,7 +109,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 
 	err = templates.ExecuteTemplate(w, "repo_tree_dir", params)
 	if err != nil {
-		http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

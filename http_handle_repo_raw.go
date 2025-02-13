@@ -19,7 +19,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 		if errors.Is(err, err_no_ref_spec) {
 			ref_type = "head"
 		} else {
-			http.Error(w, "Error querying ref type:: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -28,25 +28,25 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
-		http.Error(w, "Error opening repo:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["repo_description"] = description
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
 	if err != nil {
-		http.Error(w, "Error getting ref hash:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
-		http.Error(w, "Error getting commit object:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	tree, err := commit_object.Tree()
 	if err != nil {
-		http.Error(w, "Error getting file tree:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -58,7 +58,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 		if err != nil {
 			file, err := tree.File(path_spec)
 			if err != nil {
-				http.Error(w, "Error retrieving path:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
@@ -67,7 +67,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 			}
 			file_contents, err := file.Contents()
 			if err != nil {
-				http.Error(w, "Error reading file:: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			fmt.Fprintln(w, file_contents)
@@ -84,7 +84,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	err = templates.ExecuteTemplate(w, "repo_raw_dir", params)
 	if err != nil {
-		http.Error(w, "Error rendering template:: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
