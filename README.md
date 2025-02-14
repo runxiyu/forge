@@ -139,6 +139,9 @@ reasonable doubt.
 * We hang out in [`#chat`](https://webirc.runxiyu.org/kiwiirc/#chat)
   and [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
   on [irc.runxiyu.org](https://irc.runxiyu.org).
-* Issues and pull requests may be submitted on
-  [the Codeberg mirror](https://codeberg.org/runxiyu/forge), before our own
-  ticket tracking and merge request systems are ready.
+* Issues and pull requests may be submitted on the Codeberg mirror before our
+  own ticket tracking and merge request systems are ready.
+* We have several Git repo mirrors on a few places:
+  * [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
+  * [The Lindenii Project's cgit](https://git.lindenii.runxiyu.org/forge.git/)
+  * [Codeberg](https://codeberg.org/lindenii/forge/)
