@@ -1,4 +1,4 @@
-.PHONY: clean
+.PHONY: clean version.go
 
 forge: $(filter-out forge,$(wildcard *)) version.go
 	go build -o $@
