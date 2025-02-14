@@ -38,7 +38,7 @@ body {
 	margin: 0;
 }
 html, code, pre {
-	font-size: 1rem; /* TODO: Not always correct */
+	font-size: 0.96rem; /* TODO: Not always correct */
 }
 
 /* Toggle table controls */
