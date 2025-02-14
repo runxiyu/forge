@@ -41,7 +41,7 @@ func serve_ssh(listener net.Listener) error {
 				client_public_key_string = string(go_ssh.MarshalAuthorizedKey(client_public_key))
 			}
 
-			clog.Debug("Incoming SSH: " + session.RemoteAddr().String() + " " + strings.TrimSuffix(client_public_key_string, "\n") + " " + session.RawCommand())
+			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + strings.TrimSuffix(client_public_key_string, "\n") + " " + session.RawCommand())
 
 			cmd := session.Command()
 

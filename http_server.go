@@ -14,7 +14,7 @@ import (
 type http_router_t struct{}
 
 func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	clog.Debug("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
+	clog.Info("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
 
 	segments, _, err := parse_request_uri(r.RequestURI)
 	if err != nil {
