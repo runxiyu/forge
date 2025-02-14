@@ -71,7 +71,10 @@ the description and manage the MR further via the standard error channel.
 
 MR branches shall be synced to automatically created MR-specific mailing lists.
 These mailing lists should have archives accessible via read-only IMAP, JMAP,
-or something else that achieves a similar result.
+or something else that achieves a similar result. Merge requests are presented
+as what would be produced from git-send-email. It should also be possible for
+people to perform code reviews via email by interwoven a quoted patch with
+replies, and all these replies should be synced to the main MR database.
 
 ### Ticket tracking
 
