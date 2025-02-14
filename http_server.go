@@ -142,18 +142,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				handle_repo_raw(w, r, params)
 			case "log":
-				if non_empty_last_segments_len > separator_index+5 {
+				if non_empty_last_segments_len > separator_index+4 {
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 					return
-				} else if non_empty_last_segments_len < separator_index+5 {
-					http.Error(w, "Insufficient parameters", http.StatusBadRequest)
+				}
+				if !trailing_slash {
+					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 					return
 				}
-				if trailing_slash {
-					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
-					return
-				}
-				params["ref_name"] = segments[separator_index+4]
 				handle_repo_log(w, r, params)
 			case "commit":
 				if trailing_slash {
