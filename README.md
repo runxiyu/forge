@@ -124,7 +124,11 @@ which is
 because it expressly disclaims granting patent licenses.
 
 We have also considered the [GNU AGPL](www.gnu.org/licenses/agpl-3.0.en.html),
-but it has various caveats that we don't fully understand.
+but it has various caveats that we don't fully understand (e.g. many say that
+library code do not have to be provided, but the license text requires the
+Corresponding Source to be provided; a lot of things are contradictory).
+The server currently serves its own source via the web interface, but it does
+not contain the source of dependencies.
 
 Expect licensing to change in the future, although it will stay Libre beyond
 reasonable doubt.
