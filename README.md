@@ -47,7 +47,10 @@ The following shall function where they make sense:
 
 ### Git repos
 
-There isn't much to be said here.
+* Viewing commits, diffs, and patches
+* Viewing trees and files
+* Viewing arbitrary hashed objects and refs
+* Viewing tags
 
 ### Merge requests
 
