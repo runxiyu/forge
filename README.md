@@ -16,7 +16,7 @@ primarily designed for self-hosting by small organizations and individuals.
 
 ## Organization
 
-Misc URLs (for hosting stylesheets, scipts, the login page, etc.) are like
+Misc URLs (for hosting stylesheets, scripts, the login page, etc.) are like
 `https://forge.example.org/:/functionality...`.
 
 Contentful URLs are like
