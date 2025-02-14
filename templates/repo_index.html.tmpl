@@ -77,27 +77,13 @@
 			</table>
 		</div>
 		<div class="padding-wrapper">
-			<div id="refs">
+			<div class="toggle-off-wrapper">
+				<input type="checkbox" id="toggle-readme" class="toggle-off-toggle" />
+				<label for="toggle-readme" class="toggle-off-header centering"><div>{{ .readme_filename }}</div></label>
+				<div class="toggle-off-content pad" id="readme">
+					{{ .readme }}
+				</div>
 			</div>
-		</div>
-		<div class="padding-wrapper">
-			{{ if .readme }}
-				<input id="toggle-table-readme" type="checkbox" class="toggle-table-off" />
-				<table class="wide">
-					<thead>
-						<tr class="title-row">
-							<th><label for="toggle-table-readme">{{ .readme_filename }}</label></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td id="readme">
-								{{ .readme -}}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			{{ end }}
 		</div>
 		<footer>
 			{{ template "footer" . }}

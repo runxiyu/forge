@@ -41,6 +41,29 @@ html, code, pre {
 	font-size: 1rem; /* TODO: Not always correct */
 }
 
+/* Toggle table controls */
+.toggle-table-off, .toggle-table-on {
+       display: none;
+}
+.toggle-table-off + table > thead > tr > th, .toggle-table-on + table > thead > tr > th {
+       padding: 0;
+}
+.toggle-table-off + table > thead > tr > th > label, .toggle-table-on + table > thead > tr > th > label {
+       width: 100%;
+       display: inline-block;
+       padding: 3px 0;
+       cursor: pointer;
+}
+.toggle-table-off:checked + table > tbody {
+       display: none;
+}
+.toggle-table-on + table > tbody {
+       display: none;
+}
+.toggle-table-on:checked + table > tbody {
+       display: table-row-group;
+}
+
 /* Footer styles */
 footer {
 	margin-top: 1rem;
@@ -92,6 +115,9 @@ td, th {
 	padding: 3px 5px;
 	border: var(--lighter-border-color) solid 1px;
 }
+.pad {
+	padding: 3px 5px;
+}
 th, thead, tfoot {
 	background-color: var(--lighter-box-background-color);
 }
@@ -104,10 +130,10 @@ tr.title-row > th, th.title-row, .title-row {
 td > pre {
 	margin: 0;
 }
-td#readme > *:last-child {
+#readme > *:last-child {
 	margin-bottom: 0;
 }
-td#readme > *:first-child {
+#readme > *:first-child {
 	margin-top: 0;
 }
 
@@ -117,29 +143,6 @@ td#readme > *:first-child {
 }
 .scroll {
 	overflow-x: auto;
-}
-
-/* Toggle table controls */
-.toggle-table-off, .toggle-table-on {
-	display: none;
-}
-.toggle-table-off + table > thead > tr > th, .toggle-table-on + table > thead > tr > th {
-	padding: 0;
-}
-.toggle-table-off + table > thead > tr > th > label, .toggle-table-on + table > thead > tr > th > label {
-	width: 100%;
-	display: inline-block;
-	padding: 3px 0;
-	cursor: pointer;
-}
-.toggle-table-off:checked + table > tbody {
-	display: none;
-}
-.toggle-table-on + table > tbody {
-	display: none;
-}
-.toggle-table-on:checked + table > tbody {
-	display: table-row-group;
 }
 
 /* Diff/chunk styles */
@@ -164,29 +167,39 @@ pre.chunk {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+.centering {
+	text-align: center;
+}
 
 /* Toggle content sections */
-.toggle-on-wrapper {
+.toggle-off-wrapper, .toggle-on-wrapper {
 	border: var(--lighter-border-color) solid 1px;
 }
-.toggle-on-toggle {
+.toggle-off-toggle, .toggle-on-toggle {
 	display: none;
 }
-.toggle-on-header {
+.toggle-off-header, .toggle-on-header {
+	font-weight: bold;
 	cursor: pointer;
 	display: block;
 	width: 100%;
 	background-color: var(--lighter-box-background-color);
 }
-.toggle-on-header > span {
+.toggle-off-header > div, .toggle-on-header > div {
 	padding: 3px 5px;
-	display: inline-block;
+	display: block;
 }
 .toggle-on-content {
 	display: none;
 }
 .toggle-on-toggle:checked + .toggle-on-header + .toggle-on-content {
 	display: block;
+}
+.toggle-off-content {
+	display: block;
+}
+.toggle-off-toggle:checked + .toggle-off-header + .toggle-off-content {
+	display: none;
 }
 
 /* File display styles */
