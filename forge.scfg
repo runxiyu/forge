@@ -2,6 +2,7 @@ http {
 	net tcp
 	addr :8080
 	cookie_expiry 604800
+	root https://forge.example.org
 }
 
 ssh {

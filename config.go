@@ -19,6 +19,7 @@ var config struct {
 		Net          string `scfg:"net"`
 		Addr         string `scfg:"addr"`
 		CookieExpiry int    `scfg:"cookie_expiry"`
+		Root         string `scfg:"root"`
 	} `scfg:"http"`
 	SSH struct {
 		Net  string `scfg:"net"`
