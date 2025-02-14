@@ -14,7 +14,12 @@ import (
 type usable_file_patch struct {
 	From   diff.File
 	To     diff.File
-	Chunks []diff.Chunk
+	Chunks []usable_chunk
+}
+
+type usable_chunk struct {
+	Operation diff.Operation
+	Content   string
 }
 
 func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -70,8 +75,19 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 		if to == nil {
 			to = fake_diff_file_null
 		}
+		chunks := []usable_chunk{}
+		for _, chunk := range file_patch.Chunks() {	
+			content := chunk.Content()
+			if len(content) > 0 && content[0] == '\n' {
+				content = "\n" + content
+			} // Horrible hack to fix how browsers newlines that immediately proceed <pre>
+			chunks = append(chunks, usable_chunk{
+				Operation: chunk.Type(),
+				Content:   content,
+			})
+		}
 		usable_file_patch := usable_file_patch{
-			Chunks: file_patch.Chunks(),
+			Chunks: chunks,
 			From:   from,
 			To:     to,
 		}

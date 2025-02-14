@@ -69,11 +69,11 @@
 					</label>
 					<div class="file-content toggle-on-content scroll">
 						{{ range .Chunks }}
-							{{ if eq .Type 0 }}
+							{{ if eq .Operation 0 }}
 								<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
-							{{ else if eq .Type 1 }}
+							{{ else if eq .Operation 1 }}
 								<pre class="chunk chunk-addition">{{ .Content }}</pre>
-							{{ else if eq .Type 2 }}
+							{{ else if eq .Operation 2 }}
 								<pre class="chunk chunk-deletion">{{ .Content }}</pre>
 							{{ else }}
 								<pre class="chunk chunk-unknown">{{ .Content }}</pre>

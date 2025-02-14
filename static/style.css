@@ -147,18 +147,18 @@ td#readme > *:first-child {
 	color: grey;
 }
 .chunk-addition {
-	color: green;
+	background-color: green;
 }
 @media (prefers-color-scheme: dark) {
 	.chunk-addition {
-		color: lime;
+		background-color: lime;
 	}
 }
 .chunk-deletion {
-	color: red;
+	background-color: red;
 }
 .chunk-unknown {
-	color: yellow;
+	background-color: yellow;
 }
 pre.chunk {
 	margin-top: 0;
