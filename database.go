@@ -26,3 +26,21 @@ func query_list[T any](ctx context.Context, query string, args ...any) ([]T, err
 
 	return result, nil
 }
+
+func query_name_desc_list(ctx context.Context, query string, args ...any) ([]name_desc_t, error) {
+	rows, err := database.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := []name_desc_t{}
+	for rows.Next() {
+		var name, description string
+		if err := rows.Scan(&name, &description); err != nil {
+			return nil, err
+		}
+		result = append(result, name_desc_t{name, description})
+	}
+	return result, rows.Err()
+}
