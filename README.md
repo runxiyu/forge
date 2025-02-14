@@ -7,7 +7,7 @@ primarily designed for self-hosting by small organizations and individuals.
 
 ## Setup
 
-* Clone the source code and build a binary with `go build`.
+* Clone the source code and build a binary with GNU make.
 * Generate an SSH key pair with `ssh-keygen`.
 * Create a PostgreSQL database and run `schema.sql`.
 * Set up reverse proxies, etc., if desired.

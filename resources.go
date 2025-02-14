@@ -10,6 +10,7 @@ import (
 //go:embed .gitignore LICENSE README.md
 //go:embed *.go go.mod go.sum
 //go:embed *.scfg
+//go:embed Makefile
 //go:embed schema.sql
 //go:embed static/* templates/*
 var source_fs embed.FS
