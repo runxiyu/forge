@@ -1,0 +1,4 @@
+* linguist-vendored=false
+* linguist-generated=false
+* linguist-detectable=true
+*.html.tmpl linguist-language=HTML
