@@ -123,7 +123,8 @@ which is
 [ideal](https://opensource.org/faq#cc-zero)
 because it expressly disclaims granting patent licenses.
 
-We have also considered the [GNU AGPL](www.gnu.org/licenses/agpl-3.0.en.html),
+We have also considered the
+[GNU AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html),
 but it has various caveats that we don't fully understand (e.g. many say that
 library code do not have to be provided, but the license text requires the
 Corresponding Source to be provided; a lot of things are contradictory).
