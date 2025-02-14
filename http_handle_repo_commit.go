@@ -80,7 +80,6 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	params["file_patches"] = usable_file_patches
 
 	render_template(w, "repo_commit", params)
-	return
 }
 
 type fake_diff_file struct {

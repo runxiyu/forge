@@ -29,5 +29,4 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]a
 	params["commits"] = commits
 
 	render_template(w, "repo_log", params)
-	return
 }
