@@ -8,7 +8,7 @@ ssh {
 	net tcp
 	addr :2222
 	key /etc/lindenii/ssh_host_ed25519_key
-	root ssh://forge.example.org
+	root ssh://forge.example.org:2222
 }
 
 general {
