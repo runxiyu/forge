@@ -28,9 +28,6 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]a
 	}
 	params["commits"] = commits
 
-	err = templates.ExecuteTemplate(w, "repo_log", params)
-	if err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render_template(w, "repo_log", params)
+	return
 }

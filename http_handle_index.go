@@ -11,9 +11,5 @@ func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any)
 		return
 	}
 	params["groups"] = groups
-	err = templates.ExecuteTemplate(w, "index", params)
-	if err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render_template(w, "index", params)
 }

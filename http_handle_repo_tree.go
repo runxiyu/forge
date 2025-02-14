@@ -80,11 +80,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 			formatted_encapsulated := template.HTML(formatted_unencapsulated.Bytes())
 			params["file_contents"] = formatted_encapsulated
 
-			err = templates.ExecuteTemplate(w, "repo_tree_file", params)
-			if err != nil {
-				http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-				return
-			}
+			render_template(w, "repo_tree_file", params)
 			return
 		}
 	}
@@ -97,9 +93,6 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 	params["readme_filename"], params["readme"] = render_readme_at_tree(target)
 	params["files"] = build_display_git_tree(target)
 
-	err = templates.ExecuteTemplate(w, "repo_tree_dir", params)
-	if err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render_template(w, "repo_tree_dir", params)
+	return
 }

@@ -13,9 +13,5 @@ func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[strin
 	}
 	params["repos"] = repos
 
-	err = templates.ExecuteTemplate(w, "group_repos", params)
-	if err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render_template(w, "group_repos", params)
 }

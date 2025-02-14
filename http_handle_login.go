@@ -14,10 +14,7 @@ import (
 
 func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	if r.Method != "POST" {
-		err := templates.ExecuteTemplate(w, "login", params)
-		if err != nil {
-			http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		}
+		render_template(w, "login", params)
 		return
 	}
 
@@ -30,10 +27,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			params["login_error"] = "Unknown username"
-			err := templates.ExecuteTemplate(w, "login", params)
-			if err != nil {
-				http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-			}
+			render_template(w, "login", params)
 			return
 		}
 		http.Error(w, "Error querying user information: "+err.Error(), http.StatusInternalServerError)
@@ -48,11 +42,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 
 	if !match {
 		params["login_error"] = "Invalid password"
-		err := templates.ExecuteTemplate(w, "login", params)
-		if err != nil {
-			http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
+		render_template(w, "login", params)
 		return
 	}
 

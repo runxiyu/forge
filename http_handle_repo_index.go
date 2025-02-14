@@ -40,9 +40,6 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 
 	params["clone_url"] = generate_ssh_remote_url(group_name, repo_name)
 
-	err = templates.ExecuteTemplate(w, "repo_index", params)
-	if err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render_template(w, "repo_index", params)
+	return
 }
