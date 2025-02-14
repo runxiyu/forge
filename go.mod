@@ -11,7 +11,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
 	github.com/yuin/goldmark v1.7.8
-	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250213065845-ba04a2b9388c
+	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250214054418-c72555f0b820
 	golang.org/x/crypto v0.33.0
 )
 

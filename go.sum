@@ -100,8 +100,8 @@ github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/yuin/goldmark v1.7.8 h1:iERMLn0/QJeHFhxSt3p6PeN9mGnvIKSpG9YYorDMnic=
 github.com/yuin/goldmark v1.7.8/go.mod h1:uzxRWxtg69N339t3louHJ7+O03ezfj6PlliRlaOzY1E=
-go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250213065845-ba04a2b9388c h1:YL0WuUi0xa12IEwn1jo9eaeU6dd6WuRLdiVuCmj+iKc=
-go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250213065845-ba04a2b9388c/go.mod h1:bOxuuGXA3UpbLb1lKohr2j2MVcGGLcqfAprGx9VCkMA=
+go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250214054418-c72555f0b820 h1:pKgvP1ixBQJ17tPTyMVwRrZ9EDZ7juoS3DaYfLryF/0=
+go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250214054418-c72555f0b820/go.mod h1:bOxuuGXA3UpbLb1lKohr2j2MVcGGLcqfAprGx9VCkMA=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
