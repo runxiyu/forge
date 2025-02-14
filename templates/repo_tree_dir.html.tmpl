@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>{{ .group_name }}/repos/{{ .repo_name }}/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }} &ndash; Lindenii Forge</title>
+		<title>{{ .group_name }}/repos/{{ .repo_name }}/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }} &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="repo-tree-dir">
 		{{ template "header" . }}

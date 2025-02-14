@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>Login &ndash; Lindenii Forge</title>
+		<title>Login &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="index">
 		{{ .login_error }}
@@ -13,7 +13,7 @@
 						<thead>
 							<tr>
 								<th class="title-row" colspan="2">
-									Password Authentication
+									Password authentication
 								</th>
 							</tr>
 						</thead>

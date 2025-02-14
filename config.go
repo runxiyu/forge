@@ -26,6 +26,9 @@ var config struct {
 		Key  string `scfg:"key"`
 		Root string `scfg:"root"`
 	} `scfg:"ssh"`
+	General struct {
+		Title string `scfg:"title"`
+	} `scfg:"general"`
 	Git struct {
 		Root string `scfg:"root"`
 	} `scfg:"git"`
@@ -55,6 +58,8 @@ func load_config(path string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	global_data["forge_title"] = config.General.Title
 
 	return nil
 }

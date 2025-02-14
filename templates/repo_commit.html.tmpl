@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; Lindenii Forge</title>
+		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="repo-commit">
 		{{ template "header" . }}
@@ -11,7 +11,7 @@
 			<table id="commit-info-table">
 				<thead>
 					<tr class="title-row">
-						<th colspan="2">Commit Info</th>
+						<th colspan="2">Commit info</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -24,7 +24,7 @@
 						<td>{{ .commit_object.Author.Name }} &lt;<a href="mailto:{{ .commit_object.Author.Email }}">{{ .commit_object.Author.Email }}</a>&gt;</td>
 					</tr>
 					<tr>
-						<th scope="row">Author Date</th>
+						<th scope="row">Author date</th>
 						<td>{{ .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
 					</tr>
 					<tr>
@@ -32,7 +32,7 @@
 						<td>{{ .commit_object.Committer.Name }} &lt;<a href="mailto:{{ .commit_object.Committer.Email }}">{{ .commit_object.Committer.Email }}</a>&gt;</td>
 					</tr>
 					<tr>
-						<th scope="row">Committer Date</th>
+						<th scope="row">Committer date</th>
 						<td>{{ .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
 					</tr>
 					<tr>
@@ -41,7 +41,7 @@
 					</tr>
 					<tr>
 						<th scope="row">Actions</th>
-						<td><pre><a href="{{ .commit_object.Hash }}.patch">Get as Patch</a></pre></td>
+						<td><pre><a href="{{ .commit_object.Hash }}.patch">Get patch</a></pre></td>
 					</tr>
 				</tbody>
 			</table>

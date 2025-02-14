@@ -11,6 +11,10 @@ ssh {
 	root ssh://forge.example.org
 }
 
+general {
+	title "Test Forge"
+}
+
 db {
 	type postgres
 	conn postgresql:///lindenii-forge?host=/var/run/postgresql
