@@ -20,7 +20,7 @@ var (
 
 func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, err error) {
 	var fs_path string
-	err = database.QueryRow(ctx, "SELECT r.filesystem_path, r.description FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description)
+	err = database.QueryRow(ctx, "SELECT r.filesystem_path, COALESCE(r.description, '') FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description)
 	if err != nil {
 		return nil, "", err
 	}
