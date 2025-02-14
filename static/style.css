@@ -125,7 +125,7 @@ th[scope=row] {
 	text-align: left;
 }
 tr.title-row > th, th.title-row, .title-row {
-	background-color: var(--darker-box-background-color);
+	background-color: var(--lighter-box-background-color);
 }
 td > pre {
 	margin: 0;
