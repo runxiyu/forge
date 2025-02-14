@@ -119,23 +119,10 @@ PGP patch validation may be considered.
 
 ## License
 
-We currently use
-[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt),
-which is
-[not](https://www.gnu.org/licenses/license-list.html#CC0)
-[ideal](https://opensource.org/faq#cc-zero)
-because it expressly disclaims granting patent licenses.
+We are currently using the
+[GNU Affero General Public License version 3](https://www.gnu.org/licenses/agpl-3.0.html).
 
-We have also considered the
-[GNU AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html),
-but it has various caveats that we don't fully understand (e.g. many say that
-library code do not have to be provided, but the license text requires the
-Corresponding Source to be provided; a lot of things are contradictory).
-The server currently serves its own source via the web interface, but it does
-not contain the source of dependencies.
-
-Expect licensing to change in the future, although it will stay Libre beyond
-reasonable doubt.
+The forge software serves its own source at `/:/source/`.
 
 ## Support and development
 
