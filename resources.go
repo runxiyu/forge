@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-//go:embed .gitignore LICENSE README.md
+//go:embed .gitignore .gitattributes
+//go:embed LICENSE README.md
 //go:embed *.go go.mod go.sum
 //go:embed *.scfg
 //go:embed Makefile
