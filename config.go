@@ -29,9 +29,6 @@ var config struct {
 	General struct {
 		Title string `scfg:"title"`
 	} `scfg:"general"`
-	Git struct {
-		Root string `scfg:"root"`
-	} `scfg:"git"`
 	DB struct {
 		Type string `scfg:"type"`
 		Conn string `scfg:"conn"`
