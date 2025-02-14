@@ -1,3 +1,4 @@
+/* Base styles and variables */
 html {
 	font-family: sans-serif;
 	background-color: var(--background-color);
@@ -16,6 +17,8 @@ html {
 	--danger-color: hsl(0, 50%, 36%);
 	--danger-color-contrast: hsl(0, 0%, 100%);
 }
+
+/* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
 	html {
 		--background-color: hsl(0, 0%, 0%);
@@ -29,12 +32,16 @@ html {
 		--lighter-box-background-color: hsl(0, 0%, 15%);
 	}
 }
+
+/* Global layout */
 body {
 	margin: 0;
 }
 html, code, pre {
 	font-size: 1rem; /* TODO: Not always correct */
 }
+
+/* Footer styles */
 footer {
 	margin-top: 1rem;
 	margin-left: auto;
@@ -48,6 +55,8 @@ footer {
 footer a:link, footer a:visited {
 	color: inherit;
 }
+
+/* Padding containers */
 .padding-wrapper {
 	margin: 1rem auto;
 	max-width: 60rem;
@@ -56,15 +65,21 @@ footer a:link, footer a:visited {
 .padding {
 	padding: 0 5px;
 }
+
+/* Link styles */
 a:link, a:visited {
 	text-decoration-color: var(--text-decoration-color);
 	color: var(--link-color);
 }
+
+/* Readme inline code styling */
 #readme code:not(pre > code) {
 	background-color: var(--lighter-box-background-color);
 	border-radius: 2px;
 	padding: 2px;
 }
+
+/* Table styles */
 table {
 	border: var(--lighter-border-color) solid 1px;
 	border-spacing: 0px;
@@ -95,12 +110,16 @@ td#readme > *:last-child {
 td#readme > *:first-child {
 	margin-top: 0;
 }
+
+/* Table misc and scrolling */
 .commit-id {
 	font-family: monospace;
 }
 .scroll {
 	overflow-x: auto;
 }
+
+/* Toggle table controls */
 .toggle-table-off, .toggle-table-on {
 	display: none;
 }
@@ -122,6 +141,8 @@ td#readme > *:first-child {
 .toggle-table-on:checked + table > tbody {
 	display: table-row-group;
 }
+
+/* Diff/chunk styles */
 .chunk-unchanged {
 	color: grey;
 }
@@ -143,6 +164,8 @@ pre.chunk {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+/* Toggle content sections */
 .toggle-on-wrapper {
 	border: var(--lighter-border-color) solid 1px;
 }
@@ -165,6 +188,8 @@ pre.chunk {
 .toggle-on-toggle:checked + .toggle-on-header + .toggle-on-content {
 	display: block;
 }
+
+/* File display styles */
 .file-patch + .file-patch {
 	margin-top: 0.5rem;
 }
@@ -175,6 +200,7 @@ pre.chunk {
 	font-family: monospace;
 }
 
+/* Form elements */
 textarea {
 	box-sizing: border-box;
 	background-color: var(--lighter-box-background-color);
@@ -203,6 +229,8 @@ th.tdinput input[type=text],
 th.tdinput input[type=password] {
 	background-color: transparent;
 }
+
+/* Button styles */
 .btn-primary {
 	background: var(--primary-color);
 	color: var(--primary-color-contrast);
@@ -241,6 +269,8 @@ input[type=file]::file-selector-button {
 a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
 	text-decoration: none;
 }
+
+/* Header layout */
 header#main-header {
 	background-color: var(--lighter-box-background-color);
 	display: flex;
@@ -248,12 +278,10 @@ header#main-header {
 	align-items: center;
 	padding: 10px;
 }
-
 header#main-header > div#main-header-forge-title {
-	flex-grow: 1; /* Allows title to take up remaining space */
+	flex-grow: 1;
 }
-
 header#main-header > div#main-header-user {
 	display: flex;
-	align-items: center; /* Ensures user section is vertically aligned */
+	align-items: center;
 }
