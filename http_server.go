@@ -22,17 +22,17 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	non_empty_last_segments_len := len(segments)
-	dir_mode := false
+	trailing_slash := false
 	if segments[len(segments)-1] == "" {
 		non_empty_last_segments_len--
-		dir_mode = true
+		trailing_slash = true
 	}
 
 	if segments[0] == ":" {
 		if len(segments) < 2 {
 			http.Error(w, "Blank system endpoint", http.StatusNotFound)
 			return
-		} else if len(segments) == 2 && !dir_mode {
+		} else if len(segments) == 2 && !trailing_slash {
 			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 			return
 		}
@@ -94,7 +94,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case non_empty_last_segments_len == separator_index+1:
 		http.Error(w, "Group root hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+2:
-		if !dir_mode {
+		if !trailing_slash {
 			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 			return
 		}
@@ -124,7 +124,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			// TODO: subgroups
 			if non_empty_last_segments_len == separator_index+3 {
-				if !dir_mode {
+				if !trailing_slash {
 					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 					return
 				}
@@ -149,14 +149,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, "Insufficient parameters", http.StatusBadRequest)
 					return
 				}
-				if dir_mode {
+				if trailing_slash {
 					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
 					return
 				}
 				params["ref_name"] = segments[separator_index+4]
 				handle_repo_log(w, r, params)
 			case "commit":
-				if dir_mode {
+				if trailing_slash {
 					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
 					return
 				}
