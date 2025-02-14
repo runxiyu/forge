@@ -42,23 +42,23 @@ func serve_ssh(listener net.Listener) error {
 			}
 
 			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + strings.TrimSuffix(client_public_key_string, "\n") + " " + session.RawCommand())
-			fmt.Fprintln(session.Stderr(), "Lindenii Forge " + VERSION + ", source at " + strings.TrimSuffix(config.HTTP.Root, "/") + "/:/source/")
+			fmt.Fprintln(session.Stderr(), "Lindenii Forge " + VERSION + ", source at " + strings.TrimSuffix(config.HTTP.Root, "/") + "/:/source/\r")
 
 			cmd := session.Command()
 
 			if len(cmd) < 2 {
-				fmt.Fprintln(session.Stderr(), "Insufficient arguments")
+				fmt.Fprintln(session.Stderr(), "Insufficient arguments\r")
 				return
 			}
 
 			if cmd[0] != "git-upload-pack" {
-				fmt.Fprintln(session.Stderr(), "Unsupported command")
+				fmt.Fprintln(session.Stderr(), "Unsupported command\r")
 				return
 			}
 
 			fs_path, err := get_repo_path_from_ssh_path(session.Context(), cmd[1])
 			if err != nil {
-				fmt.Fprintln(session.Stderr(), "Error while getting repo path:", err)
+				fmt.Fprintln(session.Stderr(), "Error while getting repo path:", err, "\r")
 				return
 			}
 
