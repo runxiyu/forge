@@ -134,8 +134,11 @@ not contain the source of dependencies.
 Expect licensing to change in the future, although it will stay Libre beyond
 reasonable doubt.
 
-## Contact
+## Support and development
 
-We hang out in [`#chat`](https://webirc.runxiyu.org/kiwiirc/#chat)
-and [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
-on [irc.runxiyu.org](https://irc.runxiyu.org).
+* We hang out in [`#chat`](https://webirc.runxiyu.org/kiwiirc/#chat)
+  and [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
+  on [irc.runxiyu.org](https://irc.runxiyu.org).
+* Issues and pull requests may be submitted on
+  [the Codeberg mirror](https://codeberg.org/runxiyu/forge), before our own
+  ticket tracking and merge request systems are ready.
