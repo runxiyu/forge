@@ -17,7 +17,6 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		http.Error(w, "Error getting repo HEAD: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["ref"] = head.Name().Short()
 	head_hash := head.Hash()
 	recent_commits, err := get_recent_commits(repo, head_hash, 3)
 	if err != nil {

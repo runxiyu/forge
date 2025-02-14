@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"html/template"
 	"net/http"
 	"path"
@@ -17,16 +16,7 @@ import (
 func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	raw_path_spec := params["rest"].(string)
 	group_name, repo_name, path_spec := params["group_name"].(string), params["repo_name"].(string), strings.TrimSuffix(raw_path_spec, "/")
-	ref_type, ref_name, err := get_param_ref_and_type(r)
-	if err != nil {
-		if errors.Is(err, err_no_ref_spec) {
-			ref_type = "head"
-		} else {
-			http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-	params["ref_type"], params["ref"], params["path_spec"] = ref_type, ref_name, path_spec
+	params["path_spec"] = path_spec
 	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
@@ -34,7 +24,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 	}
 	params["repo_description"] = description
 
-	ref_hash, err := get_ref_hash_from_type_and_name(repo, ref_type, ref_name)
+	ref_hash, err := get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return

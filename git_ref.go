@@ -16,7 +16,7 @@ var (
 
 func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, ret_err error) {
 	switch ref_type {
-	case "head":
+	case "":
 		head, err := repo.Head()
 		if err != nil {
 			ret_err = misc.Wrap_one_error(err_getting_head, err)

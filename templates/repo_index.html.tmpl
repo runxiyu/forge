@@ -37,7 +37,7 @@
 			<table id="recent-commits" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="3"><label for="toggle-table-recent-commits">Recent Commits (<a href="log/{{ .ref }}/">see all</a>)</label></th>
+						<th colspan="3"><label for="toggle-table-recent-commits">Recent Commits (<a href="log/{{ .ref_name }}/">see all</a>)</label></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -60,11 +60,11 @@
 			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="3"><label for="toggle-table-file-tree">/ on {{ .ref }}</label></th>
+						<th colspan="3"><label for="toggle-table-file-tree">/ on {{ .ref_name }}</label></th>
 					</tr>
 				</thead>
 				<tbody>
-					{{- $ref := .ref }}
+					{{- $ref := .ref_name }}
 					{{- range .files }}
 						<tr>
 							<td class="file-mode">{{ .Mode }}</td>

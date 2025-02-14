@@ -8,7 +8,7 @@ import (
 
 // TODO: I probably shouldn't include *all* commits here...
 func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	group_name, repo_name, ref_name := params["group_name"].(string), params["repo_name"].(string), params["ref"].(string)
+	group_name, repo_name, ref_name := params["group_name"].(string), params["repo_name"].(string), params["ref_name"].(string)
 	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
 	if err != nil {
 		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)

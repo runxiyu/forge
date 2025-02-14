@@ -12,18 +12,18 @@
 				<thead>
 					<tr class="title-row">
 						<th colspan="3">
-							/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref }} on {{ .ref }}{{ end }}
+							/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end }}
 						</th>
 					</tr>
 				</thead>
 				<tbody>
 					{{- $path_spec := .path_spec }}
-					{{- $ref := .ref }}
+					{{- $ref := .ref_name }}
 					{{- $ref_type := .ref_type }}
 					{{- range .files }}
 						<tr>
 							<td class="file-mode">{{ .Mode }}</td>
-							<td class="file-name"><a href="{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
+							<td class="file-name"><a href="{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref_type }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
 							<td class="file-size">{{ .Size }}</td>
 						</tr>
 					{{- end }}

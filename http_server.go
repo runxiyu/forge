@@ -113,6 +113,15 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		switch module_type {
 		case "repos":
 			params["repo_name"] = module_name
+			params["ref_type"], params["ref_name"], err = get_param_ref_and_type(r)
+			if err != nil {
+				if errors.Is(err, err_no_ref_spec) {
+					params["ref_type"] = ""
+				} else {
+					http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 			// TODO: subgroups
 			if non_empty_last_segments_len == separator_index+3 {
 				if !dir_mode {
@@ -133,15 +142,18 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				handle_repo_raw(w, r, params)
 			case "log":
-				if non_empty_last_segments_len != separator_index+5 {
+				if non_empty_last_segments_len > separator_index+5 {
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
+					return
+				} else if non_empty_last_segments_len < separator_index+5 {
+					http.Error(w, "Insufficient parameters", http.StatusBadRequest)
 					return
 				}
 				if dir_mode {
 					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
 					return
 				}
-				params["ref"] = segments[separator_index+4]
+				params["ref_name"] = segments[separator_index+4]
 				handle_repo_log(w, r, params)
 			case "commit":
 				if dir_mode {
