@@ -13,6 +13,7 @@ import (
 //go:embed Makefile
 //go:embed schema.sql
 //go:embed static/* templates/*
+//go:embed vendor/*
 var source_fs embed.FS
 
 var source_handler http.Handler
