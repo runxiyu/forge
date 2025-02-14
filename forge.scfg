@@ -7,7 +7,7 @@ http {
 ssh {
 	net tcp
 	addr :2222
-	key /etc/ssh/ssh_host_ed25519_key
+	key /etc/lindenii/ssh_host_ed25519_key
 	root ssh://forge.example.org
 }
 
