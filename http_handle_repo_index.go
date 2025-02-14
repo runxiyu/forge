@@ -12,19 +12,20 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		return
 	}
 	params["repo_description"] = description
-	head, err := repo.Head()
+
+	ref_hash, err := get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {
-		http.Error(w, "Error getting repo HEAD: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	head_hash := head.Hash()
-	recent_commits, err := get_recent_commits(repo, head_hash, 3)
+
+	recent_commits, err := get_recent_commits(repo, ref_hash, 3)
 	if err != nil {
 		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["commits"] = recent_commits
-	commit_object, err := repo.CommitObject(head_hash)
+	commit_object, err := repo.CommitObject(ref_hash)
 	if err != nil {
 		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return

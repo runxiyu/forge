@@ -60,15 +60,16 @@
 			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="3"><label for="toggle-table-file-tree">/ on {{ .ref_name }}</label></th>
+						<th colspan="3"><label for="toggle-table-file-tree">/{{ if .ref_name }} on {{ .ref_name }}{{ end }}</label></th>
 					</tr>
 				</thead>
 				<tbody>
+					{{- $ref_type := .ref_type }}
 					{{- $ref := .ref_name }}
 					{{- range .files }}
 						<tr>
 							<td class="file-mode">{{ .Mode }}</td>
-							<td class="file-name"><a href="tree/{{ .Name }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
+							<td class="file-name"><a href="tree/{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref_type }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
 							<td class="file-size">{{ .Size }}</td>
 						</tr>
 					{{- end }}
