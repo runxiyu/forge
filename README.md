@@ -30,6 +30,10 @@ The available `module_type`s are:
 
 Group and subgroup names may not be `:`.
 
+While this syntax looks a bit odd, it makes it possible to unambiguously
+identify where subgroups end and modules begin, without needing to touch the
+database.
+
 ## Protocols and user interfaces
 
 The following should be roughly equivalent in functionality:
