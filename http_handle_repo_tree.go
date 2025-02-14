@@ -94,5 +94,4 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 	params["files"] = build_display_git_tree(target)
 
 	render_template(w, "repo_tree_dir", params)
-	return
 }

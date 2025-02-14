@@ -72,5 +72,4 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 	params["files"] = build_display_git_tree(target)
 
 	render_template(w, "repo_raw_dir", params)
-	return
 }
