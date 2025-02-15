@@ -23,6 +23,9 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 	fs_loader := server.NewFilesystemLoader(billy_fs)
 	transport := server.NewServer(fs_loader)
 	upload_pack_session, err := transport.NewUploadPackSession(endpoint, nil)
+	if err != nil {
+		return err
+	}
 	advertised_references, err := upload_pack_session.AdvertisedReferencesContext(r.Context())
 	if err != nil {
 		return err

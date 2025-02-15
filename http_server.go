@@ -131,9 +131,15 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			repo_feature := segments[separator_index+3]
 			switch repo_feature {
 			case "info":
-				handle_repo_info(w, r, params)
+				err = handle_repo_info(w, r, params)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 			case "git-upload-pack":
-				handle_upload_pack(w, r, params)
+				err = handle_upload_pack(w, r, params)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
