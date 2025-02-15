@@ -137,9 +137,17 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				handle_repo_info(w, r, params)
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
+				if len(segments) < separator_index+5 {
+					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+					return
+				}
 				handle_repo_tree(w, r, params)
 			case "raw":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
+				if len(segments) < separator_index+5 {
+					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+					return
+				}
 				handle_repo_raw(w, r, params)
 			case "log":
 				if non_empty_last_segments_len > separator_index+4 {
