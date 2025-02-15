@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"os/exec"
 	"strings"
 
 	glider_ssh "github.com/gliderlabs/ssh"
@@ -51,32 +50,26 @@ func serve_ssh(listener net.Listener) error {
 				return
 			}
 
-			if cmd[0] != "git-upload-pack" {
-				fmt.Fprintln(session.Stderr(), "Unsupported command\r")
+			switch cmd[0] {
+			case "git-upload-pack":
+				if len(cmd) > 2 {
+					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
+					return
+				}
+				err = ssh_handle_upload_pack(session, cmd[1])
+			case "git-receive-pack":
+				if len(cmd) > 2 {
+					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
+					return
+				}
+				err = ssh_handle_receive_pack(session, cmd[1])
+			default:
+				fmt.Fprintln(session.Stderr(), "Unsupported command: "+cmd[0]+"\r")
 				return
 			}
-
-			fs_path, err := get_repo_path_from_ssh_path(session.Context(), cmd[1])
 			if err != nil {
-				fmt.Fprintln(session.Stderr(), "Error while getting repo path:", err, "\r")
+				fmt.Fprintln(session.Stderr(), err.Error())
 				return
-			}
-
-			proc := exec.CommandContext(session.Context(), cmd[0], fs_path)
-			proc.Stdin = session
-			proc.Stdout = session
-			proc.Stderr = session.Stderr()
-
-			err = proc.Start()
-			if err != nil {
-				fmt.Fprintln(session.Stderr(), "Error while starting process:", err)
-				return
-			}
-			err = proc.Wait()
-			if exit_error, ok := err.(*exec.ExitError); ok {
-				fmt.Fprintln(session.Stderr(), "Process exited with error", exit_error.ExitCode())
-			} else if err != nil {
-				fmt.Fprintln(session.Stderr(), "Error while waiting for process:", err)
 			}
 		},
 		PublicKeyHandler:           func(ctx glider_ssh.Context, key glider_ssh.PublicKey) bool { return true },
