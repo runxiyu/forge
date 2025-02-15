@@ -102,6 +102,11 @@ a:link, a:visited {
 	padding: 2px;
 }
 
+/* Readme word breaks to avoid overfull hboxes */
+#readme {
+	word-break: break-word;
+}
+
 /* Table styles */
 table {
 	border: var(--lighter-border-color) solid 1px;
