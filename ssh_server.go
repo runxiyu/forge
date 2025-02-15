@@ -37,10 +37,10 @@ func serve_ssh(listener net.Listener) error {
 			client_public_key := session.PublicKey()
 			var client_public_key_string string
 			if client_public_key != nil {
-				client_public_key_string = string(go_ssh.MarshalAuthorizedKey(client_public_key))
+				client_public_key_string = strings.TrimSuffix(string(go_ssh.MarshalAuthorizedKey(client_public_key)), "\n")
 			}
 
-			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + strings.TrimSuffix(client_public_key_string, "\n") + " " + session.RawCommand())
+			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + client_public_key_string + " " + session.RawCommand())
 			fmt.Fprintln(session.Stderr(), "Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/:/source/\r")
 
 			cmd := session.Command()
