@@ -156,6 +156,8 @@ The forge software serves its own source at `/:/source/`.
 * We hang out in [`#chat`](https://webirc.runxiyu.org/kiwiirc/#chat)
   and [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
   on [irc.runxiyu.org](https://irc.runxiyu.org).
+  The latter is bridged to [`#lindenii`](https://web.libera.chat/#lindenii)
+  on [Libera.Chat](https://libera.chat).
 * Issues and pull requests may be submitted on the Codeberg mirror before our
   own ticket tracking and merge request systems are ready.
 * We have several Git repo mirrors on a few places:
