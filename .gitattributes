@@ -1,4 +1,4 @@
-*.html.tmpl linguist-language=HTML
+*.tmpl linguist-language=HTML
 * linguist-detectable
 go.mod -linguist-detectable
 go.sum -linguist-detectable
