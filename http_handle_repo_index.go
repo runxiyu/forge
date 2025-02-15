@@ -39,7 +39,8 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
 	params["files"] = build_display_git_tree(tree)
 
-	params["clone_url"] = generate_ssh_remote_url(group_name, repo_name)
+	params["http_clone_url"] = generate_http_remote_url(group_name, repo_name)
+	params["ssh_clone_url"] = generate_ssh_remote_url(group_name, repo_name)
 
 	render_template(w, "repo_index", params)
 }
