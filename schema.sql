@@ -36,7 +36,7 @@ CREATE TABLE mailing_lists (
 	description TEXT
 );
 
-CREATE TABLE emails (
+CREATE TABLE mailing_list_emails (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	list_id INTEGER NOT NULL REFERENCES mailing_lists(id) ON DELETE CASCADE,
 	title TEXT NOT NULL,
@@ -51,10 +51,15 @@ CREATE TABLE users (
 	password TEXT
 );
 
+CREATE TABLE ssh_public_keys (
+	key_string TEXT PRIMARY KEY NOT NULL,
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE sessions (
 	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	session_id TEXT NOT NULL,
-	PRIMARY KEY (user_id, session_id)
+	session_id TEXT PRIMARY KEY NOT NULL,
+	UNIQUE(user_id, session_id)
 );
 
 CREATE TABLE merge_requests (
@@ -68,9 +73,8 @@ CREATE TABLE merge_requests (
 	mailing_list_id INT UNIQUE REFERENCES mailing_lists(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ssh_public_keys (
-	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+CREATE TABLE user_group_roles (
+	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
 	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	content TEXT NOT NULL,
-	UNIQUE (user_id, content)
+	PRIMARY KEY(user_id, group_id)
 );
