@@ -103,8 +103,8 @@ the future.
 
 ### Authentication and authorization
 
-Anonymous SSH read access should be possible for public repos. All other Git
-access should be done via SSH public keys. We use a baked-in SSH
+Anonymous SSH and HTTPS read access should be possible for public repos. All
+other Git access should be done via SSH public keys. We use a baked-in SSH
 implementation.
 
 The native API may be authenticated in the transport layer (e.g. TLS client
