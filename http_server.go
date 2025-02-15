@@ -122,9 +122,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			// TODO: subgroups
 			if non_empty_last_segments_len == separator_index+3 {
-		if redirect_with_slash(w, r) {
-			return
-		}
+				if redirect_with_slash(w, r) {
+					return
+				}
 				handle_repo_index(w, r, params)
 				return
 			}
@@ -135,7 +135,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
-			return
+					return
 				}
 				handle_repo_tree(w, r, params)
 			case "raw":

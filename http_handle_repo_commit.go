@@ -76,7 +76,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 			to = fake_diff_file_null
 		}
 		chunks := []usable_chunk{}
-		for _, chunk := range file_patch.Chunks() {	
+		for _, chunk := range file_patch.Chunks() {
 			content := chunk.Content()
 			if len(content) > 0 && content[0] == '\n' {
 				content = "\n" + content
