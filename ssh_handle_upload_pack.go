@@ -8,7 +8,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/server"
 )
 
-func ssh_handle_upload_pack(session glider_ssh.Session, repo_identifier string) (err error) {
+func ssh_handle_upload_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
 	repo_path, err := get_repo_path_from_ssh_path(session.Context(), repo_identifier)
 	if err != nil {
 		return err
