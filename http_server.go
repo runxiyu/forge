@@ -132,6 +132,8 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			switch repo_feature {
 			case "info":
 				handle_repo_info(w, r, params)
+			case "git-upload-pack":
+				handle_upload_pack(w, r, params)
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {

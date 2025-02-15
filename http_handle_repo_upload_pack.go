@@ -3,12 +3,12 @@ package main
 import (
 	"net/http"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-git/v5/plumbing/format/pktline"
+	"github.com/go-git/go-git/v5/plumbing/protocol/packp"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/server"
 )
 
-func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
+func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
 	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
 	var repo_path string
 	err = database.QueryRow(r.Context(), "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&repo_path)
@@ -23,13 +23,20 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 	fs_loader := server.NewFilesystemLoader(billy_fs)
 	transport := server.NewServer(fs_loader)
 	upload_pack_session, err := transport.NewUploadPackSession(endpoint, nil)
-	advertised_references, err := upload_pack_session.AdvertisedReferencesContext(r.Context())
 	if err != nil {
 		return err
 	}
-	advertised_references.Prefix = [][]byte{[]byte("# service=git-upload-pack"), pktline.Flush}
-	w.Header().Set("content-type", "application/x-git-upload-pack-advertisement")
-	err = advertised_references.Encode(w)
+	w.Header().Set("Content-Type", "application/x-git-upload-pack-result")
+	reference_update_request := packp.NewUploadPackRequest()
+	err = reference_update_request.Decode(r.Body)
+	if err != nil {
+		return err
+	}
+	report_status, err := upload_pack_session.UploadPack(r.Context(), reference_update_request)
+	if err != nil {
+		return err
+	}
+	err = report_status.Encode(w)
 	if err != nil {
 		return err
 	}
