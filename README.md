@@ -76,6 +76,13 @@ as what would be produced from git-send-email. It should also be possible for
 people to perform code reviews via email by interwoven a quoted patch with
 replies, and all these replies should be synced to the main MR database.
 
+This is probably the most unique feature of Lindenii Forge: while the general
+structure is similar to Forgejo-style pull requests, MRs are automatically
+created based on branch namespaces (similar to Gerrit in some respects) and are
+synced to mailing lists. This allows users to submit MRs via email, or git
+push, or the Web interface, or the API, to support developers with different
+workflows.
+
 ### Ticket tracking
 
 Ticket tracking works like todo.sr.ht, though we also intend to support
@@ -115,7 +122,22 @@ The web interface will have a dedicated login screen. Connections are set as
 keepalive, and sessions are tracked across a kept-alive connection; optionally,
 a user may click "remember me with a cookie" in the login screen.
 
-PGP patch validation may be considered.
+PGP commit validation will be implemented. PGP patch validation may be
+considered.
+
+### Federated authentication
+
+We probably won't fully support ForgeFed because it's way too bloated. However,
+some type of federated authentication may be considered.
+
+Since Forgejo, SourceHut, and GitHub all publicly serve their users' SSH keys,
+people who submit merge requests by pushing via SSH into the branch namespace
+may link their SSH keys to an identity on an external forge. We will also serve
+users' SSH keys, but it would be opt-in.
+
+OpenID Connect will likely not be supported.
+
+This plan is subject to change.
 
 ## License
 
