@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	glider_ssh "github.com/gliderlabs/ssh"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5/plumbing/protocol/packp"
@@ -8,10 +10,15 @@ import (
 	transport_server "github.com/go-git/go-git/v5/plumbing/transport/server"
 )
 
+var err_unauthorized_push = errors.New("You are not authorized to push to this repository")
+
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	repo_path, err := get_repo_path_from_ssh_path(session.Context(), repo_identifier)
+	repo_path, access, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
+	}
+	if !access {
+		return err_unauthorized_push
 	}
 	endpoint, err := transport.NewEndpoint("/")
 	if err != nil {

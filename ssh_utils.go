@@ -9,19 +9,19 @@ import (
 
 var err_ssh_illegal_endpoint = errors.New("Illegal endpoint during SSH access")
 
-func get_repo_path_from_ssh_path(ctx context.Context, ssh_path string) (repo_path string, err error) {
+func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (repo_path string, access bool, err error) {
 	segments := strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
 
 	for i, segment := range segments {
 		var err error
 		segments[i], err = url.PathUnescape(segment)
 		if err != nil {
-			return "", err
+			return "", false, err
 		}
 	}
 
 	if segments[0] == ":" {
-		return "", err_ssh_illegal_endpoint
+		return "", false, err_ssh_illegal_endpoint
 	}
 
 	separator_index := -1
@@ -37,9 +37,9 @@ func get_repo_path_from_ssh_path(ctx context.Context, ssh_path string) (repo_pat
 
 	switch {
 	case separator_index == -1:
-		return "", err_ssh_illegal_endpoint
+		return "", false, err_ssh_illegal_endpoint
 	case len(segments) <= separator_index+2:
-		return "", err_ssh_illegal_endpoint
+		return "", false, err_ssh_illegal_endpoint
 	}
 
 	group_name := segments[0]
@@ -47,10 +47,8 @@ func get_repo_path_from_ssh_path(ctx context.Context, ssh_path string) (repo_pat
 	module_name := segments[separator_index+2]
 	switch module_type {
 	case "repos":
-		var fs_path string
-		err := database.QueryRow(ctx, "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, module_name).Scan(&fs_path)
-		return fs_path, err
+		return get_path_perm_by_group_repo_key(ctx, group_name, module_name, ssh_pubkey)
 	default:
-		return "", err_ssh_illegal_endpoint
+		return "", false, err_ssh_illegal_endpoint
 	}
 }
