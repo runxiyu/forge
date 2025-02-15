@@ -14,6 +14,11 @@ primarily designed for self-hosting by small organizations and individuals.
 * Copy `forge.scfg` to `/etc/lindenii/forge.scfg` or another reasonable
   location and edit appropriately.
 
+When email integration is ready and you wish to use email integration, you will
+need to set up
+[Lindenii Mail Daemon](https://forge.lindenii.runxiyu.org/lindenii/:/repos/maild/)
+and configure it accordingly.
+
 ## Organization
 
 Misc URLs (for hosting stylesheets, scripts, the login page, etc.) are like
