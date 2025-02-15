@@ -11,7 +11,7 @@ import (
 
 var (
 	err_duplicate_ref_spec = errors.New("Duplicate ref spec")
-	err_no_ref_spec        = errors.New("No ref spec")
+	err_no_ref_spec		= errors.New("No ref spec")
 )
 
 func get_param_ref_and_type(r *http.Request) (ref_type, ref string, err error) {
@@ -62,4 +62,23 @@ func parse_request_uri(request_uri string) (segments []string, params url.Values
 	}
 
 	return
+}
+
+func redirect_with_slash(w http.ResponseWriter, r *http.Request) bool {
+	request_uri := r.RequestURI
+
+	path_end := strings.IndexAny(request_uri, "?#")
+	var path, rest string
+	if path_end == -1 {
+		path = request_uri
+	} else {
+		path = request_uri[:path_end]
+		rest = request_uri[path_end:]
+	}
+
+	if !strings.HasSuffix(path, "/") {
+		http.Redirect(w, r, path+"/"+rest, http.StatusSeeOther)
+		return true
+	}
+	return false
 }

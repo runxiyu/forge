@@ -32,8 +32,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if len(segments) < 2 {
 			http.Error(w, "Blank system endpoint", http.StatusNotFound)
 			return
-		} else if len(segments) == 2 && !trailing_slash {
-			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+		} else if len(segments) == 2 && redirect_with_slash(w, r) {
 			return
 		}
 
@@ -94,8 +93,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case non_empty_last_segments_len == separator_index+1:
 		http.Error(w, "Group root hasn't been implemented yet", http.StatusNotImplemented)
 	case non_empty_last_segments_len == separator_index+2:
-		if !trailing_slash {
-			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+		if redirect_with_slash(w, r) {
 			return
 		}
 		module_type := segments[separator_index+1]
@@ -124,10 +122,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			// TODO: subgroups
 			if non_empty_last_segments_len == separator_index+3 {
-				if !trailing_slash {
-					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
-					return
-				}
+		if redirect_with_slash(w, r) {
+			return
+		}
 				handle_repo_index(w, r, params)
 				return
 			}
@@ -137,15 +134,13 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				handle_repo_info(w, r, params)
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
-				if len(segments) < separator_index+5 {
-					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
-					return
+				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
+			return
 				}
 				handle_repo_tree(w, r, params)
 			case "raw":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
-				if len(segments) < separator_index+5 {
-					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
 					return
 				}
 				handle_repo_raw(w, r, params)
@@ -154,14 +149,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 					return
 				}
-				if !trailing_slash {
-					http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+				if redirect_with_slash(w, r) {
 					return
 				}
 				handle_repo_log(w, r, params)
 			case "commit":
 				if trailing_slash {
 					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
+					// TODO
 					return
 				}
 				params["commit_id"] = segments[separator_index+4]
