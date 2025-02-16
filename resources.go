@@ -14,6 +14,7 @@ import (
 //go:embed Makefile
 //go:embed schema.sql
 //go:embed static/* templates/*
+//go:embed git_hooks_client/*
 //go:embed vendor/*
 var source_fs embed.FS
 
