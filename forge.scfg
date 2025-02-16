@@ -22,5 +22,5 @@ db {
 }
 
 git {
-	root /srv/git
+	hooks_socket /var/run/lindenii/forge/hooks.sock
 }

@@ -21,6 +21,9 @@ var config struct {
 		CookieExpiry int    `scfg:"cookie_expiry"`
 		Root         string `scfg:"root"`
 	} `scfg:"http"`
+	Git struct {
+		HooksSocket string `scfg:"hooks_socket"`
+	} `scfg:"git"`
 	SSH struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`
