@@ -70,8 +70,8 @@ changes from a Git ref ("source ref") into a branch in the main repo
 
 When creating a MR from the API, the web interface, email, or SSH, it shall be
 possible to create a special source ref, hosted in the main repo as a branch
-with a branch name that begins with `merge_requests/`. Unsolicited pushes to
-`merge_requests/` will automatically open a MR, returning instructions to edit
+with a branch name that begins with `contrib/`. Unsolicited pushes to
+`contrib/` will automatically open a MR, returning instructions to edit
 the description and manage the MR further via the standard error channel.
 
 MR branches shall be synced to automatically created MR-specific mailing lists.
