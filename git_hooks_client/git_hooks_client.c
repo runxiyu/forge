@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <fcntl.h>
 
@@ -31,8 +32,28 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
+	struct stat stdin_stat;
+	if (fstat(STDIN_FILENO, &stdin_stat) == -1) {
+		perror("fstat");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
+	if (!S_ISFIFO(stdin_stat.st_mode)) {
+	        dprintf(STDERR_FILENO, "fatal: stdin must be a pipe\n");
+	        close(sock);
+	        return EXIT_FAILURE;
+	}
+
+	int pipe_size = fcntl(STDIN_FILENO, F_GETPIPE_SZ);
+	if (pipe_size == -1) {
+		perror("fcntl");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
 	ssize_t bytes_spliced;
-	while ((bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, 1, SPLICE_F_MORE)) > 0) {
+	while ((bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 
 	if (bytes_spliced == -1) {
