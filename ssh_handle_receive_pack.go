@@ -2,12 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"os/exec"
 
 	glider_ssh "github.com/gliderlabs/ssh"
-	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-git/v5/plumbing/protocol/packp"
-	"github.com/go-git/go-git/v5/plumbing/transport"
-	transport_server "github.com/go-git/go-git/v5/plumbing/transport/server"
 )
 
 var err_unauthorized_push = errors.New("You are not authorized to push to this repository")
@@ -20,37 +18,24 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	if !access {
 		return err_unauthorized_push
 	}
-	endpoint, err := transport.NewEndpoint("/")
+
+	proc := exec.CommandContext(session.Context(), "git-receive-pack", repo_path)
+	proc.Stdin = session
+	proc.Stdout = session
+	proc.Stderr = session.Stderr()
+
+	err = proc.Start()
 	if err != nil {
+		fmt.Fprintln(session.Stderr(), "Error while starting process:", err)
 		return err
 	}
-	billy_fs := osfs.New(repo_path)
-	fs_loader := transport_server.NewFilesystemLoader(billy_fs)
-	transport := transport_server.NewServer(fs_loader)
-	receive_pack_session, err := transport.NewReceivePackSession(endpoint, nil)
-	if err != nil {
-		return err
+
+	err = proc.Wait()
+	if exitError, ok := err.(*exec.ExitError); ok {
+		fmt.Fprintln(session.Stderr(), "Process exited with error", exitError.ExitCode())
+	} else if err != nil {
+		fmt.Fprintln(session.Stderr(), "Error while waiting for process:", err)
 	}
-	advertised_references, err := receive_pack_session.AdvertisedReferencesContext(session.Context())
-	if err != nil {
-		return err
-	}
-	err = advertised_references.Encode(session)
-	if err != nil {
-		return err
-	}
-	reference_update_request := packp.NewReferenceUpdateRequest()
-	err = reference_update_request.Decode(session)
-	if err != nil {
-		return err
-	}
-	report_status, err := receive_pack_session.ReceivePack(session.Context(), reference_update_request)
-	if err != nil {
-		return err
-	}
-	err = report_status.Encode(session)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
