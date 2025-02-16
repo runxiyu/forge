@@ -13,6 +13,7 @@ int main(void) {
 	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 
 	if (socket_path == NULL) {
+	        dprintf(STDERR_FILENO, "fatal: environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
 		return EXIT_FAILURE;
 	}
 
