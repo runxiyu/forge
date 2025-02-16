@@ -14,7 +14,7 @@ import (
 //go:embed Makefile
 //go:embed schema.sql
 //go:embed static/* templates/*
-//go:embed git_hooks_client/*
+//go:embed git_hooks_client/*.c
 //go:embed vendor/*
 var source_fs embed.FS
 
@@ -27,7 +27,7 @@ func init() {
 	)
 }
 
-//go:embed templates/* static/*
+//go:embed templates/* static/* git_hooks_client/git_hooks_client
 var resources_fs embed.FS
 
 var templates *template.Template
