@@ -4,21 +4,21 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string.h>
+#include <fcntl.h>
 
-int main() {
+int main(void) {
 	int sock;
 	struct sockaddr_un addr;
-	const char *message = "hi";
 	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 
 	if (socket_path == NULL) {
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock == -1) {
 		perror("socket");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	memset(&addr, 0, sizeof(struct sockaddr_un));
@@ -28,16 +28,19 @@ int main() {
 	if (connect(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1) {
 		perror("connect");
 		close(sock);
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
-	if (send(sock, message, strlen(message), 0) == -1) {
-		perror("send");
+	ssize_t bytes_spliced;
+	while ((bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, 1, SPLICE_F_MORE)) > 0) {
+	}
+
+	if (bytes_spliced == -1) {
+		perror("splice");
 		close(sock);
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	close(sock);
-
-	return 0;
+	return EXIT_SUCCESS;
 }
