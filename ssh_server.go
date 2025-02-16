@@ -75,8 +75,9 @@ func serve_ssh(listener net.Listener) error {
 		PublicKeyHandler:           func(ctx glider_ssh.Context, key glider_ssh.PublicKey) bool { return true },
 		KeyboardInteractiveHandler: func(ctx glider_ssh.Context, challenge go_ssh.KeyboardInteractiveChallenge) bool { return true },
 		// It is intentional that we do not check any credentials and accept all connections.
-		// This allows all users to connect and clone repositories; when pushing is added later,
-		// we will check their public key in the session handler, not in the auth handlers.
+		// This allows all users to connect and clone repositories. However, the public key
+		// is passed to handlers, so e.g. the push handler could check the key and reject the
+		// push if it needs to.
 	}
 
 	server.AddHostKey(host_key)
