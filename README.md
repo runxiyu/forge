@@ -2,6 +2,13 @@
 
 **Work in progress.**
 
+**Brach information: This branch uses go-git natively for transport operations.
+go-git has [bugs](https://github.com/go-git/go-git/issues/647) that prevent it
+from being used reliably for transport operations, so the master branch calls
+git-{receive,upload}-pack instead. No effort is made to keep this branch
+in sync, but in the future when go-git is fixed we may merge things back.
+Please note that this branch may receive force pushes.**
+
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
 primarily designed for self-hosting by small organizations and individuals.
 
