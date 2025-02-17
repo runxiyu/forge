@@ -32,7 +32,7 @@ func deploy_hooks_to_filesystem() (err error) {
 		return err
 	}
 
-	err = os.Chmod(filepath.Join(config.Hooks.Execs, "git_hooks_client"), 0755)
+	err = os.Chmod(filepath.Join(config.Hooks.Execs, "git_hooks_client"), 0o755)
 	if err != nil {
 		return err
 	}
