@@ -1,12 +1,9 @@
 package main
 
 import (
+	"io"
 	"net/http"
-
-	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-git/v5/plumbing/protocol/packp"
-	"github.com/go-git/go-git/v5/plumbing/transport"
-	"github.com/go-git/go-git/v5/plumbing/transport/server"
+	"os/exec"
 )
 
 func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
@@ -16,30 +13,54 @@ func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[strin
 	if err != nil {
 		return err
 	}
-	endpoint, err := transport.NewEndpoint("/")
-	if err != nil {
-		return err
-	}
-	billy_fs := osfs.New(repo_path)
-	fs_loader := server.NewFilesystemLoader(billy_fs)
-	transport := server.NewServer(fs_loader)
-	upload_pack_session, err := transport.NewUploadPackSession(endpoint, nil)
-	if err != nil {
-		return err
-	}
+
 	w.Header().Set("Content-Type", "application/x-git-upload-pack-result")
-	reference_update_request := packp.NewUploadPackRequest()
-	err = reference_update_request.Decode(r.Body)
+	w.Header().Set("Connection", "Keep-Alive")
+	w.Header().Set("Transfer-Encoding", "chunked")
+	w.WriteHeader(http.StatusOK)
+
+	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", repo_path)
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	report_status, err := upload_pack_session.UploadPack(r.Context(), reference_update_request)
+	cmd.Stderr = cmd.Stdout
+	defer func() {
+		_ = stdout.Close()
+	}()
+
+	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return err
 	}
-	err = report_status.Encode(w)
+	defer func() {
+		_ = stdin.Close()
+	}()
+
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
+
+	_, err = io.Copy(stdin, r.Body)
+	if err != nil {
+		return err
+	}
+
+	err = stdin.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, stdout)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

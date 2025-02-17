@@ -1,12 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"net/http"
-
-	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-git/v5/plumbing/format/pktline"
-	"github.com/go-git/go-git/v5/plumbing/transport"
-	"github.com/go-git/go-git/v5/plumbing/transport/server"
+	"os/exec"
 )
 
 func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
@@ -16,26 +14,57 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 	if err != nil {
 		return err
 	}
-	endpoint, err := transport.NewEndpoint("/")
+
+	w.Header().Set("Content-Type", "application/x-git-upload-pack-advertisement")
+	w.WriteHeader(http.StatusOK)
+
+	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", "--advertise-refs", repo_path)
+
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	billy_fs := osfs.New(repo_path)
-	fs_loader := server.NewFilesystemLoader(billy_fs)
-	transport := server.NewServer(fs_loader)
-	upload_pack_session, err := transport.NewUploadPackSession(endpoint, nil)
+	cmd.Stderr = cmd.Stdout
+	defer func() {
+		_ = stdout.Close()
+	}()
+
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
-	advertised_references, err := upload_pack_session.AdvertisedReferencesContext(r.Context())
+
+	err = pack_line(w, "# service=git-upload-pack\n")
 	if err != nil {
 		return err
 	}
-	advertised_references.Prefix = [][]byte{[]byte("# service=git-upload-pack"), pktline.Flush}
-	w.Header().Set("content-type", "application/x-git-upload-pack-advertisement")
-	err = advertised_references.Encode(w)
+
+	err = pack_flush(w)
+	if err != nil {
+		return
+	}
+
+	_, err = io.Copy(w, stdout)
 	if err != nil {
 		return err
 	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+// Taken from https://github.com/icyphox/legit, MIT license
+func pack_line(w io.Writer, s string) error {
+	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
+	return err
+}
+
+// Taken from https://github.com/icyphox/legit, MIT license
+func pack_flush(w io.Writer) error {
+	_, err := fmt.Fprint(w, "0000")
+	return err
 }
