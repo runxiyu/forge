@@ -21,6 +21,11 @@ func main() {
 		clog.Fatal(1, "Loading configuration: "+err.Error())
 	}
 
+	err = deploy_hooks_to_filesystem()
+	if err != nil {
+		clog.Fatal(1, "Deploying hooks to filesystem: "+err.Error())
+	}
+
 	err = load_templates()
 	if err != nil {
 		clog.Fatal(1, "Loading templates: "+err.Error())
