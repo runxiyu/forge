@@ -145,11 +145,13 @@ td > pre {
 .chunk-unchanged {
 	color: grey;
 }
-.chunk-addition, @media (prefers-color-scheme: dark) .chunk-addition {
+.chunk-addition {
 	background-color: green;
 }
-.chunk-addition@media (prefers-color-scheme: dark) {
-	background-color: lime;
+@media (prefers-color-scheme: dark) {
+	.chunk-addition {
+		background-color: lime;
+	}
 }
 .chunk-deletion {
 	background-color: red;
