@@ -10,6 +10,3 @@
 
 * Unit tests
 * Refactoring other stuff
-
-Accessibility:
-* Those labels in css state machines are not keyboard focusable!
