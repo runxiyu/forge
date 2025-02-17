@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	err_not_unixconn = errors.New("Not a unix connection")
 	err_get_fd       = errors.New("Unable to get file descriptor")
 	err_get_ucred    = errors.New("Failed getsockopt")
 )
