@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,7 +8,7 @@
 #include <string.h>
 #include <fcntl.h>
 
-int main(void) {
+int main(int argc, char *argv[]) {
 	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 	if (socket_path == NULL) {
 		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
@@ -82,12 +83,41 @@ int main(void) {
 	}
 
 	/*
+	 * First we report argc and argv to the UNIX domain socket.
+	 */
+	uint64_t argc64 = (uint64_t)argc;
+	ssize_t bytes_sent = send(sock, &argc64, sizeof(argc64), 0);
+	switch (bytes_sent) {
+	case -1:
+		perror("send argc");
+		close(sock);
+		return EXIT_FAILURE;
+	case sizeof(argc64):
+		break;
+	default:
+		dprintf(STDERR_FILENO, "send returned unexpected value on internal socket\n");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+	for (int i = 0; i < argc; i++) {
+		unsigned long len = strlen(argv[i]) + 1;
+		bytes_sent = send(sock, argv[i], len, 0);
+		if (bytes_sent == -1) {
+			perror("send argv");
+			close(sock);
+			exit(EXIT_FAILURE);
+		} else if ((unsigned long)bytes_sent == len) {
+		} else {
+			dprintf(STDERR_FILENO, "send returned unexpected value on internal socket\n");
+			close(sock);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/*
 	 * Now we can start splicing data from stdin to the UNIX domain socket.
 	 * The format is irrelevant and depends on the hook being called. All we
 	 * do is pass it to the socket for it to handle.
-	 *
-	 * TODO: The argument vector may need to be passed too. We may consider
-	 * using an ancillary message.
 	 */
 	ssize_t stdin_bytes_spliced;
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
@@ -101,7 +131,6 @@ int main(void) {
 	/*
 	 * The first byte of the response from the UNIX domain socket is the
 	 * status code. We read it and record it as our return value.
-	 * (Realistically we just need a boolean to indicate success or failure.)
 	 */
 	char status_buf[1];
 	ssize_t bytes_read = read(sock, status_buf, 1);
