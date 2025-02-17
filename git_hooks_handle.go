@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net"
@@ -8,9 +10,11 @@ import (
 	"syscall"
 )
 
-var err_not_unixconn = errors.New("Not a unix connection")
-var err_get_fd = errors.New("Unable to get file descriptor")
-var err_get_ucred = errors.New("Failed getsockopt")
+var (
+	err_not_unixconn = errors.New("Not a unix connection")
+	err_get_fd       = errors.New("Unable to get file descriptor")
+	err_get_ucred    = errors.New("Failed getsockopt")
+)
 
 func hooks_handle_connection(conn net.Conn) {
 	defer conn.Close()
@@ -21,17 +25,39 @@ func hooks_handle_connection(conn net.Conn) {
 		fmt.Fprintln(conn, "Unable to get peer credentials:", err.Error())
 		return
 	}
-
 	if ucred.Uid != uint32(os.Getuid()) {
 		conn.Write([]byte{1})
 		fmt.Fprintln(conn, "UID mismatch")
 		return
 	}
 
-	conn.Write([]byte{0})
-	fmt.Fprintf(conn, "Your PID is %d\n", ucred.Pid)
+	var argc64 uint64
+	err = binary.Read(conn, binary.NativeEndian, &argc64)
+	if err != nil {
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Failed to read argc:", err.Error())
+		return
+	}
+	var args []string
+	for i := uint64(0); i < argc64; i++ {
+		var arg bytes.Buffer
+		for {
+			b := make([]byte, 1)
+			n, err := conn.Read(b)
+			if err != nil || n != 1 {
+				conn.Write([]byte{1})
+				fmt.Fprintln(conn, "Failed to read arg:", err.Error())
+				return
+			}
+			if b[0] == 0 {
+				break
+			}
+			arg.WriteByte(b[0])
+		}
+		args = append(args, arg.String())
+	}
 
-	return
+	conn.Write([]byte{0})
 }
 
 func serve_git_hooks(listener net.Listener) error {
