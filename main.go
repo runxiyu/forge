@@ -35,12 +35,25 @@ func main() {
 	if err != nil {
 		clog.Fatal(1, "Listening SSH: "+err.Error())
 	}
-
-	err = serve_ssh(ssh_listener)
-	if err != nil {
-		clog.Fatal(1, "Serving SSH: "+err.Error())
-	}
 	clog.Info("Listening SSH on " + config.SSH.Net + " " + config.SSH.Addr)
+	go func() {
+		err = serve_ssh(ssh_listener)
+		if err != nil {
+			clog.Fatal(1, "Serving SSH: "+err.Error())
+		}
+	}()
+
+	hooks_listener, err := net.Listen("unix", config.Hooks.Socket)
+	if err != nil {
+		clog.Fatal(1, "Listening hooks: "+err.Error())
+	}
+	clog.Info("Listening hooks at " + config.Hooks.Socket)
+	go func() {
+		err = serve_git_hooks(hooks_listener)
+		if err != nil {
+			clog.Fatal(1, "Serving hooks: "+err.Error())
+		}
+	}()
 
 	listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if err != nil {
@@ -48,8 +61,12 @@ func main() {
 	}
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 
-	err = http.Serve(listener, &http_router_t{})
-	if err != nil {
-		clog.Fatal(1, "Serving HTTP: "+err.Error())
-	}
+	go func() {
+		err = http.Serve(listener, &http_router_t{})
+		if err != nil {
+			clog.Fatal(1, "Serving HTTP: "+err.Error())
+		}
+	}()
+
+	select{}
 }

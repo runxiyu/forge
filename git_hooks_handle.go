@@ -31,9 +31,19 @@ func hooks_handle_connection(conn net.Conn) (err error) {
 
 	pid := ucred.Pid
 
-	_ = pid
+	conn.Write([]byte{0})
+	fmt.Fprintf(conn, "your PID is %d\n", pid)
 
 	return nil
+}
+
+func serve_git_hooks(listener net.Listener) error {
+	conn, err := listener.Accept()
+	if err != nil {
+		return err
+	}
+
+	return hooks_handle_connection(conn)
 }
 
 func get_ucred(fd *os.File) (*syscall.Ucred, error) {

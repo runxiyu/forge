@@ -83,12 +83,10 @@ func serve_ssh(listener net.Listener) error {
 
 	server.AddHostKey(host_key)
 
-	go func() {
-		err = server.Serve(listener)
-		if err != nil {
-			clog.Fatal(1, "Serving SSH: "+err.Error())
-		}
-	}()
+	err = server.Serve(listener)
+	if err != nil {
+		clog.Fatal(1, "Serving SSH: "+err.Error())
+	}
 
 	return nil
 }
