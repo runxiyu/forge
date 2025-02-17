@@ -10,40 +10,46 @@ import (
 
 var err_not_unixconn = errors.New("Not a unix connection")
 
-func hooks_handle_connection(conn net.Conn) (err error) {
+func hooks_handle_connection(conn net.Conn) {
 	defer conn.Close()
 
-	unix_conn, ok := conn.(*net.UnixConn)
-	if !ok {
-		return err_not_unixconn
-	}
+	unix_conn := conn.(*net.UnixConn)
 
 	fd, err := unix_conn.File()
 	if err != nil {
-		return err
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Unable to get file descriptor")
+		return
 	}
 	defer fd.Close()
 
 	ucred, err := get_ucred(fd)
 	if err != nil {
-		return err
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Unable to get peer credentials")
+		return
 	}
 
-	pid := ucred.Pid
+	if ucred.Uid != uint32(os.Getuid()) {
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "UID mismatch")
+		return
+	}
 
 	conn.Write([]byte{0})
-	fmt.Fprintf(conn, "your PID is %d\n", pid)
+	fmt.Fprintf(conn, "Your PID is %d\n", ucred.Pid)
 
-	return nil
+	return
 }
 
 func serve_git_hooks(listener net.Listener) error {
-	conn, err := listener.Accept()
-	if err != nil {
-		return err
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			return err
+		}
+		go hooks_handle_connection(conn)
 	}
-
-	return hooks_handle_connection(conn)
 }
 
 func get_ucred(fd *os.File) (*syscall.Ucred, error) {
