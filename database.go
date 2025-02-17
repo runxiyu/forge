@@ -44,3 +44,8 @@ func query_name_desc_list(ctx context.Context, query string, args ...any) ([]nam
 	}
 	return result, rows.Err()
 }
+
+type name_desc_t struct {
+	Name        string
+	Description string
+}
