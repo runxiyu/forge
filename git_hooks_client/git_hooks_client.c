@@ -68,6 +68,25 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
+	char status_buf[1];
+	ssize_t bytes_read = read(sock, status_buf, 1);
+	switch (bytes_read) {
+	case -1:
+		perror("read");
+		close(sock);
+		return EXIT_FAILURE;
+	case 0:
+		dprintf(STDERR_FILENO, "fatal: unexpected EOF on internal socket\n");
+		close(sock);
+		return EXIT_FAILURE;
+	case 1:
+		break;
+	default:
+		dprintf(STDERR_FILENO, "fatal: read returned unexpected value on internal socket\n");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
 	close(sock);
-	return EXIT_SUCCESS;
+	return *status_buf;
 }
