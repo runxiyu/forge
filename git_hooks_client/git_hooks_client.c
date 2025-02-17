@@ -8,8 +8,14 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <fcntl.h>
+#include <signal.h>
 
 int main(int argc, char *argv[]) {
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+		perror("signal");
+		return EXIT_FAILURE;
+	}
+
 	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 	if (socket_path == NULL) {
 		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
