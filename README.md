@@ -127,8 +127,8 @@ The web interface will have a dedicated login screen. Connections are set as
 keepalive, and sessions are tracked across a kept-alive connection; optionally,
 a user may click "remember me with a cookie" in the login screen.
 
-PGP commit validation will be implemented. PGP patch validation may be
-considered.
+Commit validation based on SSH signature validation will be implemented. PGP
+patch validation may be considered.
 
 ### Federated authentication
 
