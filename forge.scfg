@@ -21,6 +21,7 @@ db {
 	conn postgresql:///lindenii-forge?host=/var/run/postgresql
 }
 
-git {
-	hooks_socket /var/run/lindenii/forge/hooks.sock
+hooks {
+	socket /var/run/lindenii/forge/hooks.sock
+	execs /usr/libexec/lindenii/forge/hooks
 }
