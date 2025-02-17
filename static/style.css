@@ -46,8 +46,8 @@ html, code, pre {
 	opacity: 0;
 	position: absolute;
 }
-.toggle-table-off:focus + table > thead > tr > th > label,
-.toggle-table-on:focus + table > thead > tr > th > label {
+.toggle-table-off:focus-visible + table > thead > tr > th > label,
+.toggle-table-on:focus-visible + table > thead > tr > th > label {
 	outline: 1.5px var(--primary-color) solid;
 }
 .toggle-table-off + table > thead > tr > th, .toggle-table-on + table > thead > tr > th {
@@ -203,7 +203,7 @@ pre.chunk {
 .toggle-on-content {
 	display: none;
 }
-.toggle-on-toggle:focus + .toggle-on-header, .toggle-off-toggle:focus + .toggle-off-header {
+.toggle-on-toggle:focus-visible + .toggle-on-header, .toggle-off-toggle:focus-visible + .toggle-off-header {
 	outline: 1.5px var(--primary-color) solid;
 }
 .toggle-on-toggle:checked + .toggle-on-header + .toggle-on-content {
