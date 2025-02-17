@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	glider_ssh "github.com/gliderlabs/ssh"
@@ -14,6 +15,7 @@ func ssh_handle_upload_pack(session glider_ssh.Session, pubkey string, repo_iden
 	}
 
 	proc := exec.CommandContext(session.Context(), "git-upload-pack", repo_path)
+	proc.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
 	proc.Stdin = session
 	proc.Stdout = session
 	proc.Stderr = session.Stderr()

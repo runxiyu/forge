@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"net/http"
+	"os"
 	"os/exec"
 )
 
@@ -20,6 +21,7 @@ func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[strin
 	w.WriteHeader(http.StatusOK)
 
 	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", repo_path)
+	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
