@@ -110,7 +110,7 @@ be considered. No full-HTML emails are expected for normal traffic.
 
 We generally prefer to have linters, deployment pipelines and such run on each
 local developer's machine, for example as a pre-commit hook. However there are
-reasons why CI might be useful. We plan to integrate a git.sr.ht-style CI in
+reasons why CI might be useful. We plan to integrate a builds.sr.ht-style CI in
 the future.
 
 ### Authentication and authorization
