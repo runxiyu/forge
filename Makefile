@@ -9,7 +9,7 @@ forge: $(filter-out forge,$(wildcard *)) version.go git_hooks_client/*.c git_hoo
 git_hooks_client/git_hooks_client:
 
 version.go:
-	printf 'package main\nconst VERSION="%s"\n' $(shell git describe --tags --long --always --dirty) > $@
+	printf 'package main\nconst VERSION="%s"\n' $(shell git describe --tags --always --dirty) > $@
 
 clean:
 	$(RM) forge version.go vendor
