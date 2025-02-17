@@ -31,6 +31,21 @@ func hooks_handle_connection(conn net.Conn) {
 		return
 	}
 
+	cookie := make([]byte, 64)
+	_, err = conn.Read(cookie)
+	if err != nil {
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Failed to read cookie:", err.Error())
+		return
+	}
+
+	deployer_chan, ok := hooks_cookie_deployer.Load(string(cookie))
+	if !ok {
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Invalid cookie")
+		return
+	}
+
 	var argc64 uint64
 	err = binary.Read(conn, binary.NativeEndian, &argc64)
 	if err != nil {
@@ -57,7 +72,14 @@ func hooks_handle_connection(conn net.Conn) {
 		args = append(args, arg.String())
 	}
 
-	conn.Write([]byte{0})
+	callback := make(chan struct{})
+
+	deployer_chan <- hooks_cookie_deployer_return{
+		args:     args,
+		callback: callback,
+		conn:     conn,
+	}
+	<-callback
 }
 
 func serve_git_hooks(listener net.Listener) error {

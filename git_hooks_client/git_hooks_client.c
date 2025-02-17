@@ -14,6 +14,16 @@ int main(int argc, char *argv[]) {
 		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
 		return EXIT_FAILURE;
 	}
+	const char *cookie = getenv("LINDENII_FORGE_HOOKS_COOKIE");
+	if (cookie == NULL) {
+		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_COOKIE undefined\n");
+		return EXIT_FAILURE;
+	}
+	if (strlen(cookie) != 64) {
+		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_COOKIE is not 64 characters long, something has gone wrong\n");
+		dprintf(STDERR_FILENO, "%s\n", cookie);
+		return EXIT_FAILURE;
+	}
 
 	/*
 	 * All hooks in git (see builtin/receive-pack.c) use a pipe by setting
@@ -83,7 +93,24 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * First we report argc and argv to the UNIX domain socket.
+	 * We first send the 64-byte cookie to the UNIX domain socket
+	 */
+	ssize_t cookie_bytes_sent = send(sock, cookie, 64, 0);
+	switch (cookie_bytes_sent) {
+	case -1:
+		perror("send cookie");
+		close(sock);
+		return EXIT_FAILURE;
+	case 64:
+		break;
+	default:
+		dprintf(STDERR_FILENO, "send returned unexpected value on internal socket\n");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
+	/*
+	 * Next we can report argc and argv to the UNIX domain socket.
 	 */
 	uint64_t argc64 = (uint64_t)argc;
 	ssize_t bytes_sent = send(sock, &argc64, sizeof(argc64), 0);
