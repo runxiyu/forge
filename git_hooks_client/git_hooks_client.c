@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,7 +186,7 @@ int main(int argc, char *argv[]) {
 	ssize_t stderr_bytes_spliced;
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
-	if (stdin_bytes_spliced == -1) {
+	if (stdin_bytes_spliced == -1 && errno != ECONNRESET) {
 		perror("splice internal socket to stderr");
 		close(sock);
 		return EXIT_FAILURE;
