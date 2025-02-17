@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"os/exec"
 
@@ -14,13 +13,14 @@ import (
 
 var err_unauthorized_push = errors.New("You are not authorized to push to this repository")
 
-type hooks_cookie_deployer_return struct {
-	args     []string
-	callback chan struct{}
-	conn     net.Conn
+type pack_to_hook_t struct {
+	session       *glider_ssh.Session
+	pubkey        string
+	direct_access bool
+	repo_path     string
 }
 
-var hooks_cookie_deployer = cmap.ComparableMap[string, chan hooks_cookie_deployer_return]{}
+var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
 	repo_path, access, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
@@ -33,9 +33,13 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	deployer_channel := make(chan hooks_cookie_deployer_return)
-	hooks_cookie_deployer.Store(cookie, deployer_channel)
-	defer hooks_cookie_deployer.Delete(cookie)
+	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
+		session:       &session,
+		pubkey:        pubkey,
+		direct_access: access,
+		repo_path:     repo_path,
+	})
+	defer pack_to_hook_by_cookie.Delete(cookie)
 
 	proc := exec.CommandContext(session.Context(), "git-receive-pack", repo_path)
 	proc.Env = append(os.Environ(),
@@ -51,17 +55,6 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		fmt.Fprintln(session.Stderr(), "Error while starting process:", err)
 		return err
 	}
-
-	deployer := <-deployer_channel
-
-	if access {
-		deployer.conn.Write([]byte{0})
-	} else {
-		deployer.conn.Write([]byte{1})
-		fmt.Fprintln(deployer.conn, "Hi! We don't support pushing from non-authorized users yet. This will be implemented soon.")
-	}
-
-	deployer.callback <- struct{}{}
 
 	err = proc.Wait()
 	if exitError, ok := err.(*exec.ExitError); ok {

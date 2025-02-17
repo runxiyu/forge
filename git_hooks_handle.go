@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"syscall"
 )
 
 var (
-	err_get_fd       = errors.New("Unable to get file descriptor")
-	err_get_ucred    = errors.New("Failed getsockopt")
+	err_get_fd    = errors.New("Unable to get file descriptor")
+	err_get_ucred = errors.New("Failed getsockopt")
 )
 
 func hooks_handle_connection(conn net.Conn) {
@@ -38,10 +39,10 @@ func hooks_handle_connection(conn net.Conn) {
 		return
 	}
 
-	deployer_chan, ok := hooks_cookie_deployer.Load(string(cookie))
+	pack_to_hook, ok := pack_to_hook_by_cookie.Load(string(cookie))
 	if !ok {
 		conn.Write([]byte{1})
-		fmt.Fprintln(conn, "Invalid cookie")
+		fmt.Fprintln(conn, "Invalid handler cookie")
 		return
 	}
 
@@ -71,14 +72,18 @@ func hooks_handle_connection(conn net.Conn) {
 		args = append(args, arg.String())
 	}
 
-	callback := make(chan struct{})
-
-	deployer_chan <- hooks_cookie_deployer_return{
-		args:     args,
-		callback: callback,
-		conn:     conn,
+	switch filepath.Base(args[0]) {
+	case "pre-receive":
+		if pack_to_hook.direct_access {
+			conn.Write([]byte{0})
+		} else {
+			conn.Write([]byte{1})
+			fmt.Fprintln(conn, "Non-maintainer push access not implemented yet")
+		}
+	default:
+		conn.Write([]byte{1})
+		fmt.Fprintln(conn, "Invalid hook:", args[0])
 	}
-	<-callback
 }
 
 func serve_git_hooks(listener net.Listener) error {
