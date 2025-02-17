@@ -24,7 +24,6 @@ int main(void) {
 	 * We connect to the UNIX domain socket after ensuring that standard
 	 * input matches our expectations.
 	 */
-
 	struct stat stdin_stat;
 	if (fstat(STDIN_FILENO, &stdin_stat) == -1) {
 		perror("fstat on stdin");
@@ -40,8 +39,10 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
-	/* ... And we do the same for stderr */
-
+	/*
+	 * ... And we do the same for stderr. Later we will splice from the
+	 * socket to stderr, to let the daemon report back to the user.
+	 */
 	struct stat stderr_stat;
 	if (fstat(STDERR_FILENO, &stderr_stat) == -1) {
 		perror("fstat on stderr");
@@ -57,7 +58,13 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
-
+	/*
+	 * Now that we know that stdin and stderr are pipes, we can connect to
+	 * the UNIX domain socket. We don't do this earlier because we don't
+	 * want to create unnecessary connections if the hook was called
+	 * inappropriately (such as by a user with shell access in their
+	 * terminal).
+	 */
 	int sock;
 	struct sockaddr_un addr;
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -68,23 +75,34 @@ int main(void) {
 	memset(&addr, 0, sizeof(struct sockaddr_un));
 	addr.sun_family = AF_UNIX;
 	strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
-
 	if (connect(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1) {
 		perror("internal socket connect");
 		close(sock);
 		return EXIT_FAILURE;
 	}
 
+	/*
+	 * Now we can start splicing data from stdin to the UNIX domain socket.
+	 * The format is irrelevant and depends on the hook being called. All we
+	 * do is pass it to the socket for it to handle.
+	 *
+	 * TODO: The argument vector may need to be passed too. We may consider
+	 * using an ancillary message.
+	 */
 	ssize_t stdin_bytes_spliced;
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
-
 	if (stdin_bytes_spliced == -1) {
 		perror("splice stdin to internal socket");
 		close(sock);
 		return EXIT_FAILURE;
 	}
 
+	/*
+	 * The first byte of the response from the UNIX domain socket is the
+	 * status code. We read it and record it as our return value.
+	 * (Realistically we just need a boolean to indicate success or failure.)
+	 */
 	char status_buf[1];
 	ssize_t bytes_read = read(sock, status_buf, 1);
 	switch (bytes_read) {
@@ -104,10 +122,13 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
+	/*
+	 * Now we can splice data from the UNIX domain socket to stderr.
+	 * This data is directly passed to the user (with "remote: " prepended).
+	 */
 	ssize_t stderr_bytes_spliced;
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
-
 	if (stdin_bytes_spliced == -1) {
 		perror("splice internal socket to stderr");
 		close(sock);
