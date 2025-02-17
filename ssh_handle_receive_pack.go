@@ -27,9 +27,6 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	if err != nil {
 		return err
 	}
-	if !access {
-		return err_unauthorized_push
-	}
 
 	cookie, err := random_urlsafe_string(16)
 	if err != nil {
@@ -57,7 +54,12 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 
 	deployer := <-deployer_channel
 
-	deployer.conn.Write([]byte{0})
+	if access {
+		deployer.conn.Write([]byte{0})
+	} else {
+		deployer.conn.Write([]byte{1})
+		fmt.Fprintln(deployer.conn, "Hi! We don't support pushing from non-authorized users yet. This will be implemented soon.")
+	}
 
 	deployer.callback <- struct{}{}
 
