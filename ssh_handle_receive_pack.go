@@ -36,8 +36,8 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	c := make(chan hooks_cookie_deployer_return)
-	hooks_cookie_deployer.Store(cookie, c)
+	deployer_channel := make(chan hooks_cookie_deployer_return)
+	hooks_cookie_deployer.Store(cookie, deployer_channel)
 	defer hooks_cookie_deployer.Delete(cookie)
 
 	proc := exec.CommandContext(session.Context(), "git-receive-pack", repo_path)
@@ -55,7 +55,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		return err
 	}
 
-	deployer := <-c
+	deployer := <-deployer_channel
 
 	deployer.conn.Write([]byte{1})
 
