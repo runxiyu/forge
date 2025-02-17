@@ -5,6 +5,12 @@
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
 primarily designed for self-hosting by small organizations and individuals.
 
+The Lindenii project itself
+[runs an instance](https://forge.lindenii.runxiyu.org/),
+where the
+[official source repository of Lindenii Forge](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
+is located.
+
 ## Setup
 
 * Clone the source code and build a binary with `make`.
