@@ -10,7 +10,7 @@
 int main(void) {
 	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 	if (socket_path == NULL) {
-	        dprintf(STDERR_FILENO, "fatal: environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
+	        dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
 		return EXIT_FAILURE;
 	}
 
@@ -27,16 +27,16 @@ int main(void) {
 
         struct stat stdin_stat;
 	if (fstat(STDIN_FILENO, &stdin_stat) == -1) {
-		perror("fstat");
+		perror("fstat on stdin");
 		return EXIT_FAILURE;
 	}
 	if (!S_ISFIFO(stdin_stat.st_mode)) {
-	        dprintf(STDERR_FILENO, "fatal: stdin must be a pipe\n");
+	        dprintf(STDERR_FILENO, "stdin must be a pipe\n");
 	        return EXIT_FAILURE;
 	}
 	int pipe_size = fcntl(STDIN_FILENO, F_GETPIPE_SZ);
 	if (pipe_size == -1) {
-		perror("fcntl");
+		perror("fcntl on stdin");
 		return EXIT_FAILURE;
 	}
 
@@ -44,7 +44,7 @@ int main(void) {
 	struct sockaddr_un addr;
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock == -1) {
-		perror("socket");
+		perror("internal socket creation");
 		return EXIT_FAILURE;
 	}
 	memset(&addr, 0, sizeof(struct sockaddr_un));
@@ -52,7 +52,7 @@ int main(void) {
 	strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
 
 	if (connect(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1) {
-		perror("connect");
+		perror("internal socket connect");
 		close(sock);
 		return EXIT_FAILURE;
 	}
@@ -63,7 +63,7 @@ int main(void) {
 	}
 
 	if (bytes_spliced == -1) {
-		perror("splice");
+		perror("splice stdin to internal socket");
 		close(sock);
 		return EXIT_FAILURE;
 	}
@@ -72,17 +72,17 @@ int main(void) {
 	ssize_t bytes_read = read(sock, status_buf, 1);
 	switch (bytes_read) {
 	case -1:
-		perror("read");
+		perror("read status code from internal socket");
 		close(sock);
 		return EXIT_FAILURE;
 	case 0:
-		dprintf(STDERR_FILENO, "fatal: unexpected EOF on internal socket\n");
+		dprintf(STDERR_FILENO, "unexpected EOF on internal socket\n");
 		close(sock);
 		return EXIT_FAILURE;
 	case 1:
 		break;
 	default:
-		dprintf(STDERR_FILENO, "fatal: read returned unexpected value on internal socket\n");
+		dprintf(STDERR_FILENO, "read returned unexpected value on internal socket\n");
 		close(sock);
 		return EXIT_FAILURE;
 	}
