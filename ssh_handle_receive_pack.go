@@ -57,7 +57,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 
 	deployer := <-deployer_channel
 
-	deployer.conn.Write([]byte{1})
+	deployer.conn.Write([]byte{0})
 
 	deployer.callback <- struct{}{}
 
