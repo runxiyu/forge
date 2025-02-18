@@ -19,6 +19,12 @@
 						<th scope="row">Name</th>
 						<td>{{ .repo_name }}</td>
 					</tr>
+					{{ if .repo_description }}
+						<tr>
+							<th scope="row">Description</th>
+							<td>{{ .repo_description }}</td>
+						</tr>
+					{{ end }}
 					<tr>
 						<th scope="row" rowspan="2">Clone</th>
 						<td><code>git clone {{ .ssh_clone_url }}</code></td>
@@ -26,12 +32,6 @@
 					<tr>
 						<td><code>git clone {{ .http_clone_url }}</code></td>
 					</tr>
-					{{ if .repo_description }}
-						<tr>
-							<th scope="row">Description</th>
-							<td>{{ .repo_description }}</td>
-						</tr>
-					{{ end }}
 				</tbody>
 			</table>
 		</div>
