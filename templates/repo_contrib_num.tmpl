@@ -1,0 +1,18 @@
+{{- define "repo_contrib_num" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ template "head_common" . }}
+		<title>Merge requests &ndash; {{ .repo_name }} &ndash; {{ .group_name }} &ndash; {{ .global.forge_title }}</title>
+	</head>
+	<body class="repo-contrib-num">
+		{{ template "header" . }}
+		<div class="padding-wrapper">
+			Test
+		</div>
+		<footer>
+			{{ template "footer" . }}
+		</footer>
+	</body>
+</html>
+{{- end -}}

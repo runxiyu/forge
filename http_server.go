@@ -45,6 +45,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := make(map[string]any)
+	params["url_segments"] = segments
 	params["global"] = global_data
 	var _user_id int // 0 for none
 	_user_id, params["username"], err = get_user_info_from_request(r)
@@ -193,7 +194,14 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if redirect_with_slash(w, r) {
 					return
 				}
-				handle_repo_contrib_index(w, r, params)
+				switch non_empty_last_segments_len {
+				case separator_index+4:
+					handle_repo_contrib_index(w, r, params)
+				case separator_index+5:
+					handle_repo_contrib_num(w, r, params)
+				default:
+					http.Error(w, "Too many parameters", http.StatusBadRequest)
+				}
 			default:
 				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repo_feature), http.StatusNotFound)
 			}
