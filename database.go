@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+// query_list is a helper function that executes a query and returns a list of
+// results.
 func query_list[T any](ctx context.Context, query string, args ...any) ([]T, error) {
 	rows, err := database.Query(ctx, query, args...)
 	if err != nil {
@@ -27,6 +29,8 @@ func query_list[T any](ctx context.Context, query string, args ...any) ([]T, err
 	return result, nil
 }
 
+// query_name_desc_list is a helper function that executes a query and returns a
+// list of name_desc_t results.
 func query_name_desc_list(ctx context.Context, query string, args ...any) ([]name_desc_t, error) {
 	rows, err := database.Query(ctx, query, args...)
 	if err != nil {
@@ -45,6 +49,7 @@ func query_name_desc_list(ctx context.Context, query string, args ...any) ([]nam
 	return result, rows.Err()
 }
 
+// name_desc_t holds a name and a description.
 type name_desc_t struct {
 	Name        string
 	Description string

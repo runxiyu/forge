@@ -77,6 +77,9 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// random_urlsafe_string generates a random string of the given entropic size
+// using the URL-safe base64 encoding. The actual size of the string returned
+// will be 4*sz.
 func random_urlsafe_string(sz int) (string, error) {
 	r := make([]byte, 3*sz)
 	_, err := rand.Read(r)

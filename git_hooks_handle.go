@@ -18,9 +18,13 @@ var (
 	err_get_ucred = errors.New("Failed getsockopt")
 )
 
+// hooks_handle_connection handles a connection from git_hooks_client via the
+// unix socket.
 func hooks_handle_connection(conn net.Conn) {
 	defer conn.Close()
 
+	// There aren't reasonable cases where someone would run this as
+	// another user.
 	ucred, err := get_ucred(conn)
 	if err != nil {
 		conn.Write([]byte{1})

@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+// get_path_perm_by_group_repo_key returns the filesystem path and direct
+// access permission for a given repo and a provided ssh public key.
 func get_path_perm_by_group_repo_key(ctx context.Context, group_name, repo_name, ssh_pubkey string) (filesystem_path string, access bool, err error) {
 	err = database.QueryRow(ctx,
 		`SELECT 

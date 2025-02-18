@@ -18,6 +18,7 @@ var (
 	err_getting_parent_commit_object = errors.New("Error getting parent commit object")
 )
 
+// open_git_repo opens a git repository by group and repo name.
 func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, err error) {
 	var fs_path string
 	err = database.QueryRow(ctx, "SELECT r.filesystem_path, COALESCE(r.description, '') FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description)
@@ -28,6 +29,7 @@ func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git
 	return
 }
 
+// go-git's tree entries are not friendly for use in HTML templates.
 type display_git_tree_entry_t struct {
 	Name       string
 	Mode       string
@@ -42,9 +44,9 @@ func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 		display_git_tree_entry := display_git_tree_entry_t{}
 		os_mode, err := entry.Mode.ToOSFileMode()
 		if err != nil {
-			display_git_tree_entry.Mode = "x---"
+			display_git_tree_entry.Mode = "x---------"
 		} else {
-			display_git_tree_entry.Mode = os_mode.String()[:4]
+			display_git_tree_entry.Mode = os_mode.String()
 		}
 		display_git_tree_entry.Is_file = entry.Mode.IsFile()
 		display_git_tree_entry.Size, err = tree.Size(entry.Name)

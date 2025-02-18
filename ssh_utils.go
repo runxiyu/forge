@@ -9,7 +9,7 @@ import (
 
 var err_ssh_illegal_endpoint = errors.New("Illegal endpoint during SSH access")
 
-func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (repo_path string, access bool, err error) {
+func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (repo_path string, direct_access bool, err error) {
 	segments := strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
 
 	for i, segment := range segments {

@@ -10,6 +10,8 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
+// get_patch_from_commit formats a commit object as if it was returned by
+// git-format-patch.
 func format_patch_from_commit(commit *object.Commit) (string, error) {
 	_, patch, err := get_patch_from_commit(commit)
 	if err != nil {
@@ -23,6 +25,7 @@ func format_patch_from_commit(commit *object.Commit) (string, error) {
 
 	commit_msg_title, commit_msg_details, _ := strings.Cut(commit.Message, "\n")
 
+	// This date is hardcoded in Git.
 	fmt.Fprintf(&buf, "From %s Mon Sep 17 00:00:00 2001\n", commit.Hash)
 	fmt.Fprintf(&buf, "From: %s <%s>\n", author.Name, author.Email)
 	fmt.Fprintf(&buf, "Date: %s\n", date)

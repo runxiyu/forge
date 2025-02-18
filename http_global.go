@@ -1,5 +1,6 @@
 package main
 
+// global_data is passed as "global" when rendering HTML templates.
 var global_data = map[string]any{
 	"server_public_key_string":      &server_public_key_string,
 	"server_public_key_fingerprint": &server_public_key_fingerprint,

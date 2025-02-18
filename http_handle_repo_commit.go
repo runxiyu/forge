@@ -11,6 +11,8 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
+// The file patch type from go-git isn't really usable in HTML templates
+// either.
 type usable_file_patch struct {
 	From   diff.File
 	To     diff.File

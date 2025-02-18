@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+// deploy_hooks_to_filesystem deploys the git hooks client to the filesystem.
+// The git hooks client is expected to be embedded in resources_fs and must be
+// pre-compiled during the build process; see the Makefile.
 func deploy_hooks_to_filesystem() (err error) {
 	err = func() error {
 		src_fd, err := resources_fs.Open("git_hooks_client/git_hooks_client")
@@ -32,6 +35,8 @@ func deploy_hooks_to_filesystem() (err error) {
 		return err
 	}
 
+	// Go's embed filesystems do not store permissions; but in any case,
+	// they would need to be 0o755:
 	err = os.Chmod(filepath.Join(config.Hooks.Execs, "git_hooks_client"), 0o755)
 	if err != nil {
 		return err
