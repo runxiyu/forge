@@ -82,3 +82,22 @@ func redirect_with_slash(w http.ResponseWriter, r *http.Request) bool {
 	}
 	return false
 }
+
+func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
+	request_uri := r.RequestURI
+
+	path_end := strings.IndexAny(request_uri, "?#")
+	var path, rest string
+	if path_end == -1 {
+		path = request_uri
+	} else {
+		path = request_uri[:path_end]
+		rest = request_uri[path_end:]
+	}
+
+	if strings.HasSuffix(path, "/") {
+		http.Redirect(w, r, strings.TrimSuffix(path, "/") + rest, http.StatusSeeOther)
+		return true
+	}
+	return false
+}

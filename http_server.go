@@ -22,10 +22,8 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	non_empty_last_segments_len := len(segments)
-	trailing_slash := false
 	if segments[len(segments)-1] == "" {
 		non_empty_last_segments_len--
-		trailing_slash = true
 	}
 
 	if segments[0] == ":" {
@@ -186,9 +184,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				handle_repo_log(w, r, params)
 			case "commit":
-				if trailing_slash {
-					http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusSeeOther)
-					// TODO
+				if redirect_without_slash(w, r) {
 					return
 				}
 				params["commit_id"] = segments[separator_index+4]
