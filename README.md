@@ -171,7 +171,9 @@ The forge software serves its own source at `/:/source/`.
 * We have several Git repo mirrors on a few places:
   * [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
   * [The Lindenii Project's cgit](https://git.lindenii.runxiyu.org/forge.git/)
+  * [SourceHut](https://git.sr.ht/~runxiyu/forge/)
   * [Codeberg](https://codeberg.org/lindenii/forge/)
+  * [GitHub](https://github.com/runxiyu/forge/)
 
 ## Code style
 
