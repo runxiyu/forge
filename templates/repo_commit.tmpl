@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>{{ .group_name }}/repos/{{ .repo_name }} &ndash; {{ .global.forge_title }}</title>
+		<title>Commit {{ .commit_id }} &ndash; {{ .repo_name }} &ndash; {{ .group_name }} &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="repo-commit">
 		{{ template "header" . }}
