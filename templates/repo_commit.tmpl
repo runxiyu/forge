@@ -36,15 +36,14 @@
 						<td>{{ .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
 					</tr>
 					<tr>
-						<th scope="row">Message</th>
-						<td><pre>{{ .commit_object.Message }}</pre></td>
-					</tr>
-					<tr>
 						<th scope="row">Actions</th>
 						<td><pre><a href="{{ .commit_object.Hash }}.patch">Get patch</a></pre></td>
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="padding-wrapper scroll" id="this-commit-message">
+			<pre>{{ .commit_object.Message }}</pre>
 		</div>
 		<div class="padding-wrapper">
 			{{ $parent_commit_hash := .parent_commit_hash }}
