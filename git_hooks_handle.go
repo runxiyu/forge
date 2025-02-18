@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"path/filepath"
@@ -70,6 +71,12 @@ func hooks_handle_connection(conn net.Conn) {
 			arg.WriteByte(b[0])
 		}
 		args = append(args, arg.String())
+	}
+
+	var stdin bytes.Buffer
+	_, err = io.Copy(&stdin, conn)
+	if err != nil {
+		fmt.Fprintln(conn, "Failed to read to the stdin buffer:", err.Error())
 	}
 
 	switch filepath.Base(args[0]) {

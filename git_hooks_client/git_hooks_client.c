@@ -163,6 +163,16 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
+	 * The sending part of the UNIX socket should be shut down, to let
+	 * io.Copy on the Go side return.
+	 */
+	if (shutdown(sock, SHUT_WR) == -1) {
+		perror("shutdown internal socket");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
+	/*
 	 * The first byte of the response from the UNIX domain socket is the
 	 * status code. We read it and record it as our return value.
 	 */
