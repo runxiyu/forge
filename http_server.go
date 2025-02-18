@@ -85,6 +85,12 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// TODO
+	if separator_index != 1 {
+		http.Error(w, "Subgroups haven't been implemented yet", http.StatusNotImplemented)
+		return
+	}
+
 	switch {
 	case non_empty_last_segments_len == 0:
 		handle_index(w, r, params)
