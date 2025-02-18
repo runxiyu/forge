@@ -64,15 +64,17 @@ CREATE TABLE sessions (
 	UNIQUE(user_id, session_id)
 );
 
+// TODO: 
 CREATE TABLE merge_requests (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	title TEXT NOT NULL,
 	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,
-	creator INTEGER REFERENCES users(id) ON DELETE SET NULL,
+	creator INTEGER NOT NULL REFERENCES users(id) ON DELETE SET NULL,
 	source_ref TEXT NOT NULL,
 	destination_branch TEXT NOT NULL,
 	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
-	created_at TIMESTAMP NOT NULL,
-	mailing_list_id INT UNIQUE REFERENCES mailing_lists(id) ON DELETE CASCADE
+	UNIQUE (repo_id, source_ref, destination_branch),
+	UNIQUE (repo_id, id)
 );
 
 CREATE TABLE user_group_roles (

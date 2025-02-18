@@ -1,0 +1,33 @@
+{{- define "repo_contrib_index" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ template "head_common" . }}
+		<title>Merge requests &ndash; {{ .repo_name }} &ndash; {{ .group_name }} &ndash; {{ .global.forge_title }}</title>
+	</head>
+	<body class="repo-contrib-index">
+		{{ template "header" . }}
+		<div class="padding-wrapper">
+			<table id="recent-merge_requests" class="wide">
+				<thead>
+					<tr class="title-row">
+						<th colspan="3">Merge requests</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- range .merge_requests }}
+						<tr>
+							<td class="merge_request-id">{{ .ID }}</td>
+							<td class="merge_request-title"><a href="{{ .ID }}/">{{ .Title }}</a></td>
+							<td class="merge_request-status">{{ .Status }}</td>
+						</tr>
+					{{- end }}
+				</tbody>
+			</table>
+		</div>
+		<footer>
+			{{ template "footer" . }}
+		</footer>
+	</body>
+</html>
+{{- end -}}

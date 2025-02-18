@@ -19,11 +19,11 @@ var (
 )
 
 // open_git_repo opens a git repository by group and repo name.
-func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, err error) {
+func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, repo_id int, err error) {
 	var fs_path string
-	err = database.QueryRow(ctx, "SELECT r.filesystem_path, COALESCE(r.description, '') FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description)
+	err = database.QueryRow(ctx, "SELECT r.filesystem_path, COALESCE(r.description, ''), r.id FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&fs_path, &description, &repo_id)
 	if err != nil {
-		return nil, "", err
+		return
 	}
 	repo, err = git.PlainOpen(fs_path)
 	return

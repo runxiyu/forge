@@ -146,7 +146,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// TODO: subgroups
 
-			params["repo"], params["repo_description"], err = open_git_repo(r.Context(), group_name, module_name)
+			params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_name, module_name)
 			if err != nil {
 				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
@@ -189,6 +189,11 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				params["commit_id"] = segments[separator_index+4]
 				handle_repo_commit(w, r, params)
+			case "contrib":
+				if redirect_with_slash(w, r) {
+					return
+				}
+				handle_repo_contrib_index(w, r, params)
 			default:
 				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repo_feature), http.StatusNotFound)
 			}
