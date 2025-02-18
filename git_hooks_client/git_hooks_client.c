@@ -27,8 +27,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 	if (strlen(cookie) != 64) {
-		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_COOKIE is not 64 characters long, something has gone wrong\n");
-		dprintf(STDERR_FILENO, "%s\n", cookie);
+		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_COOKIE is not 64 characters long\n");
 		return EXIT_FAILURE;
 	}
 
