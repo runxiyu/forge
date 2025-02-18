@@ -13,8 +13,6 @@ type id_title_status_t struct {
 }
 
 func handle_repo_contrib_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	_ = params["repo"].(*git.Repository)
-
 	rows, err := database.Query(r.Context(), "SELECT id, title, status FROM merge_requests WHERE repo_id = $1", params["repo_id"])
 	if err != nil {
 		http.Error(w, "Error querying merge requests: "+err.Error(), http.StatusInternalServerError)
