@@ -8,6 +8,7 @@ import (
 )
 
 // We embed all source for easy AGPL compliance.
+//
 //go:embed .gitignore .gitattributes
 //go:embed LICENSE README.md
 //go:embed *.go go.mod go.sum
@@ -18,6 +19,7 @@ import (
 //go:embed git_hooks_client/*.c
 //go:embed vendor/*
 var source_fs embed.FS
+
 var source_handler = http.StripPrefix(
 	"/:/source/",
 	http.FileServer(http.FS(source_fs)),
@@ -27,6 +29,7 @@ var source_handler = http.StripPrefix(
 var resources_fs embed.FS
 
 var templates *template.Template
+
 func load_templates() (err error) {
 	templates, err = template.New("templates").Funcs(template.FuncMap{
 		"first_line": first_line,
