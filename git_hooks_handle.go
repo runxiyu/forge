@@ -27,12 +27,16 @@ func hooks_handle_connection(conn net.Conn) {
 	// another user.
 	ucred, err := get_ucred(conn)
 	if err != nil {
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "Unable to get peer credentials:", err.Error())
 		return
 	}
 	if ucred.Uid != uint32(os.Getuid()) {
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "UID mismatch")
 		return
 	}
@@ -40,14 +44,18 @@ func hooks_handle_connection(conn net.Conn) {
 	cookie := make([]byte, 64)
 	_, err = conn.Read(cookie)
 	if err != nil {
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "Failed to read cookie:", err.Error())
 		return
 	}
 
 	pack_to_hook, ok := pack_to_hook_by_cookie.Load(string(cookie))
 	if !ok {
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "Invalid handler cookie")
 		return
 	}
@@ -55,7 +63,9 @@ func hooks_handle_connection(conn net.Conn) {
 	var argc64 uint64
 	err = binary.Read(conn, binary.NativeEndian, &argc64)
 	if err != nil {
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "Failed to read argc:", err.Error())
 		return
 	}
@@ -66,7 +76,9 @@ func hooks_handle_connection(conn net.Conn) {
 			b := make([]byte, 1)
 			n, err := conn.Read(b)
 			if err != nil || n != 1 {
-				conn.Write([]byte{1})
+				if _, err := conn.Write([]byte{1}); err != nil {
+					return
+				}
 				fmt.Fprintln(conn, "Failed to read arg:", err.Error())
 				return
 			}
@@ -87,7 +99,9 @@ func hooks_handle_connection(conn net.Conn) {
 	switch filepath.Base(args[0]) {
 	case "pre-receive":
 		if pack_to_hook.direct_access {
-			conn.Write([]byte{0})
+			if _, err := conn.Write([]byte{0}); err != nil {
+				return
+			}
 		} else {
 			ref_ok := make(map[string]uint8)
 			// 0 for ok
@@ -103,14 +117,18 @@ func hooks_handle_connection(conn net.Conn) {
 
 				old_oid, rest, found := strings.Cut(line, " ")
 				if !found {
-					conn.Write([]byte{1})
+					if _, err := conn.Write([]byte{1}); err != nil {
+						return
+					}
 					fmt.Fprintln(conn, "Invalid pre-receive line:", line)
 					break
 				}
 
 				new_oid, ref_name, found := strings.Cut(rest, " ")
 				if !found {
-					conn.Write([]byte{1})
+					if _, err := conn.Write([]byte{1}); err != nil {
+						return
+					}
 					fmt.Fprintln(conn, "Invalid pre-receive line:", line)
 					break
 				}
@@ -129,10 +147,14 @@ func hooks_handle_connection(conn net.Conn) {
 			}
 
 			if or_all_in_map(ref_ok) == 0 {
-				conn.Write([]byte{0})
+				if _, err := conn.Write([]byte{0}); err != nil {
+					return
+				}
 				fmt.Fprintln(conn, "Stuff")
 			} else {
-				conn.Write([]byte{1})
+				if _, err := conn.Write([]byte{1}); err != nil {
+					return
+				}
 				for ref, status := range ref_ok {
 					switch status {
 					case 0:
@@ -148,7 +170,9 @@ func hooks_handle_connection(conn net.Conn) {
 			}
 		}
 	default:
-		conn.Write([]byte{1})
+		if _, err := conn.Write([]byte{1}); err != nil {
+			return
+		}
 		fmt.Fprintln(conn, "Invalid hook:", args[0])
 	}
 }
