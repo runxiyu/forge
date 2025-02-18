@@ -96,7 +96,7 @@ func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if strings.HasSuffix(path, "/") {
-		http.Redirect(w, r, strings.TrimSuffix(path, "/") + rest, http.StatusSeeOther)
+		http.Redirect(w, r, strings.TrimSuffix(path, "/")+rest, http.StatusSeeOther)
 		return true
 	}
 	return false
