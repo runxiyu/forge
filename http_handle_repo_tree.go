@@ -10,19 +10,14 @@ import (
 	chroma_formatters_html "github.com/alecthomas/chroma/v2/formatters/html"
 	chroma_lexers "github.com/alecthomas/chroma/v2/lexers"
 	chroma_styles "github.com/alecthomas/chroma/v2/styles"
+	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	raw_path_spec := params["rest"].(string)
-	group_name, repo_name, path_spec := params["group_name"].(string), params["repo_name"].(string), strings.TrimSuffix(raw_path_spec, "/")
+	repo, path_spec := params["repo"].(*git.Repository), strings.TrimSuffix(raw_path_spec, "/")
 	params["path_spec"] = path_spec
-	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
-	if err != nil {
-		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	params["repo_description"] = description
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {

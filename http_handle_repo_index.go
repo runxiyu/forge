@@ -2,16 +2,12 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/go-git/go-git/v5"
 )
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
-	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
-	if err != nil {
-		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	params["repo_description"] = description
+	repo, repo_name, group_name := params["repo"].(*git.Repository), params["repo_name"].(string), params["group_name"].(string)
 
 	ref_hash, err := get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {

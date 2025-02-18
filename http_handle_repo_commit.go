@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
@@ -25,13 +26,8 @@ type usable_chunk struct {
 }
 
 func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	group_name, repo_name, commit_id_specified_string := params["group_name"].(string), params["repo_name"].(string), params["commit_id"].(string)
-	repo, description, err := open_git_repo(r.Context(), group_name, repo_name)
-	if err != nil {
-		http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	params["repo_description"] = description
+	repo, commit_id_specified_string := params["repo"].(*git.Repository), params["commit_id"].(string)
+
 	commit_id_specified_string_without_suffix := strings.TrimSuffix(commit_id_specified_string, ".patch")
 	commit_id := plumbing.NewHash(commit_id_specified_string_without_suffix)
 	commit_object, err := repo.CommitObject(commit_id)

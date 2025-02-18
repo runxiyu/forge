@@ -113,10 +113,29 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		module_type := segments[separator_index+1]
 		module_name := segments[separator_index+2]
-		params["group_name"] = segments[0]
+		group_name := segments[0]
+		params["group_name"] = group_name
 		switch module_type {
 		case "repos":
 			params["repo_name"] = module_name
+
+			if non_empty_last_segments_len > separator_index+3 {
+				switch segments[separator_index+3] {
+				case "info":
+					err = handle_repo_info(w, r, params)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+					}
+					return
+				case "git-upload-pack":
+					err = handle_upload_pack(w, r, params)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+					}
+					return
+				}
+			}
+
 			params["ref_type"], params["ref_name"], err = get_param_ref_and_type(r)
 			if err != nil {
 				if errors.Is(err, err_no_ref_spec) {
@@ -126,7 +145,15 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
+
 			// TODO: subgroups
+
+			params["repo"], params["repo_description"], err = open_git_repo(r.Context(), group_name, module_name)
+			if err != nil {
+				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+
 			if non_empty_last_segments_len == separator_index+3 {
 				if redirect_with_slash(w, r) {
 					return
@@ -134,18 +161,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				handle_repo_index(w, r, params)
 				return
 			}
+
 			repo_feature := segments[separator_index+3]
 			switch repo_feature {
-			case "info":
-				err = handle_repo_info(w, r, params)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-			case "git-upload-pack":
-				err = handle_upload_pack(w, r, params)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
 			case "tree":
 				params["rest"] = strings.Join(segments[separator_index+4:], "/")
 				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
