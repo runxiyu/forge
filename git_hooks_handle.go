@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
@@ -84,8 +85,63 @@ func hooks_handle_connection(conn net.Conn) {
 		if pack_to_hook.direct_access {
 			conn.Write([]byte{0})
 		} else {
-			conn.Write([]byte{1})
-			fmt.Fprintln(conn, "Non-maintainer push access not implemented yet")
+			ref_ok := make(map[string]uint8)
+			// 0 for ok
+			// 1 for rejection due to not a contrib branch
+			// 2 for rejection due to not being a new branch
+
+			for {
+				line, err := stdin.ReadString('\n')
+				if errors.Is(err, io.EOF) {
+					break
+				}
+				line = line[:len(line)-1]
+
+				old_oid, rest, found := strings.Cut(line, " ")
+				if !found {
+					conn.Write([]byte{1})
+					fmt.Fprintln(conn, "Invalid pre-receive line:", line)
+					break
+				}
+
+				new_oid, ref_name, found := strings.Cut(rest, " ")
+				if !found {
+					conn.Write([]byte{1})
+					fmt.Fprintln(conn, "Invalid pre-receive line:", line)
+					break
+				}
+
+				_ = new_oid
+
+				if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
+					if all_zero_num_string(old_oid) {
+						ref_ok[ref_name] = 0
+					} else {
+						ref_ok[ref_name] = 2
+					}
+				} else {
+					ref_ok[ref_name] = 1
+				}
+			}
+
+			if or_all_in_map(ref_ok) == 0 {
+				conn.Write([]byte{0})
+				fmt.Fprintln(conn, "Stuff")
+			} else {
+				conn.Write([]byte{1})
+				for ref, status := range ref_ok {
+					switch status {
+					case 0:
+						fmt.Fprintln(conn, "Acceptable", ref)
+					case 1:
+						fmt.Fprintln(conn, "Not in the contrib/ namespace", ref)
+					case 2:
+						fmt.Fprintln(conn, "Branch already exists", ref)
+					default:
+						panic("Invalid branch status")
+					}
+				}
+			}
 		}
 	default:
 		conn.Write([]byte{1})
@@ -116,4 +172,20 @@ func get_ucred(conn net.Conn) (*syscall.Ucred, error) {
 		return nil, err_get_ucred
 	}
 	return ucred, nil
+}
+
+func all_zero_num_string(s string) bool {
+	for _, r := range s {
+		if r != '0' {
+			return false
+		}
+	}
+	return true
+}
+
+func or_all_in_map[K comparable, V uint8 | uint16 | uint32 | uint64](m map[K]V) (result V) {
+	for _, value := range m {
+		result |= value
+	}
+	return
 }
