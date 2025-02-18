@@ -2,8 +2,6 @@ package main
 
 import (
 	"net/http"
-
-	"github.com/go-git/go-git/v5"
 )
 
 type id_title_status_t struct {
