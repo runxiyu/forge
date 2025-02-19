@@ -38,11 +38,10 @@
 			</p>
 		</div>
 		<div class="padding-wrapper scroll">
-			<input id="toggle-table-recent-commits" type="checkbox" class="toggle-table-off" />
 			<table id="recent-commits" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="3"><label for="toggle-table-recent-commits">Recent commits (<a href="log/{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">see all</a>)</label></th>
+						<th colspan="3">Recent commits (<a href="log/{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">see all</a>)</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -61,11 +60,10 @@
 			</table>
 		</div>
 		<div class="padding-wrapper scroll">
-			<input id="toggle-table-file-tree" type="checkbox" class="toggle-table-off" />
 			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="3"><label for="toggle-table-file-tree">/{{ if .ref_name }} on {{ .ref_name }}{{ end }}</label></th>
+						<th colspan="3">/{{ if .ref_name }} on {{ .ref_name }}{{ end }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -81,14 +79,8 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="padding-wrapper">
-			<div class="toggle-off-wrapper">
-				<input type="checkbox" id="toggle-readme" class="toggle-off-toggle" />
-				<label for="toggle-readme" class="toggle-off-header centering"><div>{{ .readme_filename }}</div></label>
-				<div class="toggle-off-content pad scroll" id="readme">
-					{{ .readme }}
-				</div>
-			</div>
+		<div class="padding-wrapper" id="readme">
+			{{ .readme }}
 		</div>
 		<footer>
 			{{ template "footer" . }}
