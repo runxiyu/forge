@@ -11,6 +11,9 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 )
 
 var (
@@ -103,10 +106,8 @@ func hooks_handle_connection(conn net.Conn) {
 				return
 			}
 		} else {
-			ref_ok := make(map[string]uint8)
-			// 0 for ok
-			// 1 for rejection due to not a contrib branch
-			// 2 for rejection due to not being a new branch
+			all_ok := true
+			messages := make([]string, 0)
 
 			for {
 				line, err := stdin.ReadString('\n')
@@ -133,48 +134,86 @@ func hooks_handle_connection(conn net.Conn) {
 					break
 				}
 
-				_ = new_oid
-
 				if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
-					if all_zero_num_string(old_oid) {
-						ref_ok[ref_name] = 0
+					if all_zero_num_string(old_oid) { // New branch
+						messages = append(messages, "Acceptable push to new contrib branch: "+ref_name)
 						// TODO: Create a merge request. If that fails,
 						// we should just reject this entire push
 						// immediately.
-					} else {
-						ref_ok[ref_name] = 2
+					} else { // Existing contrib branch
 						// TODO: Check if the current user is authorized
 						// to push to this contrib branch.
-						// Then, check if this push is a fast-forward.
-						// If not, we create a MR history archive ref
-						// that points to the old object name.
+						repo, err := git.PlainOpen(pack_to_hook.repo_path)
+						if err != nil {
+							if _, err := conn.Write([]byte{1}); err != nil {
+								return
+							}
+							fmt.Fprintln(conn, "Daemon failed to open repo:", err.Error())
+							return
+						}
+
+						old_hash := plumbing.NewHash(old_oid)
+						fmt.Println(old_hash)
+
+						old_commit, err := repo.CommitObject(old_hash)
+						if err != nil {
+							if _, err := conn.Write([]byte{1}); err != nil {
+								return
+							}
+							fmt.Fprintln(conn, "Daemon failed to get old commit:", err.Error())
+							return
+						}
+
+						// Potential BUG: I'm not sure if new_commit is guaranteed to be
+						// detectable as they haven't been merged into the main repo's
+						// objects yet. But it seems to work, and I don't think there's
+						// any reason for this to only work intermitently.
+						new_hash := plumbing.NewHash(new_oid)
+						new_commit, err := repo.CommitObject(new_hash)
+						if err != nil {
+							if _, err := conn.Write([]byte{1}); err != nil {
+								return
+							}
+							fmt.Fprintln(conn, "Daemon failed to get new commit:", err.Error())
+							return
+						}
+
+						is_ancestor, err := old_commit.IsAncestor(new_commit)
+						if err != nil {
+							if _, err := conn.Write([]byte{1}); err != nil {
+								return
+							}
+							fmt.Fprintln(conn, "Daemon failed to check if old commit is ancestor:", err.Error())
+							return
+						}
+
+						if !is_ancestor {
+							// TODO: Create MR snapshot ref instead
+							all_ok = false
+							messages = append(messages, "Rejecting force push to contrib branch: "+ref_name)
+							continue
+						}
+
+						messages = append(messages, "Acceptable push to existing contrib branch: "+ref_name)
 					}
-				} else {
-					ref_ok[ref_name] = 1
+				} else { // Non-contrib branch
+					all_ok = false
+					messages = append(messages, "Rejecting push to non-contrib branch: "+ref_name)
 				}
 			}
 
-			if or_all_in_map(ref_ok) == 0 {
+			if all_ok {
 				if _, err := conn.Write([]byte{0}); err != nil {
 					return
 				}
-				fmt.Fprintln(conn, "Stuff")
 			} else {
 				if _, err := conn.Write([]byte{1}); err != nil {
 					return
 				}
-				for ref, status := range ref_ok {
-					switch status {
-					case 0:
-						fmt.Fprintln(conn, "Acceptable", ref)
-					case 1:
-						fmt.Fprintln(conn, "Not in the contrib/ namespace", ref)
-					case 2:
-						fmt.Fprintln(conn, "Branch already exists", ref)
-					default:
-						panic("Invalid branch status")
-					}
-				}
+			}
+
+			for _, message := range messages {
+				fmt.Fprintln(conn, message)
 			}
 		}
 	default:
@@ -217,11 +256,4 @@ func all_zero_num_string(s string) bool {
 		}
 	}
 	return true
-}
-
-func or_all_in_map[K comparable, V uint8 | uint16 | uint32 | uint64](m map[K]V) (result V) {
-	for _, value := range m {
-		result |= value
-	}
-	return
 }
