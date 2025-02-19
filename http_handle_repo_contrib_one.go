@@ -50,6 +50,10 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 	params["destination_commit"] = destination_commit
 
 	patch, err := destination_commit.Patch(source_commit)
+	if err != nil {
+		http.Error(w, "Error getting patch: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	params["file_patches"] = make_usable_file_patches(patch)
 
 	render_template(w, "repo_contrib_one", params)
