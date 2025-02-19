@@ -21,19 +21,15 @@ var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	// Here "access" means direct maintainer access. access=false doesn't
-	// necessarily mean the push is declined. This decision is delegated to
-	// the pre-receive hook, which is then handled by git_hooks_handle.go
-	// while being aware of the refs to be updated.
-	repo_path, access, contrib_requirements, is_registered_user, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	repo_path, direct_access, contrib_requirements, is_registered_user, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
 	}
 
-	if !access {
+	if !direct_access {
 		switch contrib_requirements {
 		case "closed":
-			if !access {
+			if !direct_access {
 				return errors.New("You need direct access to push to this repo.")
 			}
 		case "registered_user":
@@ -58,7 +54,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
 		session:       session,
 		pubkey:        pubkey,
-		direct_access: access,
+		direct_access: direct_access,
 		repo_path:     repo_path,
 	})
 	defer pack_to_hook_by_cookie.Delete(cookie)
