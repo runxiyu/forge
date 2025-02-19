@@ -21,7 +21,7 @@ var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	repo_path, direct_access, contrib_requirements, is_registered_user, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	repo_path, direct_access, contrib_requirements, user_type, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
 	}
@@ -33,12 +33,19 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 				return errors.New("You need direct access to push to this repo.")
 			}
 		case "registered_user":
-			if !is_registered_user {
+			if user_type != "registered" {
 				return errors.New("You need to be a registered user to push to this repo.")
 			}
 		case "ssh_pubkey":
 			if pubkey == "" {
 				return errors.New("You need to have an SSH public key to push to this repo.")
+			}
+			if user_type == "" {
+				user_id, err := add_user_ssh(session.Context(), pubkey)
+				if err != nil {
+					return err
+				}
+				fmt.Fprintln(session.Stderr(), "You are now registered as user ID", user_id)
 			}
 		case "public":
 		default:

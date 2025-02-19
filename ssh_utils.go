@@ -9,19 +9,19 @@ import (
 
 var err_ssh_illegal_endpoint = errors.New("illegal endpoint during SSH access")
 
-func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (repo_path string, direct_access bool, contrib_requirements string, is_registered_user bool, err error) {
+func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (repo_path string, direct_access bool, contrib_requirements string, user_type string, err error) {
 	segments := strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
 
 	for i, segment := range segments {
 		var err error
 		segments[i], err = url.PathUnescape(segment)
 		if err != nil {
-			return "", false, "", false, err
+			return "", false, "", "", err
 		}
 	}
 
 	if segments[0] == ":" {
-		return "", false, "", false, err_ssh_illegal_endpoint
+		return "", false, "", "", err_ssh_illegal_endpoint
 	}
 
 	separator_index := -1
@@ -37,9 +37,9 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 
 	switch {
 	case separator_index == -1:
-		return "", false, "", false, err_ssh_illegal_endpoint
+		return "", false, "", "", err_ssh_illegal_endpoint
 	case len(segments) <= separator_index+2:
-		return "", false, "", false, err_ssh_illegal_endpoint
+		return "", false, "", "", err_ssh_illegal_endpoint
 	}
 
 	group_name := segments[0]
@@ -49,6 +49,6 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 	case "repos":
 		return get_path_perm_by_group_repo_key(ctx, group_name, module_name, ssh_pubkey)
 	default:
-		return "", false, "", false, err_ssh_illegal_endpoint
+		return "", false, "", "", err_ssh_illegal_endpoint
 	}
 }
