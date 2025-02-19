@@ -259,28 +259,28 @@ th.tdinput input[type=password] {
 }
 
 /* Button styles */
-.btn-primary {
+.btn-primary, a.btn-primary {
 	background: var(--primary-color);
 	color: var(--primary-color-contrast);
 	border: var(--lighter-border-color) 1px solid;
 	font-weight: bold;
 }
-.btn-danger {
+.btn-danger, a.btn-danger {
 	background: var(--danger-color);
 	color: var(--danger-color-contrast);
 	border: var(--lighter-border-color) 1px solid;
 	font-weight: bold;
 }
-.btn-white {
+.btn-white, a.btn-white {
 	background: var(--primary-color-contrast);
 	color: var(--primary-color);
 	border: var(--lighter-border-color) 1px solid;
 }
-.btn-normal,
+.btn-normal, a.btn-normal,
 input[type=file]::file-selector-button {
 	background: var(--lighter-box-background-color);
 	border: var(--lighter-border-color) 1px solid !important;
-	color: var(--light-text-color);
+	color: var(--text-color);
 }
 .btn, .btn-white, .btn-danger, .btn-normal, .btn-primary,
 input[type=submit],
