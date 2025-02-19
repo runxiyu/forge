@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 )
 
 func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -21,7 +22,6 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 		http.Error(w, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["mr_title"], params["mr_status"], params["mr_source_ref"], params["mr_destination_branch"] = title, status, source_ref, destination_branch
 
 	repo := params["repo"].(*git.Repository)
 
@@ -37,10 +37,16 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 	}
 	params["source_commit"] = source_commit
 
-	destination_branch_hash, err := get_ref_hash_from_type_and_name(repo, "branch", destination_branch)
-	if err != nil {
-		http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
-		return
+	var destination_branch_hash plumbing.Hash
+	if destination_branch == "" {
+		destination_branch = "HEAD"
+		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "", "")
+	} else {
+		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "branch", destination_branch)
+		if err != nil {
+			http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 	destination_commit, err := repo.CommitObject(destination_branch_hash)
 	if err != nil {
@@ -55,6 +61,8 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 		return
 	}
 	params["file_patches"] = make_usable_file_patches(patch)
+
+	params["mr_title"], params["mr_status"], params["mr_source_ref"], params["mr_destination_branch"] = title, status, source_ref, destination_branch
 
 	render_template(w, "repo_contrib_one", params)
 }
