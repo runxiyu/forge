@@ -1,17 +1,8 @@
 package main
 
 import (
-	"errors"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"go.lindenii.runxiyu.org/lindenii-common/misc"
-)
-
-var (
-	err_getting_tag_reference    = errors.New("error getting tag reference")
-	err_getting_branch_reference = errors.New("error getting branch reference")
-	err_getting_head             = errors.New("error getting HEAD")
 )
 
 // get_ref_hash_from_type_and_name returns the hash of a reference given its
@@ -21,7 +12,7 @@ func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name st
 	case "":
 		head, err := repo.Head()
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_head, err)
+			ret_err = err
 			return
 		}
 		ref_hash = head.Hash()
@@ -30,14 +21,14 @@ func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name st
 	case "branch":
 		ref, err := repo.Reference(plumbing.NewBranchReferenceName(ref_name), true)
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_branch_reference, err)
+			ret_err = err
 			return
 		}
 		ref_hash = ref.Hash()
 	case "tag":
 		ref, err := repo.Reference(plumbing.NewTagReferenceName(ref_name), true)
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_tag_reference, err)
+			ret_err = err
 			return
 		}
 		ref_hash = ref.Hash()

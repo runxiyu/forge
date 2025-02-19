@@ -9,13 +9,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"go.lindenii.runxiyu.org/lindenii-common/misc"
-)
-
-var (
-	err_getting_commit_tree          = errors.New("error getting commit tree")
-	err_getting_patch_of_commit      = errors.New("error getting patch of commit")
-	err_getting_parent_commit_object = errors.New("error getting parent commit object")
 )
 
 // open_git_repo opens a git repository by group and repo name.
@@ -59,12 +52,9 @@ func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 	return display_git_tree
 }
 
-var err_get_recent_commits = errors.New("error getting recent commits")
-
 func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of_commits int) (recent_commits []*object.Commit, err error) {
 	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})
 	if err != nil {
-		err = misc.Wrap_one_error(err_get_recent_commits, err)
 		return nil, err
 	}
 	recent_commits = make([]*object.Commit, 0)
@@ -75,7 +65,6 @@ func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of
 			if errors.Is(err, io.EOF) {
 				return recent_commits, nil
 			} else if err != nil {
-				err = misc.Wrap_one_error(err_get_recent_commits, err)
 				return nil, err
 			}
 			recent_commits = append(recent_commits, this_recent_commit)
@@ -86,7 +75,6 @@ func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of
 			if errors.Is(err, io.EOF) {
 				return recent_commits, nil
 			} else if err != nil {
-				err = misc.Wrap_one_error(err_get_recent_commits, err)
 				return nil, err
 			}
 			recent_commits = append(recent_commits, this_recent_commit)
@@ -100,22 +88,22 @@ func get_patch_from_commit(commit_object *object.Commit) (parent_commit_hash plu
 	if errors.Is(err, object.ErrParentNotFound) {
 		commit_tree, err := commit_object.Tree()
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_commit_tree, err)
+			ret_err = err
 			return
 		}
 		patch, err = (&object.Tree{}).Patch(commit_tree)
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_patch_of_commit, err)
+			ret_err = err
 			return
 		}
 	} else if err != nil {
-		ret_err = misc.Wrap_one_error(err_getting_parent_commit_object, err)
+		ret_err = err
 		return
 	} else {
 		parent_commit_hash = parent_commit_object.Hash
 		patch, err = parent_commit_object.Patch(commit_object)
 		if err != nil {
-			ret_err = misc.Wrap_one_error(err_getting_patch_of_commit, err)
+			ret_err = err
 			return
 		}
 	}

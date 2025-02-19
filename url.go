@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
 var (
@@ -52,15 +50,11 @@ func parse_request_uri(request_uri string) (segments []string, params url.Values
 	for i, segment := range segments {
 		segments[i], err = url.PathUnescape(segment)
 		if err != nil {
-			return nil, nil, misc.Wrap_one_error(err_bad_request, err)
+			return
 		}
 	}
 
 	params, err = url.ParseQuery(params_string)
-	if err != nil {
-		return nil, nil, misc.Wrap_one_error(err_bad_request, err)
-	}
-
 	return
 }
 

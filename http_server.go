@@ -213,5 +213,3 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
-var err_bad_request = errors.New("bad request")

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
 // get_patch_from_commit formats a commit object as if it was returned by
@@ -15,7 +14,7 @@ import (
 func format_patch_from_commit(commit *object.Commit) (string, error) {
 	_, patch, err := get_patch_from_commit(commit)
 	if err != nil {
-		return "", misc.Wrap_one_error(err_getting_patch_of_commit, err)
+		return "", err
 	}
 
 	var buf bytes.Buffer
