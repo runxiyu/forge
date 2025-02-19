@@ -47,7 +47,7 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 		http.Error(w, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["source_commit"] = source_commit
+	params["destination_commit"] = destination_commit
 
 	patch, err := destination_commit.Patch(source_commit)
 	params["file_patches"] = make_usable_file_patches(patch)
