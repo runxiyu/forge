@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	err_duplicate_ref_spec = errors.New("Duplicate ref spec")
-	err_no_ref_spec        = errors.New("No ref spec")
+	err_duplicate_ref_spec = errors.New("duplicate ref spec")
+	err_no_ref_spec        = errors.New("no ref spec")
 )
 
 func get_param_ref_and_type(r *http.Request) (ref_type, ref string, err error) {

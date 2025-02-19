@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	err_getting_commit_tree          = errors.New("Error getting commit tree")
-	err_getting_patch_of_commit      = errors.New("Error getting patch of commit")
-	err_getting_parent_commit_object = errors.New("Error getting parent commit object")
+	err_getting_commit_tree          = errors.New("error getting commit tree")
+	err_getting_patch_of_commit      = errors.New("error getting patch of commit")
+	err_getting_parent_commit_object = errors.New("error getting parent commit object")
 )
 
 // open_git_repo opens a git repository by group and repo name.
@@ -59,7 +59,7 @@ func build_display_git_tree(tree *object.Tree) []display_git_tree_entry_t {
 	return display_git_tree
 }
 
-var err_get_recent_commits = errors.New("Error getting recent commits")
+var err_get_recent_commits = errors.New("error getting recent commits")
 
 func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of_commits int) (recent_commits []*object.Commit, err error) {
 	commit_iter, err := repo.Log(&git.LogOptions{From: head_hash})

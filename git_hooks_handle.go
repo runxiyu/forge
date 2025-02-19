@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	err_get_fd    = errors.New("Unable to get file descriptor")
-	err_get_ucred = errors.New("Failed getsockopt")
+	err_get_fd    = errors.New("unable to get file descriptor")
+	err_get_ucred = errors.New("failed getsockopt")
 )
 
 // hooks_handle_connection handles a connection from git_hooks_client via the

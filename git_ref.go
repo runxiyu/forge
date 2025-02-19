@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	err_getting_tag_reference    = errors.New("Error getting tag reference")
-	err_getting_branch_reference = errors.New("Error getting branch reference")
-	err_getting_head             = errors.New("Error getting HEAD")
+	err_getting_tag_reference    = errors.New("error getting tag reference")
+	err_getting_branch_reference = errors.New("error getting branch reference")
+	err_getting_head             = errors.New("error getting HEAD")
 )
 
 // get_ref_hash_from_type_and_name returns the hash of a reference given its

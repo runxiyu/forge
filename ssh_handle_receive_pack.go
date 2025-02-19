@@ -10,7 +10,7 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
-var err_unauthorized_push = errors.New("You are not authorized to push to this repository")
+var err_unauthorized_push = errors.New("you are not authorized to push to this repository")
 
 type pack_to_hook_t struct {
 	session       *glider_ssh.Session

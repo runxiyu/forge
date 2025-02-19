@@ -12,7 +12,7 @@ import (
 
 var database *pgxpool.Pool
 
-var err_unsupported_database_type = errors.New("Unsupported database type")
+var err_unsupported_database_type = errors.New("unsupported database type")
 
 var config struct {
 	HTTP struct {
