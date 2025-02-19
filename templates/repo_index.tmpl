@@ -26,11 +26,8 @@
 						</tr>
 					{{ end }}
 					<tr>
-						<th scope="row" rowspan="2">Clone</th>
-						<td><code>git clone {{ .ssh_clone_url }}</code></td>
-					</tr>
-					<tr>
-						<td><code>git clone {{ .http_clone_url }}</code></td>
+						<th scope="row">SSH remote</th>
+						<td><code>{{ .ssh_clone_url }}</code></td>
 					</tr>
 				</tbody>
 			</table>
