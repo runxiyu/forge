@@ -150,6 +150,7 @@ td > pre {
 /* Table misc and scrolling */
 .commit-id {
 	font-family: monospace;
+	word-break: break-word;
 }
 .scroll {
 	overflow-x: auto;
