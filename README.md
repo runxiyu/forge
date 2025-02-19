@@ -63,7 +63,7 @@ The following shall function where they make sense:
 
 ### Git repos
 
-* Viewing commits, diffs, and patches
+* Viewing commits and patches
 * Viewing trees and files
 * Viewing arbitrary hashed objects and refs
 * Viewing tags
@@ -78,8 +78,8 @@ changes from a Git ref ("source ref") into a branch in the main repo
 When creating a MR from the API, the web interface, email, or SSH, it shall be
 possible to create a special source ref, hosted in the main repo as a branch
 with a branch name that begins with `contrib/`. Unsolicited pushes to
-`contrib/` will automatically open a MR, returning instructions to edit
-the description and manage the MR further via the standard error channel.
+`contrib/` automatically open a MR, returning instructions to edit the
+description and manage the MR further via the standard error channel.
 
 MR branches shall be synced to automatically created MR-specific mailing lists.
 These mailing lists should have archives accessible via read-only IMAP, JMAP,
@@ -122,20 +122,18 @@ the future.
 
 ### Authentication and authorization
 
-Anonymous SSH and HTTPS read access should be possible for public repos. All
-other Git access should be done via SSH public keys. We use a baked-in SSH
-implementation.
+Anonymous SSH and HTTPS read access is possible for public repos. Git write
+access is done via SSH public keys. We use a baked-in SSH implementation.
 
 The native API may be authenticated in the transport layer (e.g. TLS client
 certificates or UNIX domain socket authentication), via passwords, and via
 challenge-response mechanisms including SSH keys. SASL may be considered.
 
-The web interface will have a dedicated login screen. Connections are set as
-keepalive, and sessions are tracked across a kept-alive connection; optionally,
-a user may click "remember me with a cookie" in the login screen.
+The web interface has a dedicated login screen. Logins are remembered with
+cookies. A dropdown box shall be available to select the time the user wishes
+to remain logged in.
 
-Commit validation based on SSH signature validation will be implemented. PGP
-patch validation may be considered.
+Commit validation based on SSH signature validation will be implemented.
 
 ### Federated authentication
 
