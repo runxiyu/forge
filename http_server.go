@@ -197,9 +197,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				switch non_empty_last_segments_len {
-				case separator_index+4:
+				case separator_index + 4:
 					handle_repo_contrib_index(w, r, params)
-				case separator_index+5:
+				case separator_index + 5:
 					params["mr_id"] = segments[separator_index+4]
 					handle_repo_contrib_one(w, r, params)
 				default:

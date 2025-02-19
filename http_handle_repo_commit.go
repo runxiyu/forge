@@ -123,4 +123,3 @@ func make_usable_file_patches(patch diff.Patch) (usable_file_patches []usable_fi
 	}
 	return
 }
-
