@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,8 +8,6 @@ import (
 	glider_ssh "github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
-
-var err_unauthorized_push = errors.New("you are not authorized to push to this repository")
 
 type pack_to_hook_t struct {
 	session       glider_ssh.Session
