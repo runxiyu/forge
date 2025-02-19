@@ -138,8 +138,16 @@ func hooks_handle_connection(conn net.Conn) {
 				if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
 					if all_zero_num_string(old_oid) {
 						ref_ok[ref_name] = 0
+						// TODO: Create a merge request. If that fails,
+						// we should just reject this entire push
+						// immediately.
 					} else {
 						ref_ok[ref_name] = 2
+						// TODO: Check if the current user is authorized
+						// to push to this contrib branch.
+						// Then, check if this push is a fast-forward.
+						// If not, we create a MR history archive ref
+						// that points to the old object name.
 					}
 				} else {
 					ref_ok[ref_name] = 1
