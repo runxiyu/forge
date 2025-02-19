@@ -21,10 +21,12 @@ is located.
 * Copy `forge.scfg` to `/etc/lindenii/forge.scfg` or another reasonable
   location and edit appropriately.
 
-When email integration is ready and you wish to use email integration, you will
+When email integration is ready and you wish to use email integration, you may
 need to set up
 [Lindenii Mail Daemon](https://forge.lindenii.runxiyu.org/lindenii/:/repos/maild/)
 and configure it accordingly.
+
+Currently, database migrations must be done manually.
 
 ## Organization
 
@@ -38,7 +40,7 @@ The available `module_type`s are:
 
 * `repos` for version control
 * `tickets` for ticket trackers
-* `mail` for mailing lists
+* `discuss` for discussions
 
 Group and subgroup names may not be `:`.
 
@@ -72,21 +74,24 @@ The following shall function where they make sense:
 
 Each version-controlled repo ("main repo") has an area for merge requests
 ("MR"s) which may be optionally enabled. A MR is a request to merge 
-changes from a Git ref ("source ref") into a branch in the main repo
-("destination branch").
+changes from one branch ("source branch") into another ("destination branch"),
+in the same repo. The source branch usually, but not always, begins with
+`contrib/`.
 
-When creating a MR from the API, the web interface, email, or SSH, it shall be
-possible to create a special source ref, hosted in the main repo as a branch
-with a branch name that begins with `contrib/`. Unsolicited pushes to
-`contrib/` automatically open a MR, returning instructions to edit the
-description and manage the MR further via the standard error channel.
+* Unsolicited pushes to `contrib/...` automatically open a MR, returning
+  instructions to edit the description and manage the MR further, via the
+  SSH standard error channel.
+* Patches received from email will be automatically converted into MRs.
+* The web interface and APIs (to create MRs from existing branches).
 
-MR branches shall be synced to automatically created MR-specific mailing lists.
-These mailing lists should have archives accessible via read-only IMAP, JMAP,
-or something else that achieves a similar result. Merge requests are presented
-as what would be produced from git-send-email. It should also be possible for
-people to perform code reviews via email by interwoven a quoted patch with
-replies, and all these replies should be synced to the main MR database.
+MR branches will be synced to automatically created MR-specific mailing lists.
+These mailing lists should have archives accessible via read-only IMAP.
+The contents of merge requests are presented as what would be produced from
+git-send-email.
+
+It should also be possible for people to perform code reviews via email by
+interwoven a quoted patch with replies, and all these replies should be synced
+to the main MR database, presented via IMAP and the Web interface.
 
 This is probably the most unique feature of Lindenii Forge: while the general
 structure is similar to Forgejo-style pull requests, MRs are automatically
@@ -97,17 +102,20 @@ workflows.
 
 ### Ticket tracking
 
-Ticket tracking works like todo.sr.ht, though we also intend to support
-IMAP/JMAP/etc to view their archives.
+Ticket tracking works like todo.sr.ht, though we also intend to support IMAP
+for viewing them and downloading them locally for later use.
 
-Simple tracking should work for now. Directed acrylic graph and other
-dependency mechanisms may be considered in the far future.
+Directed acrylic graphs or other dependency mechanisms may be considered in the
+far future.
 
-Should be possible to associated with MRs.
+It should be possible to associate tickets with MRs.
 
-### Mailing lists
+### Discussions
 
-Mailing lists are not designed to handle patchsets. Patchsets should be send to
+Discussions are basically mailing lists that could also be used from a Web
+interface. IMAP archive should be provided.
+
+Discussions are not designed to handle patchsets. Patchsets should be send to
 the corresponding repo, where they are turned into Lindenii patchsets.
 
 Mailing list messages are expected to be plain text. A subset of markdown shall
@@ -117,23 +125,19 @@ be considered. No full-HTML emails are expected for normal traffic.
 
 We generally prefer to have linters, deployment pipelines and such run on each
 local developer's machine, for example as a pre-commit hook. However there are
-reasons why CI might be useful. We plan to integrate a builds.sr.ht-style CI in
-the future.
+reasons why CI might be useful.
+
+We plan to integrate a builds.sr.ht-style CI in the future.
 
 ### Authentication and authorization
 
-Anonymous SSH and HTTPS read access is possible for public repos. Git write
-access is done via SSH public keys. We use a baked-in SSH implementation.
-
-The native API may be authenticated in the transport layer (e.g. TLS client
-certificates or UNIX domain socket authentication), via passwords, and via
-challenge-response mechanisms including SSH keys. SASL may be considered.
-
-The web interface has a dedicated login screen. Logins are remembered with
-cookies. A dropdown box shall be available to select the time the user wishes
-to remain logged in.
-
-Commit validation based on SSH signature validation will be implemented.
+* Anonymous SSH and HTTPS read access is possible for public repos.
+* Git write access is authenticated via SSH public keys.
+* The TLS API will be authenticated with TLS client certificates.
+* The web interface has a dedicated login screen. Logins are remembered with
+  cookies. A dropdown box will be available to select the time the user wishes
+  to remain logged in.
+* Commit validation based on SSH signature validation will be implemented.
 
 ### Federated authentication
 
@@ -178,6 +182,6 @@ The forge software serves its own source at `/:/source/`.
 We follow the Lindenii Project's general code style, which has a few important
 deviations from what most people may be used to:
 
-* We used tabs for indentation everywhere (Go, HTML, CSS, JS, SQL, etc.)
+* We used tabs for indentation everywhere (Go, C, HTML, CSS, JS, SQL, etc.)
 * All names are in `snake_case`; exported identifiers in Go use
   `Capitalized_snake_case`. Type identifiers end with `_t`.
