@@ -66,14 +66,14 @@ CREATE TABLE sessions (
 	UNIQUE(user_id, session_id)
 );
 
-// TODO: 
+-- TODO:
 CREATE TABLE merge_requests (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	title TEXT NOT NULL,
+	title TEXT,
 	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,
-	creator INTEGER NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+	creator INTEGER REFERENCES users(id) ON DELETE SET NULL,
 	source_ref TEXT NOT NULL,
-	destination_branch TEXT NOT NULL,
+	destination_branch TEXT,
 	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
 	UNIQUE (repo_id, source_ref, destination_branch),
 	UNIQUE (repo_id, id)

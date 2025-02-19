@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
@@ -25,6 +27,8 @@ var (
 // unix socket.
 func hooks_handle_connection(conn net.Conn) {
 	defer conn.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// There aren't reasonable cases where someone would run this as
 	// another user.
@@ -124,12 +128,35 @@ func hooks_handle_connection(conn net.Conn) {
 					if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
 						if all_zero_num_string(old_oid) { // New branch
 							fmt.Fprintln(ssh_stderr, "Acceptable push to new contrib branch: "+ref_name)
-							// TODO: Create a merge request. If that fails,
-							// we should just reject this entire push
-							// immediately.
+							_, err = database.Exec(ctx,
+								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open')",
+								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/contrib/"),
+							)
+							if err != nil {
+								fmt.Fprintln(ssh_stderr, "Error creating merge request:", err.Error())
+								return 1
+							}
 						} else { // Existing contrib branch
-							// TODO: Check if the current user is authorized
-							// to push to this contrib branch.
+							var existing_merge_request_user_id int
+							err = database.QueryRow(ctx,
+								"SELECT creator FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
+								strings.TrimPrefix(ref_name, "refs/heads/contrib/"), pack_to_hook.repo_id,
+							).Scan(&existing_merge_request_user_id)
+							if err != nil {
+								if errors.Is(err, pgx.ErrNoRows) {
+									fmt.Fprintln(ssh_stderr, "No existing merge request for existing contrib branch:", err.Error())
+								} else {
+									fmt.Fprintln(ssh_stderr, "Error querying for existing merge request:", err.Error())
+								}
+								return 1
+							}
+
+							if existing_merge_request_user_id != pack_to_hook.user_id {
+								all_ok = false
+								fmt.Fprintln(ssh_stderr, "Rejecting push to existing contrib branch owned by another user:", ref_name)
+								continue
+							}
+
 							repo, err := git.PlainOpen(pack_to_hook.repo_path)
 							if err != nil {
 								fmt.Fprintln(ssh_stderr, "Daemon failed to open repo:", err.Error())

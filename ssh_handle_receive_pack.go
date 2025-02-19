@@ -15,13 +15,15 @@ type pack_to_hook_t struct {
 	pubkey        string
 	direct_access bool
 	repo_path     string
+	user_id       int
+	repo_id       int
 }
 
 var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	repo_path, direct_access, contrib_requirements, user_type, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
 	}
@@ -41,7 +43,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 				return errors.New("You need to have an SSH public key to push to this repo.")
 			}
 			if user_type == "" {
-				user_id, err := add_user_ssh(session.Context(), pubkey)
+				user_id, err = add_user_ssh(session.Context(), pubkey)
 				if err != nil {
 					return err
 				}
@@ -63,6 +65,8 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		pubkey:        pubkey,
 		direct_access: direct_access,
 		repo_path:     repo_path,
+		user_id:       user_id,
+		repo_id:       repo_id,
 	})
 	defer pack_to_hook_by_cookie.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
