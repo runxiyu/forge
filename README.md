@@ -167,9 +167,10 @@ The forge software serves its own source at `/:/source/`.
   on [irc.runxiyu.org](https://irc.runxiyu.org).
   The latter is bridged to [`#lindenii`](https://web.libera.chat/#lindenii)
   on [Libera.Chat](https://libera.chat).
-* Issues and pull requests may be submitted on the Codeberg mirror before our
-  own ticket tracking and merge request systems are ready. However, anonymous
-  pushes to `contrib/` branches should already be possible.
+* We currently use
+  [the issue tracker on Codeberg](https://codeberg.org/lindenii/forge/issues/)
+  since our own ticket tracking system is not ready yet.
+  Please submit patches by pushing to `contrib/...` in the official repo.
 * We have several Git repo mirrors on a few places:
   * [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
   * [The Lindenii Project's cgit](https://git.lindenii.runxiyu.org/forge.git/)
