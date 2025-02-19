@@ -84,6 +84,8 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	params["separator_index"] = separator_index
+
 	// TODO
 	if separator_index > 1 {
 		http.Error(w, "Subgroups haven't been implemented yet", http.StatusNotImplemented)
@@ -198,7 +200,8 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				case separator_index+4:
 					handle_repo_contrib_index(w, r, params)
 				case separator_index+5:
-					handle_repo_contrib_num(w, r, params)
+					params["mr_id"] = segments[separator_index+4]
+					handle_repo_contrib_one(w, r, params)
 				default:
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 				}

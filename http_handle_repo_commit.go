@@ -62,36 +62,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	params["parent_commit_hash"] = parent_commit_hash.String()
 	params["patch"] = patch
 
-	// TODO: Remove unnecessary context
-	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
-	usable_file_patches := make([]usable_file_patch, 0)
-	for _, file_patch := range patch.FilePatches() {
-		from, to := file_patch.Files()
-		if from == nil {
-			from = fake_diff_file_null
-		}
-		if to == nil {
-			to = fake_diff_file_null
-		}
-		chunks := []usable_chunk{}
-		for _, chunk := range file_patch.Chunks() {
-			content := chunk.Content()
-			if len(content) > 0 && content[0] == '\n' {
-				content = "\n" + content
-			} // Horrible hack to fix how browsers newlines that immediately proceed <pre>
-			chunks = append(chunks, usable_chunk{
-				Operation: chunk.Type(),
-				Content:   content,
-			})
-		}
-		usable_file_patch := usable_file_patch{
-			Chunks: chunks,
-			From:   from,
-			To:     to,
-		}
-		usable_file_patches = append(usable_file_patches, usable_file_patch)
-	}
-	params["file_patches"] = usable_file_patches
+	params["file_patches"] = make_usable_file_patches(patch)
 
 	render_template(w, "repo_commit", params)
 }
@@ -119,3 +90,37 @@ var fake_diff_file_null = fake_diff_file{
 	mode: misc.First_or_panic(filemode.New("100644")),
 	path: "",
 }
+
+func make_usable_file_patches(patch diff.Patch) (usable_file_patches []usable_file_patch) {
+	// TODO: Remove unnecessary context
+	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
+	usable_file_patches = make([]usable_file_patch, 0)
+	for _, file_patch := range patch.FilePatches() {
+		from, to := file_patch.Files()
+		if from == nil {
+			from = fake_diff_file_null
+		}
+		if to == nil {
+			to = fake_diff_file_null
+		}
+		chunks := []usable_chunk{}
+		for _, chunk := range file_patch.Chunks() {
+			content := chunk.Content()
+			if len(content) > 0 && content[0] == '\n' {
+				content = "\n" + content
+			} // Horrible hack to fix how browsers newlines that immediately proceed <pre>
+			chunks = append(chunks, usable_chunk{
+				Operation: chunk.Type(),
+				Content:   content,
+			})
+		}
+		usable_file_patch := usable_file_patch{
+			Chunks: chunks,
+			From:   from,
+			To:     to,
+		}
+		usable_file_patches = append(usable_file_patches, usable_file_patch)
+	}
+	return
+}
+
