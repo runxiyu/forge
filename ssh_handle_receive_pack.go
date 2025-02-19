@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -24,9 +25,29 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	// necessarily mean the push is declined. This decision is delegated to
 	// the pre-receive hook, which is then handled by git_hooks_handle.go
 	// while being aware of the refs to be updated.
-	repo_path, access, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	repo_path, access, contrib_requirements, is_registered_user, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
+	}
+
+	if !access {
+		switch contrib_requirements {
+		case "closed":
+			if !access {
+				return errors.New("You need direct access to push to this repo.")
+			}
+		case "registered_user":
+			if !is_registered_user {
+				return errors.New("You need to be a registered user to push to this repo.")
+			}
+		case "ssh_pubkey":
+			if pubkey == "" {
+				return errors.New("You need to have an SSH public key to push to this repo.")
+			}
+		case "public":
+		default:
+			panic("unknown contrib_requirements value " + contrib_requirements)
+		}
 	}
 
 	cookie, err := random_urlsafe_string(16)
