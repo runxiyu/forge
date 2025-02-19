@@ -130,7 +130,7 @@ func hooks_handle_connection(conn net.Conn) {
 							fmt.Fprintln(ssh_stderr, "Acceptable push to new contrib branch: "+ref_name)
 							_, err = database.Exec(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open')",
-								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/contrib/"),
+								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/"),
 							)
 							if err != nil {
 								fmt.Fprintln(ssh_stderr, "Error creating merge request:", err.Error())
@@ -140,7 +140,7 @@ func hooks_handle_connection(conn net.Conn) {
 							var existing_merge_request_user_id int
 							err = database.QueryRow(ctx,
 								"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
-								strings.TrimPrefix(ref_name, "refs/heads/contrib/"), pack_to_hook.repo_id,
+								strings.TrimPrefix(ref_name, "refs/heads/"), pack_to_hook.repo_id,
 							).Scan(&existing_merge_request_user_id)
 							if err != nil {
 								if errors.Is(err, pgx.ErrNoRows) {
