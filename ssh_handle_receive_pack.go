@@ -13,7 +13,7 @@ import (
 var err_unauthorized_push = errors.New("you are not authorized to push to this repository")
 
 type pack_to_hook_t struct {
-	session       *glider_ssh.Session
+	session       glider_ssh.Session
 	pubkey        string
 	direct_access bool
 	repo_path     string
@@ -38,7 +38,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	}
 
 	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
-		session:       &session,
+		session:       session,
 		pubkey:        pubkey,
 		direct_access: access,
 		repo_path:     repo_path,
