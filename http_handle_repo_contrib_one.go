@@ -16,7 +16,7 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 	}
 
 	var title, status, source_ref, destination_branch string
-	err = database.QueryRow(r.Context(), "SELECT title, status, source_ref, destination_branch FROM merge_requests WHERE id = $1", mr_id).Scan(&title, &status, &source_ref, &destination_branch)
+	err = database.QueryRow(r.Context(), "SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE id = $1", mr_id).Scan(&title, &status, &source_ref, &destination_branch)
 	if err != nil {
 		http.Error(w, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
 		return

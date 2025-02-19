@@ -139,7 +139,7 @@ func hooks_handle_connection(conn net.Conn) {
 						} else { // Existing contrib branch
 							var existing_merge_request_user_id int
 							err = database.QueryRow(ctx,
-								"SELECT creator FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
+								"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
 								strings.TrimPrefix(ref_name, "refs/heads/contrib/"), pack_to_hook.repo_id,
 							).Scan(&existing_merge_request_user_id)
 							if err != nil {
@@ -149,6 +149,11 @@ func hooks_handle_connection(conn net.Conn) {
 									fmt.Fprintln(ssh_stderr, "Error querying for existing merge request:", err.Error())
 								}
 								return 1
+							}
+							if existing_merge_request_user_id == 0 {
+								all_ok = false
+								fmt.Fprintln(ssh_stderr, "Rejecting push to merge request with no owner", ref_name)
+								continue
 							}
 
 							if existing_merge_request_user_id != pack_to_hook.user_id {

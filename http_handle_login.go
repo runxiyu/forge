@@ -23,7 +23,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	password := r.PostFormValue("password")
 
 	var password_hash string
-	err := database.QueryRow(r.Context(), "SELECT id, password FROM users WHERE username = $1", username).Scan(&user_id, &password_hash)
+	err := database.QueryRow(r.Context(), "SELECT id, COALESCE(password, '') FROM users WHERE username = $1", username).Scan(&user_id, &password_hash)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			params["login_error"] = "Unknown username"
@@ -31,6 +31,11 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 			return
 		}
 		http.Error(w, "Error querying user information: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if password_hash == "" {
+		params["login_error"] = "User has no password"
+		render_template(w, "login", params)
 		return
 	}
 
