@@ -211,13 +211,12 @@ func hooks_handle_connection(conn net.Conn) {
 					}
 				}
 
+				fmt.Fprintln(ssh_stderr)
 				if all_ok {
-					fmt.Fprintln(ssh_stderr)
-					fmt.Fprintln(ssh_stderr, ansiec.Green + "ACK" + ansiec.Reset + " (all checks passed)")
+					fmt.Fprintln(ssh_stderr, "Overall " + ansiec.Green + "ACK" + ansiec.Reset + " (all checks passed)")
 					return 0
 				} else {
-					fmt.Fprintln(ssh_stderr)
-					fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset + " (one or more branches failed checks; rejecting everything)")
+					fmt.Fprintln(ssh_stderr, "Overall " + ansiec.Red + "NAK" + ansiec.Reset + " (one or more branches failed checks)")
 					return 1
 				}
 			}
