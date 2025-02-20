@@ -16,6 +16,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
 
 var (
@@ -37,14 +38,14 @@ func hooks_handle_connection(conn net.Conn) {
 		if _, err := conn.Write([]byte{1}); err != nil {
 			return
 		}
-		fmt.Fprintln(conn, "Unable to get peer credentials:", err.Error())
+		wf_error(conn, "\nUnable to get peer credentials: %v", err)
 		return
 	}
 	if ucred.Uid != uint32(os.Getuid()) {
 		if _, err := conn.Write([]byte{1}); err != nil {
 			return
 		}
-		fmt.Fprintln(conn, "UID mismatch")
+		wf_error(conn, "\nUID mismatch")
 		return
 	}
 
@@ -54,7 +55,7 @@ func hooks_handle_connection(conn net.Conn) {
 		if _, err := conn.Write([]byte{1}); err != nil {
 			return
 		}
-		fmt.Fprintln(conn, "Failed to read cookie:", err.Error())
+		wf_error(conn, "\nFailed to read cookie: %v", err)
 		return
 	}
 
@@ -63,17 +64,19 @@ func hooks_handle_connection(conn net.Conn) {
 		if _, err := conn.Write([]byte{1}); err != nil {
 			return
 		}
-		fmt.Fprintln(conn, "Invalid handler cookie")
+		wf_error(conn, "\nInvalid handler cookie")
 		return
 	}
 
 	ssh_stderr := pack_to_hook.session.Stderr()
 
+	ssh_stderr.Write([]byte{'\n'})
+
 	hook_return_value := func() byte {
 		var argc64 uint64
 		err = binary.Read(conn, binary.NativeEndian, &argc64)
 		if err != nil {
-			fmt.Fprintln(ssh_stderr, "Failed to read argc:", err.Error())
+			wf_error(ssh_stderr, "Failed to read argc: %v", err)
 			return 1
 		}
 		var args []string
@@ -83,7 +86,7 @@ func hooks_handle_connection(conn net.Conn) {
 				b := make([]byte, 1)
 				n, err := conn.Read(b)
 				if err != nil || n != 1 {
-					fmt.Fprintln(ssh_stderr, "Failed to read arg:", err.Error())
+					wf_error(ssh_stderr, "Failed to read arg: %v", err)
 					return 1
 				}
 				if b[0] == 0 {
@@ -97,7 +100,7 @@ func hooks_handle_connection(conn net.Conn) {
 		var stdin bytes.Buffer
 		_, err = io.Copy(&stdin, conn)
 		if err != nil {
-			fmt.Fprintln(conn, "Failed to read to the stdin buffer:", err.Error())
+			wf_error(conn, "Failed to read to the stdin buffer: %v", err)
 		}
 
 		switch filepath.Base(args[0]) {
@@ -115,25 +118,25 @@ func hooks_handle_connection(conn net.Conn) {
 
 					old_oid, rest, found := strings.Cut(line, " ")
 					if !found {
-						fmt.Fprintln(ssh_stderr, "Invalid pre-receive line:", line)
+						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
 						return 1
 					}
 
 					new_oid, ref_name, found := strings.Cut(rest, " ")
 					if !found {
-						fmt.Fprintln(ssh_stderr, "Invalid pre-receive line:", line)
+						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
 						return 1
 					}
 
 					if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
 						if all_zero_num_string(old_oid) { // New branch
-							fmt.Fprintln(ssh_stderr, "Acceptable push to new contrib branch: "+ref_name)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue + "POK" + ansiec.Reset, ref_name)
 							_, err = database.Exec(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open')",
 								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/"),
 							)
 							if err != nil {
-								fmt.Fprintln(ssh_stderr, "Error creating merge request:", err.Error())
+								wf_error(ssh_stderr, "Error creating merge request: %v", err)
 								return 1
 							}
 						} else { // Existing contrib branch
@@ -144,27 +147,27 @@ func hooks_handle_connection(conn net.Conn) {
 							).Scan(&existing_merge_request_user_id)
 							if err != nil {
 								if errors.Is(err, pgx.ErrNoRows) {
-									fmt.Fprintln(ssh_stderr, "No existing merge request for existing contrib branch:", err.Error())
+									wf_error(ssh_stderr, "No existing merge request for existing contrib branch: %v", err)
 								} else {
-									fmt.Fprintln(ssh_stderr, "Error querying for existing merge request:", err.Error())
+									wf_error(ssh_stderr, "Error querying for existing merge request: %v", err)
 								}
 								return 1
 							}
 							if existing_merge_request_user_id == 0 {
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, "Rejecting push to merge request with no owner", ref_name)
+								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(branch belongs to unowned MR)")
 								continue
 							}
 
 							if existing_merge_request_user_id != pack_to_hook.user_id {
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, "Rejecting push to existing contrib branch owned by another user:", ref_name)
+								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(branch belongs another user's MR)")
 								continue
 							}
 
 							repo, err := git.PlainOpen(pack_to_hook.repo_path)
 							if err != nil {
-								fmt.Fprintln(ssh_stderr, "Daemon failed to open repo:", err.Error())
+								wf_error(ssh_stderr, "Daemon failed to open repo: %v", err)
 								return 1
 							}
 
@@ -172,7 +175,7 @@ func hooks_handle_connection(conn net.Conn) {
 
 							old_commit, err := repo.CommitObject(old_hash)
 							if err != nil {
-								fmt.Fprintln(ssh_stderr, "Daemon failed to get old commit:", err.Error())
+								wf_error(ssh_stderr, "Daemon failed to get old commit: %v", err)
 								return 1
 							}
 
@@ -183,42 +186,48 @@ func hooks_handle_connection(conn net.Conn) {
 							new_hash := plumbing.NewHash(new_oid)
 							new_commit, err := repo.CommitObject(new_hash)
 							if err != nil {
-								fmt.Fprintln(ssh_stderr, "Daemon failed to get new commit:", err.Error())
+								wf_error(ssh_stderr, "Daemon failed to get new commit: %v", err)
 								return 1
 							}
 
 							is_ancestor, err := old_commit.IsAncestor(new_commit)
 							if err != nil {
-								fmt.Fprintln(ssh_stderr, "Daemon failed to check if old commit is ancestor:", err.Error())
+								wf_error(ssh_stderr, "Daemon failed to check if old commit is ancestor: %v", err)
 								return 1
 							}
 
 							if !is_ancestor {
 								// TODO: Create MR snapshot ref instead
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, "Rejecting force push to contrib branch: "+ref_name)
+								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(force pushes are not supported yet)")
 								continue
 							}
 
-							fmt.Fprintln(ssh_stderr, "Acceptable push to existing contrib branch: "+ref_name)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue + "POK" + ansiec.Reset, ref_name)
 						}
 					} else { // Non-contrib branch
 						all_ok = false
-						fmt.Fprintln(ssh_stderr, "Rejecting push to non-contrib branch: "+ref_name)
+						fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(you cannot push to branches outside of contrib/*)")
 					}
 				}
 
 				if all_ok {
+					fmt.Fprintln(ssh_stderr)
+					fmt.Fprintln(ssh_stderr, ansiec.Green + "ACK" + ansiec.Reset + " (all checks passed)")
 					return 0
 				} else {
+					fmt.Fprintln(ssh_stderr)
+					fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset + " (one or more branches failed checks; rejecting everything)")
 					return 1
 				}
 			}
 		default:
-			fmt.Fprintln(ssh_stderr, "Invalid hook:", args[0])
+			fmt.Fprintln(ssh_stderr, ansiec.Red + "Invalid hook:", args[0] + ansiec.Reset)
 			return 1
 		}
 	}()
+
+	fmt.Fprintln(ssh_stderr)
 
 	_, _ = conn.Write([]byte{hook_return_value})
 }

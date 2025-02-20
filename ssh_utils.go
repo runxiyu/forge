@@ -3,8 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"net/url"
 	"strings"
+
+	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
 
 var err_ssh_illegal_endpoint = errors.New("illegal endpoint during SSH access")
@@ -51,4 +55,8 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 	default:
 		return 0, "", false, "", "", 0, err_ssh_illegal_endpoint
 	}
+}
+
+func wf_error(w io.Writer, format string, args ...any) {
+	fmt.Fprintln(w, ansiec.Red + fmt.Sprintf(format, args...) + ansiec.Reset)
 }
