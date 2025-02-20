@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -131,14 +132,16 @@ func hooks_handle_connection(conn net.Conn) {
 					if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
 						if all_zero_num_string(old_oid) { // New branch
 							fmt.Fprintln(ssh_stderr, ansiec.Blue + "POK" + ansiec.Reset, ref_name)
-							_, err = database.Exec(ctx,
-								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open')",
+							var new_mr_id int
+							err = database.QueryRow(ctx,
+								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
 								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/"),
-							)
+							).Scan(&new_mr_id)
 							if err != nil {
 								wf_error(ssh_stderr, "Error creating merge request: %v", err)
 								return 1
 							}
+							fmt.Fprintln(ssh_stderr, ansiec.Blue + "Created merge request at", generate_http_remote_url(pack_to_hook.group_name, pack_to_hook.repo_name) + "/contrib/" + strconv.FormatUint(uint64(new_mr_id), 10) + "/" + ansiec.Reset)
 						} else { // Existing contrib branch
 							var existing_merge_request_user_id int
 							err = database.QueryRow(ctx,

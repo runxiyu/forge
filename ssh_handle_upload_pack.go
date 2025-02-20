@@ -11,7 +11,7 @@ import (
 // ssh_handle_upload_pack handles clones/fetches. It just uses git-upload-pack
 // and has no ACL checks.
 func ssh_handle_upload_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	_, repo_path, _, _, _, _, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	_, _, _, repo_path, _, _, _, _, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
 	}
