@@ -14,9 +14,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/jackc/pgx/v5"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
 
@@ -131,7 +130,7 @@ func hooks_handle_connection(conn net.Conn) {
 
 					if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
 						if all_zero_num_string(old_oid) { // New branch
-							fmt.Fprintln(ssh_stderr, ansiec.Blue + "POK" + ansiec.Reset, ref_name)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue+"POK"+ansiec.Reset, ref_name)
 							var new_mr_id int
 							err = database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
@@ -141,7 +140,7 @@ func hooks_handle_connection(conn net.Conn) {
 								wf_error(ssh_stderr, "Error creating merge request: %v", err)
 								return 1
 							}
-							fmt.Fprintln(ssh_stderr, ansiec.Blue + "Created merge request at", generate_http_remote_url(pack_to_hook.group_name, pack_to_hook.repo_name) + "/contrib/" + strconv.FormatUint(uint64(new_mr_id), 10) + "/" + ansiec.Reset)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(pack_to_hook.group_name, pack_to_hook.repo_name)+"/contrib/"+strconv.FormatUint(uint64(new_mr_id), 10)+"/"+ansiec.Reset)
 						} else { // Existing contrib branch
 							var existing_merge_request_user_id int
 							err = database.QueryRow(ctx,
@@ -158,25 +157,19 @@ func hooks_handle_connection(conn net.Conn) {
 							}
 							if existing_merge_request_user_id == 0 {
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(branch belongs to unowned MR)")
+								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(branch belongs to unowned MR)")
 								continue
 							}
 
 							if existing_merge_request_user_id != pack_to_hook.user_id {
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(branch belongs another user's MR)")
+								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(branch belongs another user's MR)")
 								continue
-							}
-
-							repo, err := git.PlainOpen(pack_to_hook.repo_path)
-							if err != nil {
-								wf_error(ssh_stderr, "Daemon failed to open repo: %v", err)
-								return 1
 							}
 
 							old_hash := plumbing.NewHash(old_oid)
 
-							old_commit, err := repo.CommitObject(old_hash)
+							old_commit, err := pack_to_hook.repo.CommitObject(old_hash)
 							if err != nil {
 								wf_error(ssh_stderr, "Daemon failed to get old commit: %v", err)
 								return 1
@@ -187,7 +180,7 @@ func hooks_handle_connection(conn net.Conn) {
 							// objects yet. But it seems to work, and I don't think there's
 							// any reason for this to only work intermitently.
 							new_hash := plumbing.NewHash(new_oid)
-							new_commit, err := repo.CommitObject(new_hash)
+							new_commit, err := pack_to_hook.repo.CommitObject(new_hash)
 							if err != nil {
 								wf_error(ssh_stderr, "Daemon failed to get new commit: %v", err)
 								return 1
@@ -202,29 +195,29 @@ func hooks_handle_connection(conn net.Conn) {
 							if !is_ancestor {
 								// TODO: Create MR snapshot ref instead
 								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(force pushes are not supported yet)")
+								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(force pushes are not supported yet)")
 								continue
 							}
 
-							fmt.Fprintln(ssh_stderr, ansiec.Blue + "POK" + ansiec.Reset, ref_name)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue+"POK"+ansiec.Reset, ref_name)
 						}
 					} else { // Non-contrib branch
 						all_ok = false
-						fmt.Fprintln(ssh_stderr, ansiec.Red + "NAK" + ansiec.Reset, ref_name, "(you cannot push to branches outside of contrib/*)")
+						fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(you cannot push to branches outside of contrib/*)")
 					}
 				}
 
 				fmt.Fprintln(ssh_stderr)
 				if all_ok {
-					fmt.Fprintln(ssh_stderr, "Overall " + ansiec.Green + "ACK" + ansiec.Reset + " (all checks passed)")
+					fmt.Fprintln(ssh_stderr, "Overall "+ansiec.Green+"ACK"+ansiec.Reset+" (all checks passed)")
 					return 0
 				} else {
-					fmt.Fprintln(ssh_stderr, "Overall " + ansiec.Red + "NAK" + ansiec.Reset + " (one or more branches failed checks)")
+					fmt.Fprintln(ssh_stderr, "Overall "+ansiec.Red+"NAK"+ansiec.Reset+" (one or more branches failed checks)")
 					return 1
 				}
 			}
 		default:
-			fmt.Fprintln(ssh_stderr, ansiec.Red + "Invalid hook:", args[0] + ansiec.Reset)
+			fmt.Fprintln(ssh_stderr, ansiec.Red+"Invalid hook:", args[0]+ansiec.Reset)
 			return 1
 		}
 	}()

@@ -7,11 +7,13 @@ import (
 	"os/exec"
 
 	glider_ssh "github.com/gliderlabs/ssh"
+	"github.com/go-git/go-git/v5"
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
 type pack_to_hook_t struct {
 	session       glider_ssh.Session
+	repo          *git.Repository
 	pubkey        string
 	direct_access bool
 	repo_path     string
@@ -28,6 +30,25 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	group_name, repo_name, repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
+	}
+	repo, err := git.PlainOpen(repo_path)
+	if err != nil {
+		return err
+	}
+
+	repo_config, err := repo.Config()
+	if err != nil {
+		return err
+	}
+
+	repo_config_core := repo_config.Raw.Section("core")
+	if repo_config_core == nil {
+		return errors.New("Repository has no core section in config")
+	}
+
+	hooksPath := repo_config_core.OptionAll("hooksPath")
+	if len(hooksPath) != 1 || hooksPath[0] != config.Hooks.Execs {
+		return errors.New("Repository has hooksPath set to an unexpected value")
 	}
 
 	if !direct_access {
@@ -73,6 +94,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		repo_id:       repo_id,
 		group_name:    group_name,
 		repo_name:     repo_name,
+		repo:          repo,
 	})
 	defer pack_to_hook_by_cookie.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
