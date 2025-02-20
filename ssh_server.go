@@ -42,7 +42,7 @@ func serve_ssh(listener net.Listener) error {
 			}
 
 			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + client_public_key_string + " " + session.RawCommand())
-			fmt.Fprintln(session.Stderr(), ansiec.Blue + "Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/:/source/" + ansiec.Reset + "\r")
+			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/:/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
 

@@ -60,5 +60,5 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 }
 
 func wf_error(w io.Writer, format string, args ...any) {
-	fmt.Fprintln(w, ansiec.Red + fmt.Sprintf(format, args...) + ansiec.Reset)
+	fmt.Fprintln(w, ansiec.Red+fmt.Sprintf(format, args...)+ansiec.Reset)
 }
