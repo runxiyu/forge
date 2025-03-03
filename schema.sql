@@ -1,3 +1,6 @@
+-- SPDX-License-Identifier: AGPL-3.0-only
+-- SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+
 CREATE TABLE groups (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	name TEXT NOT NULL UNIQUE,
