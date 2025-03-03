@@ -177,11 +177,17 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	/*
-	 * The first byte of the response from the UNIX domain socket is the
-	 * status code. We read it and record it as our return value.
-	 */
-	char status_buf[1];
+        /*
+         * The first byte of the response from the UNIX domain socket is the
+         * status code. We read it and record it as our return value.
+         *
+         * FIXME: It doesn't make sense to require the return value to be
+         * sent before the log message. However, if we were to keep splicing,
+         * it's difficult to get the last byte before EOF. Perhaps we could
+         * hack together some sort of OOB message or ancillary data, or perhaps
+         * even use signals.
+         */
+        char status_buf[1];
 	ssize_t bytes_read = read(sock, status_buf, 1);
 	switch (bytes_read) {
 	case -1:
