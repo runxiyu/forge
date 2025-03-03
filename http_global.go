@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+
 package main
 
 // global_data is passed as "global" when rendering HTML templates.
