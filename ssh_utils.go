@@ -17,7 +17,11 @@ import (
 var err_ssh_illegal_endpoint = errors.New("illegal endpoint during SSH access")
 
 func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path string, ssh_pubkey string) (group_name string, repo_name string, repo_id int, repo_path string, direct_access bool, contrib_requirements string, user_type string, user_id int, err error) {
-	segments := strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
+	var segments []string
+	var separator_index int
+	var module_type, module_name string
+
+	segments = strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
 
 	for i, segment := range segments {
 		var err error
@@ -31,7 +35,7 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 		return "", "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint
 	}
 
-	separator_index := -1
+	separator_index = -1
 	for i, part := range segments {
 		if part == ":" {
 			separator_index = i
@@ -50,8 +54,8 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path stri
 	}
 
 	group_name = segments[0]
-	module_type := segments[separator_index+1]
-	module_name := segments[separator_index+2]
+	module_type = segments[separator_index+1]
+	module_name = segments[separator_index+2]
 	repo_name = module_name
 	switch module_type {
 	case "repos":

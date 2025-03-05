@@ -37,11 +37,10 @@ func main() {
 	hooks_listener, err = net.Listen("unix", config.Hooks.Socket)
 	if errors.Is(err, syscall.EADDRINUSE) {
 		clog.Warn("Removing stale socket " + config.Hooks.Socket)
-		if err := syscall.Unlink(config.Hooks.Socket); err != nil {
+		if err = syscall.Unlink(config.Hooks.Socket); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		hooks_listener, err = net.Listen("unix", config.Hooks.Socket)
-		if err != nil {
+		if hooks_listener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
 			clog.Fatal(1, "Listening hooks: "+err.Error())
 		}
 	} else if err != nil {
@@ -49,7 +48,7 @@ func main() {
 	}
 	clog.Info("Listening hooks on unix " + config.Hooks.Socket)
 	go func() {
-		if err := serve_git_hooks(hooks_listener); err != nil {
+		if err = serve_git_hooks(hooks_listener); err != nil {
 			clog.Fatal(1, "Serving hooks: "+err.Error())
 		}
 	}()
@@ -58,11 +57,10 @@ func main() {
 	ssh_listener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.SSH.Net == "unix" {
 		clog.Warn("Removing stale socket " + config.SSH.Addr)
-		if err := syscall.Unlink(config.SSH.Addr); err != nil {
+		if err = syscall.Unlink(config.SSH.Addr); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		ssh_listener, err = net.Listen(config.SSH.Net, config.SSH.Addr)
-		if err != nil {
+		if ssh_listener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
 			clog.Fatal(1, "Listening SSH: "+err.Error())
 		}
 	} else if err != nil {
@@ -70,7 +68,7 @@ func main() {
 	}
 	clog.Info("Listening SSH on " + config.SSH.Net + " " + config.SSH.Addr)
 	go func() {
-		if err := serve_ssh(ssh_listener); err != nil {
+		if err = serve_ssh(ssh_listener); err != nil {
 			clog.Fatal(1, "Serving SSH: "+err.Error())
 		}
 	}()
@@ -79,11 +77,10 @@ func main() {
 	http_listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.HTTP.Net == "unix" {
 		clog.Warn("Removing stale socket " + config.HTTP.Addr)
-		if err := syscall.Unlink(config.HTTP.Addr); err != nil {
+		if err = syscall.Unlink(config.HTTP.Addr); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		http_listener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr)
-		if err != nil {
+		if http_listener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
 			clog.Fatal(1, "Listening HTTP: "+err.Error())
 		}
 	} else if err != nil {
@@ -91,7 +88,7 @@ func main() {
 	}
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 	go func() {
-		if err := http.Serve(http_listener, &http_router_t{}); err != nil {
+		if err = http.Serve(http_listener, &http_router_t{}); err != nil {
 			clog.Fatal(1, "Serving HTTP: "+err.Error())
 		}
 	}()

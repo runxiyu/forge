@@ -44,8 +44,7 @@ func load_templates() (err error) {
 var static_handler http.Handler
 
 func init() {
-	static_fs, err := fs.Sub(resources_fs, "static")
-	if err != nil {
+	if static_fs, err := fs.Sub(resources_fs, "static"); err != nil {
 		panic(err)
 	}
 	static_handler = http.StripPrefix("/:/static/", http.FileServer(http.FS(static_fs)))

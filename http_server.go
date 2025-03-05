@@ -19,12 +19,17 @@ type http_router_t struct{}
 func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	clog.Info("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
 
-	segments, _, err := parse_request_uri(r.RequestURI)
-	if err != nil {
+	var segments []string
+	var err error
+	var non_empty_last_segments_len int
+	var params map[string]any
+	var separator_index int
+
+	if segments, _, err = parse_request_uri(r.RequestURI); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	non_empty_last_segments_len := len(segments)
+	non_empty_last_segments_len = len(segments)
 	if segments[len(segments)-1] == "" {
 		non_empty_last_segments_len--
 	}
@@ -47,7 +52,6 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := make(map[string]any)
 	params["url_segments"] = segments
 	params["global"] = global_data
 	var _user_id int // 0 for none
@@ -79,7 +83,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	separator_index := -1
+	separator_index = -1
 	for i, part := range segments {
 		if part == ":" {
 			separator_index = i
@@ -95,6 +99,10 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var module_type string
+	var module_name string
+	var group_name string
+
 	switch {
 	case non_empty_last_segments_len == 0:
 		handle_index(w, r, params)
@@ -106,7 +114,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if redirect_with_slash(w, r) {
 			return
 		}
-		module_type := segments[separator_index+1]
+		module_type = segments[separator_index+1]
 		params["group_name"] = segments[0]
 		switch module_type {
 		case "repos":
@@ -115,9 +123,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Unknown module type: %s", module_type), http.StatusNotFound)
 		}
 	default:
-		module_type := segments[separator_index+1]
-		module_name := segments[separator_index+2]
-		group_name := segments[0]
+		module_type = segments[separator_index+1]
+		module_name = segments[separator_index+2]
+		group_name = segments[0]
 		params["group_name"] = group_name
 		switch module_type {
 		case "repos":
@@ -126,22 +134,19 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if non_empty_last_segments_len > separator_index+3 {
 				switch segments[separator_index+3] {
 				case "info":
-					err = handle_repo_info(w, r, params)
-					if err != nil {
+					if err = handle_repo_info(w, r, params); err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				case "git-upload-pack":
-					err = handle_upload_pack(w, r, params)
-					if err != nil {
+					if err = handle_upload_pack(w, r, params); err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				}
 			}
 
-			params["ref_type"], params["ref_name"], err = get_param_ref_and_type(r)
-			if err != nil {
+			if params["ref_type"], params["ref_name"], err = get_param_ref_and_type(r); err != nil {
 				if errors.Is(err, err_no_ref_spec) {
 					params["ref_type"] = ""
 				} else {
@@ -152,8 +157,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// TODO: subgroups
 
-			params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_name, module_name)
-			if err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_name, module_name); err != nil {
 				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
 			}

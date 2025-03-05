@@ -112,8 +112,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	proc.Stdout = session
 	proc.Stderr = session.Stderr()
 
-	err = proc.Start()
-	if err != nil {
+	if err = proc.Start(); err != nil {
 		fmt.Fprintln(session.Stderr(), "Error while starting process:", err)
 		return err
 	}

@@ -22,13 +22,16 @@ var (
 )
 
 func serve_ssh(listener net.Listener) error {
-	host_key_bytes, err := os.ReadFile(config.SSH.Key)
-	if err != nil {
+	var host_key_bytes []byte
+	var host_key go_ssh.Signer
+	var err error
+	var server *glider_ssh.Server
+
+	if host_key_bytes, err = os.ReadFile(config.SSH.Key); err != nil {
 		return err
 	}
 
-	host_key, err := go_ssh.ParsePrivateKey(host_key_bytes)
-	if err != nil {
+	if host_key, err = go_ssh.ParsePrivateKey(host_key_bytes); err != nil {
 		return err
 	}
 
@@ -36,7 +39,7 @@ func serve_ssh(listener net.Listener) error {
 	server_public_key_string = string(go_ssh.MarshalAuthorizedKey(server_public_key))
 	server_public_key_fingerprint = string(go_ssh.FingerprintSHA256(server_public_key))
 
-	server := &glider_ssh.Server{
+	server = &glider_ssh.Server{
 		Handler: func(session glider_ssh.Session) {
 			client_public_key := session.PublicKey()
 			var client_public_key_string string
@@ -86,8 +89,7 @@ func serve_ssh(listener net.Listener) error {
 
 	server.AddHostKey(host_key)
 
-	err = server.Serve(listener)
-	if err != nil {
+	if err = server.Serve(listener); err != nil {
 		clog.Fatal(1, "Serving SSH: "+err.Error())
 	}
 
