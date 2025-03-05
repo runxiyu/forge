@@ -1,15 +1,34 @@
 http {
+	# What network transport should we listen on?
+	# Examples: tcp tcp4 tcp6 unix
 	net tcp
-	addr :8080
+
+	# What address to listen on?
+	# Examples for net tcp*: 127.0.0.1:8080 :80
+	# Example for unix: /var/run/lindenii/forge/http.sock
+	addr /var/run/lindenii/forge/http.sock
+
+	# How many seconds should cookies be remembered before they are purged?
 	cookie_expiry 604800
+
+	# What is the canonical URL of the web root?
 	root https://forge.example.org
 }
 
 ssh {
+	# What network transport should we listen on?
+	# This should be "tcp" in almost all cases.
 	net tcp
-	addr :2222
+
+	# What address to listen on?
+	addr :22
+
+	# What is the path to the SSH host key? Generate it with ssh-keygen.
+	# The key must have an empty password.
 	key /etc/lindenii/ssh_host_ed25519_key
-	root ssh://forge.example.org:2222
+
+	# What is the canonical SSH URL?
+	root ssh://forge.example.org
 }
 
 general {
@@ -17,11 +36,18 @@ general {
 }
 
 db {
+	# What type of database are we connecting to?
+	# Currently only "postgres" is supported.
 	type postgres
+
+	# What is the connection string?
 	conn postgresql:///lindenii-forge?host=/var/run/postgresql
 }
 
 hooks {
+	# On which UNIX domain socket should we listen for hook callbacks on?
 	socket /var/run/lindenii/forge/hooks.sock
+
+	# Where should hook executables be put?
 	execs /usr/libexec/lindenii/forge/hooks
 }
