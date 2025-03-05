@@ -4,7 +4,6 @@
 package main
 
 import (
-	"errors"
 	"io"
 	"io/fs"
 	"os"

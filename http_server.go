@@ -22,8 +22,8 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var segments []string
 	var err error
 	var non_empty_last_segments_len int
-	var params map[string]any
 	var separator_index int
+	params := make(map[string]any)
 
 	if segments, _, err = parse_request_uri(r.RequestURI); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

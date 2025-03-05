@@ -55,11 +55,12 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "", "")
 	} else {
 		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "branch", destination_branch)
-		if err != nil {
-			http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
 	}
+	if err != nil {
+		http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	destination_commit, err := repo.CommitObject(destination_branch_hash)
 	if err != nil {
 		http.Error(w, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)

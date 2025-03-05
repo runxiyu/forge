@@ -82,7 +82,7 @@ func hooks_handle_connection(conn net.Conn) {
 
 	ssh_stderr = pack_to_hook.session.Stderr()
 
-	ssh_stderr.Write([]byte{'\n'})
+	_, _ = ssh_stderr.Write([]byte{'\n'})
 
 	hook_return_value = func() byte {
 		var argc64 uint64

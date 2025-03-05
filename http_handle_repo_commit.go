@@ -103,7 +103,7 @@ var fake_diff_file_null = fake_diff_file{
 	path: "",
 }
 
-func make_usable_file_patches(patch diff.Patch) (usable_file_patches []usable_file_patch) {
+func make_usable_file_patches(patch diff.Patch) (usable_file_patches []usable_file_patch_t) {
 	// TODO: Remove unnecessary context
 	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
 

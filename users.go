@@ -15,7 +15,9 @@ func add_user_ssh(ctx context.Context, pubkey string) (user_id int, err error) {
 	if tx, err = database.Begin(ctx); err != nil {
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
 
 	if err = tx.QueryRow(ctx, `INSERT INTO users (type) VALUES ('pubkey_only') RETURNING id`).Scan(&user_id); err != nil {
 		return
