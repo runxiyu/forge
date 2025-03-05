@@ -8,8 +8,12 @@ import (
 )
 
 func handle_group_repos(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	group_name := params["group_name"]
-	repos, err := query_name_desc_list(r.Context(), "SELECT r.name, COALESCE(r.description, '') FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1;", group_name)
+	var group_name string
+	var repos []name_desc_t
+	var err error
+
+	group_name = params["group_name"].(string)
+	repos, err = query_name_desc_list(r.Context(), "SELECT r.name, COALESCE(r.description, '') FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1;", group_name)
 	if err != nil {
 		http.Error(w, "Error getting groups: "+err.Error(), http.StatusInternalServerError)
 		return

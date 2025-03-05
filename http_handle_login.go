@@ -16,17 +16,28 @@ import (
 )
 
 func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	var username, password string
+	var user_id int
+	var password_hash string
+	var err error
+	var password_matches bool
+	var cookie_value string
+	var now time.Time
+	var expiry time.Time
+	var cookie http.Cookie
+
 	if r.Method != "POST" {
 		render_template(w, "login", params)
 		return
 	}
 
-	var user_id int
-	username := r.PostFormValue("username")
-	password := r.PostFormValue("password")
+	username = r.PostFormValue("username")
+	password = r.PostFormValue("password")
 
-	var password_hash string
-	err := database.QueryRow(r.Context(), "SELECT id, COALESCE(password, '') FROM users WHERE username = $1", username).Scan(&user_id, &password_hash)
+	err = database.QueryRow(r.Context(),
+		"SELECT id, COALESCE(password, '') FROM users WHERE username = $1",
+		username,
+	).Scan(&user_id, &password_hash)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			params["login_error"] = "Unknown username"
@@ -42,28 +53,26 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 		return
 	}
 
-	match, err := argon2id.ComparePasswordAndHash(password, password_hash)
-	if err != nil {
+	if password_matches, err = argon2id.ComparePasswordAndHash(password, password_hash); err != nil {
 		http.Error(w, "Error comparing password and hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if !match {
+	if !password_matches {
 		params["login_error"] = "Invalid password"
 		render_template(w, "login", params)
 		return
 	}
 
-	cookie_value, err := random_urlsafe_string(16)
-	if err != nil {
+	if cookie_value, err = random_urlsafe_string(16); err != nil {
 		http.Error(w, "Error getting random string: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	now := time.Now()
-	expiry := now.Add(time.Duration(config.HTTP.CookieExpiry) * time.Second)
+	now = time.Now()
+	expiry = now.Add(time.Duration(config.HTTP.CookieExpiry) * time.Second)
 
-	cookie := http.Cookie{
+	cookie = http.Cookie{
 		Name:     "session",
 		Value:    cookie_value,
 		SameSite: http.SameSiteLaxMode,

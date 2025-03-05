@@ -18,6 +18,7 @@ import (
 	"syscall"
 
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/jackc/pgx/v5"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
@@ -30,55 +31,62 @@ var (
 // hooks_handle_connection handles a connection from git_hooks_client via the
 // unix socket.
 func hooks_handle_connection(conn net.Conn) {
+	var ctx context.Context
+	var cancel context.CancelFunc
+	var ucred *syscall.Ucred
+	var err error
+	var cookie []byte
+	var pack_to_hook pack_to_hook_t
+	var ssh_stderr io.Writer
+	var ok bool
+	var hook_return_value byte
+
 	defer conn.Close()
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel = context.WithCancel(context.Background())
 	defer cancel()
 
 	// There aren't reasonable cases where someone would run this as
 	// another user.
-	ucred, err := get_ucred(conn)
-	if err != nil {
-		if _, err := conn.Write([]byte{1}); err != nil {
+	if ucred, err = get_ucred(conn); err != nil {
+		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
 		wf_error(conn, "\nUnable to get peer credentials: %v", err)
 		return
 	}
 	if ucred.Uid != uint32(os.Getuid()) {
-		if _, err := conn.Write([]byte{1}); err != nil {
+		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
 		wf_error(conn, "\nUID mismatch")
 		return
 	}
 
-	cookie := make([]byte, 64)
-	_, err = conn.Read(cookie)
-	if err != nil {
-		if _, err := conn.Write([]byte{1}); err != nil {
+	cookie = make([]byte, 64)
+	if _, err = conn.Read(cookie); err != nil {
+		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
 		wf_error(conn, "\nFailed to read cookie: %v", err)
 		return
 	}
 
-	pack_to_hook, ok := pack_to_hook_by_cookie.Load(string(cookie))
+	pack_to_hook, ok = pack_to_hook_by_cookie.Load(string(cookie))
 	if !ok {
-		if _, err := conn.Write([]byte{1}); err != nil {
+		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
 		wf_error(conn, "\nInvalid handler cookie")
 		return
 	}
 
-	ssh_stderr := pack_to_hook.session.Stderr()
+	ssh_stderr = pack_to_hook.session.Stderr()
 
 	ssh_stderr.Write([]byte{'\n'})
 
-	hook_return_value := func() byte {
+	hook_return_value = func() byte {
 		var argc64 uint64
-		err = binary.Read(conn, binary.NativeEndian, &argc64)
-		if err != nil {
+		if err = binary.Read(conn, binary.NativeEndian, &argc64); err != nil {
 			wf_error(ssh_stderr, "Failed to read argc: %v", err)
 			return 1
 		}
@@ -101,8 +109,7 @@ func hooks_handle_connection(conn net.Conn) {
 		}
 
 		var stdin bytes.Buffer
-		_, err = io.Copy(&stdin, conn)
-		if err != nil {
+		if _, err = io.Copy(&stdin, conn); err != nil {
 			wf_error(conn, "Failed to read to the stdin buffer: %v", err)
 		}
 
@@ -113,19 +120,27 @@ func hooks_handle_connection(conn net.Conn) {
 			} else {
 				all_ok := true
 				for {
-					line, err := stdin.ReadString('\n')
+					var line, old_oid, rest, new_oid, ref_name string
+					var found bool
+					var old_hash, new_hash plumbing.Hash
+					var old_commit, new_commit *object.Commit
+
+					line, err = stdin.ReadString('\n')
 					if errors.Is(err, io.EOF) {
 						break
+					} else if err != nil {
+						wf_error(ssh_stderr, "Failed to read pre-receive line: %v", err)
+						return 1
 					}
 					line = line[:len(line)-1]
 
-					old_oid, rest, found := strings.Cut(line, " ")
+					old_oid, rest, found = strings.Cut(line, " ")
 					if !found {
 						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
 						return 1
 					}
 
-					new_oid, ref_name, found := strings.Cut(rest, " ")
+					new_oid, ref_name, found = strings.Cut(rest, " ")
 					if !found {
 						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
 						return 1
@@ -135,6 +150,7 @@ func hooks_handle_connection(conn net.Conn) {
 						if all_zero_num_string(old_oid) { // New branch
 							fmt.Fprintln(ssh_stderr, ansiec.Blue+"POK"+ansiec.Reset, ref_name)
 							var new_mr_id int
+
 							err = database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
 								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/"),
@@ -146,6 +162,8 @@ func hooks_handle_connection(conn net.Conn) {
 							fmt.Fprintln(ssh_stderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(pack_to_hook.group_name, pack_to_hook.repo_name)+"/contrib/"+strconv.FormatUint(uint64(new_mr_id), 10)+"/"+ansiec.Reset)
 						} else { // Existing contrib branch
 							var existing_merge_request_user_id int
+							var is_ancestor bool
+
 							err = database.QueryRow(ctx,
 								"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
 								strings.TrimPrefix(ref_name, "refs/heads/"), pack_to_hook.repo_id,
@@ -170,10 +188,9 @@ func hooks_handle_connection(conn net.Conn) {
 								continue
 							}
 
-							old_hash := plumbing.NewHash(old_oid)
+							old_hash = plumbing.NewHash(old_oid)
 
-							old_commit, err := pack_to_hook.repo.CommitObject(old_hash)
-							if err != nil {
+							if old_commit, err = pack_to_hook.repo.CommitObject(old_hash); err != nil {
 								wf_error(ssh_stderr, "Daemon failed to get old commit: %v", err)
 								return 1
 							}
@@ -182,15 +199,13 @@ func hooks_handle_connection(conn net.Conn) {
 							// detectable as they haven't been merged into the main repo's
 							// objects yet. But it seems to work, and I don't think there's
 							// any reason for this to only work intermitently.
-							new_hash := plumbing.NewHash(new_oid)
-							new_commit, err := pack_to_hook.repo.CommitObject(new_hash)
-							if err != nil {
+							new_hash = plumbing.NewHash(new_oid)
+							if new_commit, err = pack_to_hook.repo.CommitObject(new_hash); err != nil {
 								wf_error(ssh_stderr, "Daemon failed to get new commit: %v", err)
 								return 1
 							}
 
-							is_ancestor, err := old_commit.IsAncestor(new_commit)
-							if err != nil {
+							if is_ancestor, err = old_commit.IsAncestor(new_commit); err != nil {
 								wf_error(ssh_stderr, "Daemon failed to check if old commit is ancestor: %v", err)
 								return 1
 							}
@@ -240,16 +255,16 @@ func serve_git_hooks(listener net.Listener) error {
 	}
 }
 
-func get_ucred(conn net.Conn) (*syscall.Ucred, error) {
-	unix_conn := conn.(*net.UnixConn)
-	fd, err := unix_conn.File()
-	if err != nil {
+func get_ucred(conn net.Conn) (ucred *syscall.Ucred, err error) {
+	var unix_conn *net.UnixConn = conn.(*net.UnixConn)
+	var fd *os.File
+
+	if fd, err = unix_conn.File(); err != nil {
 		return nil, err_get_fd
 	}
 	defer fd.Close()
 
-	ucred, err := syscall.GetsockoptUcred(int(fd.Fd()), syscall.SOL_SOCKET, syscall.SO_PEERCRED)
-	if err != nil {
+	if ucred, err = syscall.GetsockoptUcred(int(fd.Fd()), syscall.SOL_SOCKET, syscall.SO_PEERCRED); err != nil {
 		return nil, err_get_ucred
 	}
 	return ucred, nil

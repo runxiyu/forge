@@ -8,12 +8,17 @@ import (
 )
 
 func get_user_info_from_request(r *http.Request) (id int, username string, err error) {
-	session_cookie, err := r.Cookie("session")
-	if err != nil {
+	var session_cookie *http.Cookie
+
+	if session_cookie, err = r.Cookie("session"); err != nil {
 		return
 	}
 
-	err = database.QueryRow(r.Context(), "SELECT user_id, COALESCE(username, '') FROM users u JOIN sessions s ON u.id = s.user_id WHERE s.session_id = $1;", session_cookie.Value).Scan(&id, &username)
+	err = database.QueryRow(
+		r.Context(),
+		"SELECT user_id, COALESCE(username, '') FROM users u JOIN sessions s ON u.id = s.user_id WHERE s.session_id = $1;",
+		session_cookie.Value,
+	).Scan(&id, &username)
 
 	return
 }

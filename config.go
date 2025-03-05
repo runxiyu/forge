@@ -44,23 +44,24 @@ var config struct {
 }
 
 func load_config(path string) (err error) {
-	config_file, err := os.Open(path)
-	if err != nil {
+	var config_file *os.File
+	var decoder *scfg.Decoder
+
+	if config_file, err = os.Open(path); err != nil {
 		return err
 	}
 	defer config_file.Close()
 
-	decoder := scfg.NewDecoder(bufio.NewReader(config_file))
-	err = decoder.Decode(&config)
-	if err != nil {
+	decoder = scfg.NewDecoder(bufio.NewReader(config_file))
+	if err = decoder.Decode(&config); err != nil {
 		return err
 	}
 
 	if config.DB.Type != "postgres" {
 		return err_unsupported_database_type
 	}
-	database, err = pgxpool.New(context.Background(), config.DB.Conn)
-	if err != nil {
+
+	if database, err = pgxpool.New(context.Background(), config.DB.Conn); err != nil {
 		return err
 	}
 

@@ -10,28 +10,23 @@ import (
 
 // get_ref_hash_from_type_and_name returns the hash of a reference given its
 // type and name as supplied in URL queries.
-func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, ret_err error) {
+func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, err error) {
+	var ref *plumbing.Reference
 	switch ref_type {
 	case "":
-		head, err := repo.Head()
-		if err != nil {
-			ret_err = err
+		if ref, err = repo.Head(); err != nil {
 			return
 		}
-		ref_hash = head.Hash()
+		ref_hash = ref.Hash()
 	case "commit":
 		ref_hash = plumbing.NewHash(ref_name)
 	case "branch":
-		ref, err := repo.Reference(plumbing.NewBranchReferenceName(ref_name), true)
-		if err != nil {
-			ret_err = err
+		if ref, err = repo.Reference(plumbing.NewBranchReferenceName(ref_name), true); err != nil {
 			return
 		}
 		ref_hash = ref.Hash()
 	case "tag":
-		ref, err := repo.Reference(plumbing.NewTagReferenceName(ref_name), true)
-		if err != nil {
-			ret_err = err
+		if ref, err = repo.Reference(plumbing.NewTagReferenceName(ref_name), true); err != nil {
 			return
 		}
 		ref_hash = ref.Hash()

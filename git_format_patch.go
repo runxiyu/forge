@@ -14,18 +14,21 @@ import (
 
 // get_patch_from_commit formats a commit object as if it was returned by
 // git-format-patch.
-func format_patch_from_commit(commit *object.Commit) (string, error) {
-	_, patch, err := get_patch_from_commit(commit)
-	if err != nil {
+func format_patch_from_commit(commit *object.Commit) (final string, err error) {
+	var patch *object.Patch
+	var buf bytes.Buffer
+	var author object.Signature
+	var date string
+	var commit_msg_title, commit_msg_details string
+
+	if _, patch, err = get_patch_from_commit(commit); err != nil {
 		return "", err
 	}
 
-	var buf bytes.Buffer
+	author = commit.Author
+	date = author.When.Format(time.RFC1123Z)
 
-	author := commit.Author
-	date := author.When.Format(time.RFC1123Z)
-
-	commit_msg_title, commit_msg_details, _ := strings.Cut(commit.Message, "\n")
+	commit_msg_title, commit_msg_details, _ = strings.Cut(commit.Message, "\n")
 
 	// This date is hardcoded in Git.
 	fmt.Fprintf(&buf, "From %s Mon Sep 17 00:00:00 2001\n", commit.Hash)
