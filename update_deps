@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eux
+
+go get -t -u
+go mod tidy
+go get github.com/go-git/go-git/v5@main
