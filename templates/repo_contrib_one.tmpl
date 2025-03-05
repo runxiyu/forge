@@ -39,11 +39,15 @@
 						<th scope="row">Destination branch</th>
 						<td>{{ .mr_destination_branch }}</td>
 					</tr>
+					<tr>
+						<th scope="row">Merge base</th>
+						<td>{{ .merge_base.ID.String }}</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
 		<div class="padding-wrapper">
-			{{ $destination_commit := .destination_commit }}
+			{{ $merge_base := .merge_base }}
 			{{ $source_commit := .source_commit }}
 			{{ range .file_patches }}
 				<div class="file-patch toggle-on-wrapper">
@@ -53,7 +57,7 @@
 							{{ if eq .From.Path "" }}
 								--- /dev/null
 							{{ else }}
-								--- a/<a href="../../tree/{{ .From.Path }}?commit={{ $destination_commit.Hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
+								--- a/<a href="../../tree/{{ .From.Path }}?commit={{ $merge_base.Hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
 							{{ end }}
 							<br />
 							{{ if eq .To.Path "" }}
