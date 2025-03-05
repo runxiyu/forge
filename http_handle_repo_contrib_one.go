@@ -19,7 +19,8 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 	var title, status, source_ref, destination_branch string
 	var repo *git.Repository
 	var source_ref_hash plumbing.Hash
-	var source_commit *object.Commit
+	var source_commit, destination_commit, merge_base *object.Commit
+	var merge_bases []*object.Commit
 
 	mr_id_string = params["mr_id"].(string)
 	mr_id_int64, err := strconv.ParseInt(mr_id_string, 10, strconv.IntSize)
@@ -61,19 +62,17 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 		return
 	}
 
-	destination_commit, err := repo.CommitObject(destination_branch_hash)
-	if err != nil {
+	if destination_commit, err = repo.CommitObject(destination_branch_hash); err != nil {
 		http.Error(w, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["destination_commit"] = destination_commit
 
-	merge_bases, err := source_commit.MergeBase(destination_commit)
-	if err != nil {
+	if merge_bases, err = source_commit.MergeBase(destination_commit); err != nil {
 		http.Error(w, "Error getting merge base: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	merge_base := merge_bases[0]
+	merge_base = merge_bases[0]
 	params["merge_base"] = merge_base
 
 	patch, err := merge_base.Patch(source_commit)
