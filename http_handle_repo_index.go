@@ -7,29 +7,37 @@ import (
 	"net/http"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	repo, repo_name, group_name := params["repo"].(*git.Repository), params["repo_name"].(string), params["group_name"].(string)
+	var repo *git.Repository
+	var repo_name, group_name string
+	var ref_hash plumbing.Hash
+	var err error
+	var recent_commits []*object.Commit
+	var commit_object *object.Commit
+	var tree *object.Tree
 
-	ref_hash, err := get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
-	if err != nil {
+	repo, repo_name, group_name = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_name"].(string)
+
+	if ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	recent_commits, err := get_recent_commits(repo, ref_hash, 3)
-	if err != nil {
+	if recent_commits, err = get_recent_commits(repo, ref_hash, 3); err != nil {
 		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["commits"] = recent_commits
-	commit_object, err := repo.CommitObject(ref_hash)
+	commit_object, err = repo.CommitObject(ref_hash)
 	if err != nil {
 		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	tree, err := commit_object.Tree()
+	tree, err = commit_object.Tree()
 	if err != nil {
 		http.Error(w, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
 		return

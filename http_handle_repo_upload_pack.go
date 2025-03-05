@@ -11,10 +11,18 @@ import (
 )
 
 func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
-	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
+	var group_name, repo_name string
 	var repo_path string
-	err = database.QueryRow(r.Context(), "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&repo_path)
-	if err != nil {
+	var stdout io.ReadCloser
+	var stdin io.WriteCloser
+	var cmd *exec.Cmd
+
+	group_name, repo_name = params["group_name"].(string), params["repo_name"].(string)
+
+	if err = database.QueryRow(r.Context(),
+		"SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;",
+		group_name, repo_name,
+	).Scan(&repo_path); err != nil {
 		return err
 	}
 
@@ -23,10 +31,9 @@ func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[strin
 	w.Header().Set("Transfer-Encoding", "chunked")
 	w.WriteHeader(http.StatusOK)
 
-	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", repo_path)
+	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repo_path)
 	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
+	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
 	}
 	cmd.Stderr = cmd.Stdout
@@ -34,36 +41,30 @@ func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[strin
 		_ = stdout.Close()
 	}()
 
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
+	if stdin, err = cmd.StdinPipe(); err != nil {
 		return err
 	}
 	defer func() {
 		_ = stdin.Close()
 	}()
 
-	err = cmd.Start()
-	if err != nil {
+	if err = cmd.Start(); err != nil {
 		return err
 	}
 
-	_, err = io.Copy(stdin, r.Body)
-	if err != nil {
+	if _, err = io.Copy(stdin, r.Body); err != nil {
 		return err
 	}
 
-	err = stdin.Close()
-	if err != nil {
+	if err = stdin.Close(); err != nil {
 		return err
 	}
 
-	_, err = io.Copy(w, stdout)
-	if err != nil {
+	if _, err = io.Copy(w, stdout); err != nil {
 		return err
 	}
 
-	err = cmd.Wait()
-	if err != nil {
+	if err = cmd.Wait(); err != nil {
 		return err
 	}
 

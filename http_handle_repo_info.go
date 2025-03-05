@@ -11,10 +11,13 @@ import (
 )
 
 func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
-	group_name, repo_name := params["group_name"].(string), params["repo_name"].(string)
-	var repo_path string
-	err = database.QueryRow(r.Context(), "SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;", group_name, repo_name).Scan(&repo_path)
-	if err != nil {
+	var group_name, repo_name, repo_path string
+
+	group_name, repo_name = params["group_name"].(string), params["repo_name"].(string)
+	if err = database.QueryRow(r.Context(),
+		"SELECT r.filesystem_path FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;",
+		group_name, repo_name,
+	).Scan(&repo_path); err != nil {
 		return err
 	}
 
@@ -22,38 +25,32 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 	w.WriteHeader(http.StatusOK)
 
 	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", "--advertise-refs", repo_path)
-
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	cmd.Stderr = cmd.Stdout
 	defer func() {
 		_ = stdout.Close()
 	}()
+	cmd.Stderr = cmd.Stdout
 
-	err = cmd.Start()
-	if err != nil {
+	if err = cmd.Start(); err != nil {
 		return err
 	}
 
-	err = pack_line(w, "# service=git-upload-pack\n")
-	if err != nil {
+	if err = pack_line(w, "# service=git-upload-pack\n"); err != nil {
 		return err
 	}
 
-	err = pack_flush(w)
-	if err != nil {
+	if err = pack_flush(w); err != nil {
 		return
 	}
 
-	_, err = io.Copy(w, stdout)
-	if err != nil {
+	if _, err = io.Copy(w, stdout); err != nil {
 		return err
 	}
 
-	err = cmd.Wait()
-	if err != nil {
+	if err = cmd.Wait(); err != nil {
 		return err
 	}
 

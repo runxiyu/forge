@@ -5,6 +5,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type id_title_status_t struct {
@@ -14,24 +16,29 @@ type id_title_status_t struct {
 }
 
 func handle_repo_contrib_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	rows, err := database.Query(r.Context(), "SELECT id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1", params["repo_id"])
-	if err != nil {
+	var rows pgx.Rows
+	var result []id_title_status_t
+	var err error
+
+	if rows, err = database.Query(r.Context(),
+		"SELECT id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
+		params["repo_id"],
+	); err != nil {
 		http.Error(w, "Error querying merge requests: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	result := []id_title_status_t{}
 	for rows.Next() {
 		var id int
 		var title, status string
-		if err := rows.Scan(&id, &title, &status); err != nil {
+		if err = rows.Scan(&id, &title, &status); err != nil {
 			http.Error(w, "Error scanning merge request: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		result = append(result, id_title_status_t{id, title, status})
 	}
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		http.Error(w, "Error ranging over merge requests: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
