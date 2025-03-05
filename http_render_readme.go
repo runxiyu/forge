@@ -24,7 +24,7 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 	var readme_file_contents string
 	var err error
 
-	if readme_file, err = tree.File("README"); err != nil {
+	if readme_file, err = tree.File("README"); err == nil {
 		if readme_file_contents, err = readme_file.Contents(); err != nil {
 			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
 		}
@@ -32,7 +32,7 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 		return "README", template.HTML("<pre>" + html.EscapeString(readme_file_contents) + "</pre>")
 	}
 
-	if readme_file, err = tree.File("README.md"); err != nil {
+	if readme_file, err = tree.File("README.md"); err == nil {
 		if readme_file_contents, err = readme_file.Contents(); err != nil {
 			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
 		}
@@ -44,7 +44,7 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
 	}
 
-	if readme_file, err = tree.File("README.org"); err != nil {
+	if readme_file, err = tree.File("README.org"); err == nil {
 		if readme_file_contents, err = readme_file.Contents(); err != nil {
 			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
 		}
