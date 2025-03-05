@@ -1,6 +1,7 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
  * SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+ * SPDX-FileContributor: luk3yx <https://luk3yx.github.io>
  */
 
 /* Base styles and variables */
@@ -239,7 +240,6 @@ pre.chunk {
 	content: "\25b6";
 	font-family: sans-serif;
 	margin-left: auto;
-	font-size: 1.75em;
 	line-height: 100%;
 	margin-right: 0.25em;
 }
