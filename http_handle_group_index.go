@@ -61,6 +61,20 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 		return
 	}
 
+	// ACL
+	var count int
+	err = database.QueryRow(r.Context(), `
+		SELECT COUNT(*)
+		FROM user_group_roles
+		WHERE user_id = $1
+			AND group_id = $2
+	`, params["user_id"].(int), group_id).Scan(&count)
+	if err != nil {
+		http.Error(w, "Error checking access: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	direct_access := (count > 0)
+
 	// Repos
 	var rows pgx.Rows
 	rows, err = database.Query(r.Context(), `
@@ -115,6 +129,7 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 	params["repos"] = repos
 	params["subgroups"] = subgroups
 	params["description"] = group_description
+	params["direct_access"] = direct_access
 
 	fmt.Println(group_path)
 

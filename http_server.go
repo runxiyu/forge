@@ -56,6 +56,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	params["global"] = global_data
 	var _user_id int // 0 for none
 	_user_id, params["username"], err = get_user_info_from_request(r)
+	params["user_id"] = _user_id
 	if errors.Is(err, http.ErrNoCookie) {
 	} else if errors.Is(err, pgx.ErrNoRows) {
 	} else if err != nil {
@@ -64,9 +65,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _user_id == 0 {
-		params["user_id"] = ""
+		params["user_id_string"] = ""
 	} else {
-		params["user_id"] = strconv.Itoa(_user_id)
+		params["user_id_string"] = strconv.Itoa(_user_id)
 	}
 
 	if segments[0] == ":" {
