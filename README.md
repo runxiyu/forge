@@ -5,7 +5,7 @@
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
 primarily designed for self-hosting by small organizations and individuals.
 
-* [Upstream source repository](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
+* [Upstream source repository](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/)
   ([backup](https://git.lindenii.runxiyu.org/forge.git/))
 * [Website and documentation](https://lindenii.runxiyu.org/forge/)
 * [Temporary issue tracker](https://codeberg.org/lindenii/forge/issues/)
@@ -43,7 +43,7 @@ The forge software serves its own source at `/:/source/`.
 Please submit patches by pushing to `contrib/...` in the official repo.
 
 We have several Git repo mirrors on a few places:
-* [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/:/repos/forge/)
+* [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/)
 * [The Lindenii Project's cgit](https://git.lindenii.runxiyu.org/forge.git/)
 * [SourceHut](https://git.sr.ht/~runxiyu/forge/)
 * [Codeberg](https://codeberg.org/lindenii/forge/)
