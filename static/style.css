@@ -223,6 +223,10 @@ pre.chunk {
 	display: none;
 }
 
+*:focus-visible {
+	outline: 1.5px var(--primary-color) solid;
+}
+
 /* File display styles */
 .file-patch + .file-patch {
 	margin-top: 0.5rem;
