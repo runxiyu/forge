@@ -99,6 +99,21 @@ func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
+func redirect_unconditionally(w http.ResponseWriter, r *http.Request) {
+	request_uri := r.RequestURI
+
+	path_end := strings.IndexAny(request_uri, "?#")
+	var path, rest string
+	if path_end == -1 {
+		path = request_uri
+	} else {
+		path = request_uri[:path_end]
+		rest = request_uri[path_end:]
+	}
+
+	http.Redirect(w, r, path+rest, http.StatusSeeOther)
+}
+
 func path_escape_cat_segments(segments []string) string {
 	for i, segment := range segments {
 		segments[i] = url.PathEscape(segment)

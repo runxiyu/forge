@@ -28,6 +28,9 @@ var config struct {
 		Socket string `scfg:"socket"`
 		Execs  string `scfg:"execs"`
 	} `scfg:"hooks"`
+	Git struct {
+		RepoDir string `scfg:"repo_dir"`
+	} `scfg:"git"`
 	SSH struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`

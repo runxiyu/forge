@@ -271,6 +271,7 @@ input[type=password] {
 }
 td.tdinput, th.tdinput {
 	padding: 0;
+	position: relative;
 }
 td.tdinput textarea,
 td.tdinput input[type=text],
@@ -280,6 +281,21 @@ th.tdinput input[type=text],
 th.tdinput input[type=password] {
 	background-color: transparent;
 }
+td.tdinput select {
+	position: absolute;
+	background-color: var(--background-color);
+	border: none;
+	/*
+	width: 100%;
+	height: 100%;
+	*/
+	box-sizing: border-box;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
 
 /* Button styles */
 .btn-primary, a.btn-primary {

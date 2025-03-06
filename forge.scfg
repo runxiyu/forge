@@ -15,6 +15,10 @@ http {
 	root https://forge.example.org
 }
 
+git {
+	repo_dir /var/lib/lindenii/forge/repos
+}
+
 ssh {
 	# What network transport should we listen on?
 	# This should be "tcp" in almost all cases.

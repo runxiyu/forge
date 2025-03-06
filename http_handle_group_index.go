@@ -5,6 +5,8 @@ package main
 
 import (
 	"net/http"
+	"path/filepath"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -73,6 +75,60 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 		return
 	}
 	direct_access := (count > 0)
+
+	if r.Method == "POST" {
+		if !direct_access {
+			http.Error(w, "You do not have direct access to this group", http.StatusForbidden)
+			return
+		}
+
+		repo_name := r.FormValue("repo_name")
+		repo_description := r.FormValue("repo_description")
+		contrib_requirements := r.FormValue("repo_contrib")
+		if repo_name == "" {
+			http.Error(w, "Repo name is required", http.StatusBadRequest)
+			return
+		}
+
+		var new_repo_id int
+		err := database.QueryRow(
+			r.Context(),
+			`INSERT INTO repos (name, description, group_id, contrib_requirements)
+	 VALUES ($1, $2, $3, $4)
+	 RETURNING id`,
+			repo_name,
+			repo_description,
+			group_id,
+			contrib_requirements,
+		).Scan(&new_repo_id)
+		if err != nil {
+			http.Error(w, "Error creating repo: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		file_path := filepath.Join(config.Git.RepoDir, strconv.Itoa(new_repo_id)+".git")
+
+		_, err = database.Exec(
+			r.Context(),
+			`UPDATE repos
+	 SET filesystem_path = $1
+	 WHERE id = $2`,
+			file_path,
+			new_repo_id,
+		)
+		if err != nil {
+			http.Error(w, "Error updating repo path: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err = git_bare_init_with_default_hooks(file_path); err != nil {
+			http.Error(w, "Error initializing repo: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		redirect_unconditionally(w, r)
+		return
+	}
 
 	// Repos
 	var rows pgx.Rows
