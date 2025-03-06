@@ -1,0 +1,3 @@
+#!/bin/sh
+
+golangci-lint run . --enable-all --disable wsl,wrapcheck,nlreturn,nonamedreturns,mnd,lll,intrange,godox,gochecknoglobals,gochecknoinits,forcetypeassert,gofmt,gofumpt,revive,stylecheck,exhaustruct,godot,unparam,err113,depguard
