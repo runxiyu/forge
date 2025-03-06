@@ -100,7 +100,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if separator_index > 0 {
 		group_path = segments[:separator_index]
 	} else {
-		group_path = segments[:len(segments) - 1]
+		group_path = segments[:len(segments)-1]
 	}
 	params["group_path"] = group_path
 
@@ -160,7 +160,7 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			if non_empty_last_segments_len == separator_index+3 {
 				if redirect_with_slash(w, r) {
-				        return
+					return
 				}
 				handle_repo_index(w, r, params)
 				return

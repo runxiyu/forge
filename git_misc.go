@@ -10,10 +10,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // open_git_repo opens a git repository by group and repo name.

@@ -127,4 +127,3 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 
 	render_template(w, "group", params)
 }
-

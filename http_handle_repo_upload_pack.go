@@ -59,7 +59,6 @@ func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[strin
 		return err
 	}
 
-
 	w.Header().Set("Content-Type", "application/x-git-upload-pack-result")
 	w.Header().Set("Connection", "Keep-Alive")
 	w.Header().Set("Transfer-Encoding", "chunked")
