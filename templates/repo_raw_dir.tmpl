@@ -19,6 +19,11 @@
 							(Raw) /{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end }}
 						</th>
 					</tr>
+					<tr>
+						<th scope="col">Mode</th>
+						<th scope="col">Filename</th>
+						<th scope="col">Size</th>
+					</tr>
 				</thead>
 				<tbody>
 					{{- $path_spec := .path_spec }}

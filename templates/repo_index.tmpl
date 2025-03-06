@@ -47,6 +47,11 @@
 					<tr class="title-row">
 						<th colspan="3">Recent commits (<a href="log/{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">see all</a>)</th>
 					</tr>
+					<tr>
+						<th scope="col">Title</th>
+						<th scope="col">Author</th>
+						<th scope="col">Author Date</th>
+					</tr>
 				</thead>
 				<tbody>
 					{{- range .commits }}
@@ -68,6 +73,11 @@
 				<thead>
 					<tr class="title-row">
 						<th colspan="3">/{{ if .ref_name }} on {{ .ref_name }}{{ end }}</th>
+					</tr>
+					<tr>
+						<th scope="col">Mode</th>
+						<th scope="col">Filename</th>
+						<th scope="col">Size</th>
 					</tr>
 				</thead>
 				<tbody>
