@@ -1,0 +1,24 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "group" -}}
+{{ $group_path := .group_path }}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{ template "head_common" . }}
+		<title>{{ range $i, $s := .group_path }}{{ $s }}{{ if ne $i (len $group_path) }} / {{ end }}{{ end }} &ndash; {{ .global.forge_title }}</title>
+	</head>
+	<body class="group">
+		{{ template "header" . }}
+		<div class="padding-wrapper">
+			<p>{{ range $i, $s := .group_path }}{{ $s }}{{ if ne $i (len $group_path) }} / {{ end }}{{ end }}
+			{{ template "group_view" . }}
+		</div>
+		<footer>
+			{{ template "footer" . }}
+		</footer>
+	</body>
+</html>
+{{- end -}}

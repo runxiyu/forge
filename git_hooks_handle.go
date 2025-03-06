@@ -159,7 +159,7 @@ func hooks_handle_connection(conn net.Conn) {
 								wf_error(ssh_stderr, "Error creating merge request: %v", err)
 								return 1
 							}
-							fmt.Fprintln(ssh_stderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(pack_to_hook.group_name, pack_to_hook.repo_name)+"/contrib/"+strconv.FormatUint(uint64(new_mr_id), 10)+"/"+ansiec.Reset)
+							fmt.Fprintln(ssh_stderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(pack_to_hook.group_path, pack_to_hook.repo_name)+"/contrib/"+strconv.FormatUint(uint64(new_mr_id), 10)+"/"+ansiec.Reset)
 						} else { // Existing contrib branch
 							var existing_merge_request_user_id int
 							var is_ancestor bool

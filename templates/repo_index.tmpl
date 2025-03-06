@@ -7,7 +7,7 @@
 <html lang="en">
 	<head>
 		{{ template "head_common" . }}
-		<title>{{ .repo_name }} &ndash; {{ .group_name }} &ndash; {{ .global.forge_title }}</title>
+		<title>{{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="repo-index">
 		{{ template "header" . }}

@@ -336,3 +336,6 @@ header#main-header > div#main-header-user {
 	display: flex;
 	align-items: center;
 }
+table + table {
+	margin-top: 1rem;
+}

@@ -93,40 +93,34 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	params["separator_index"] = separator_index
 
-	// TODO
-	if separator_index > 1 {
-		http.Error(w, "Subgroups haven't been implemented yet", http.StatusNotImplemented)
-		return
-	}
-
+	var group_path []string
 	var module_type string
 	var module_name string
-	var group_name string
+
+	if separator_index > 0 {
+		group_path = segments[:separator_index]
+	} else {
+		group_path = segments[:len(segments) - 1]
+	}
+	params["group_path"] = group_path
 
 	switch {
 	case non_empty_last_segments_len == 0:
 		handle_index(w, r, params)
 	case separator_index == -1:
-		http.Error(w, "Group indexing hasn't been implemented yet", http.StatusNotImplemented)
-	case non_empty_last_segments_len == separator_index+1:
-		http.Error(w, "Group root hasn't been implemented yet", http.StatusNotImplemented)
-	case non_empty_last_segments_len == separator_index+2:
 		if redirect_with_slash(w, r) {
 			return
 		}
-		module_type = segments[separator_index+1]
-		params["group_name"] = segments[0]
-		switch module_type {
-		case "repos":
-			handle_group_repos(w, r, params)
-		default:
-			http.Error(w, fmt.Sprintf("Unknown module type: %s", module_type), http.StatusNotFound)
-		}
+		handle_group_index(w, r, params)
+	case non_empty_last_segments_len == separator_index+1:
+		http.Error(w, "Illegal path 1", http.StatusNotImplemented)
+		return
+	case non_empty_last_segments_len == separator_index+2:
+		http.Error(w, "Illegal path 2", http.StatusNotImplemented)
+		return
 	default:
 		module_type = segments[separator_index+1]
 		module_name = segments[separator_index+2]
-		group_name = segments[0]
-		params["group_name"] = group_name
 		switch module_type {
 		case "repos":
 			params["repo_name"] = module_name
@@ -157,14 +151,16 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// TODO: subgroups
 
-			if params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_name, module_name); err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_path, module_name); err != nil {
 				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
+			fmt.Println(non_empty_last_segments_len, separator_index, segments)
+
 			if non_empty_last_segments_len == separator_index+3 {
 				if redirect_with_slash(w, r) {
-					return
+				        return
 				}
 				handle_repo_index(w, r, params)
 				return

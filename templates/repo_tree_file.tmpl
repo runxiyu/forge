@@ -8,13 +8,13 @@
 	<head>
 		{{ template "head_common" . }}
 		<link rel="stylesheet" href="/:/static/chroma.css" />
-		<title>/{{ .path_spec }} &ndash; {{ .repo_name }} &ndash; {{ .group_name }} &ndash; {{ .global.forge_title }}</title>
+		<title>/{{ .path_spec }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
 	</head>
 	<body class="repo-tree-file">
 		{{ template "header" . }}
 		<div class="padding">
 			<p>
-				/{{ .path_spec }} (<a href="/{{ .group_name }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">raw</a>)
+				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">raw</a>)
 			</p>
 			{{ .file_contents }}
 		</div>

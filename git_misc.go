@@ -10,21 +10,54 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 // open_git_repo opens a git repository by group and repo name.
-func open_git_repo(ctx context.Context, group_name, repo_name string) (repo *git.Repository, description string, repo_id int, err error) {
+func open_git_repo(ctx context.Context, group_path []string, repo_name string) (repo *git.Repository, description string, repo_id int, err error) {
 	var fs_path string
-	err = database.QueryRow(ctx,
-		"SELECT r.filesystem_path, COALESCE(r.description, ''), r.id FROM repos r JOIN groups g ON r.group_id = g.id WHERE g.name = $1 AND r.name = $2;",
-		group_name, repo_name,
-	).Scan(&fs_path, &description, &repo_id)
+
+	err = database.QueryRow(ctx, `
+WITH RECURSIVE group_path_cte AS (
+	-- Start: match the first name in the path where parent_group IS NULL
+	SELECT
+		id,
+		parent_group,
+		name,
+		1 AS depth
+	FROM groups
+	WHERE name = ($1::text[])[1]
+		AND parent_group IS NULL
+
+	UNION ALL
+
+	-- Recurse: join next segment of the path
+	SELECT
+		g.id,
+		g.parent_group,
+		g.name,
+		group_path_cte.depth + 1
+	FROM groups g
+	JOIN group_path_cte ON g.parent_group = group_path_cte.id
+	WHERE g.name = ($1::text[])[group_path_cte.depth + 1]
+		AND group_path_cte.depth + 1 <= cardinality($1::text[])
+)
+SELECT
+	r.filesystem_path,
+	COALESCE(r.description, ''),
+	r.id
+FROM group_path_cte g
+JOIN repos r ON r.group_id = g.id
+WHERE g.depth = cardinality($1::text[])
+	AND r.name = $2
+	`, pgtype.FlatArray[string](group_path), repo_name).Scan(&fs_path, &description, &repo_id)
 	if err != nil {
 		return
 	}
+
 	repo, err = git.PlainOpen(fs_path)
 	return
 }

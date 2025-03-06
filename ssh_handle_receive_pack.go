@@ -22,7 +22,7 @@ type pack_to_hook_t struct {
 	repo_path     string
 	user_id       int
 	repo_id       int
-	group_name    string
+	group_path    []string
 	repo_name     string
 }
 
@@ -30,7 +30,7 @@ var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
-	group_name, repo_name, repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+	group_path, repo_name, repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
 	}
@@ -86,8 +86,6 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	fmt.Println(group_name, repo_name)
-
 	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
 		session:       session,
 		pubkey:        pubkey,
@@ -95,7 +93,7 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 		repo_path:     repo_path,
 		user_id:       user_id,
 		repo_id:       repo_id,
-		group_name:    group_name,
+		group_path:    group_path,
 		repo_name:     repo_name,
 		repo:          repo,
 	})

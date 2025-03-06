@@ -13,14 +13,15 @@ import (
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
-	var repo_name, group_name string
+	var repo_name string
+	var group_path []string
 	var ref_hash plumbing.Hash
 	var err error
 	var recent_commits []*object.Commit
 	var commit_object *object.Commit
 	var tree *object.Tree
 
-	repo, repo_name, group_name = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_name"].(string)
+	repo, repo_name, group_path = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
 	if ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
@@ -46,8 +47,8 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
 	params["files"] = build_display_git_tree(tree)
 
-	params["http_clone_url"] = generate_http_remote_url(group_name, repo_name)
-	params["ssh_clone_url"] = generate_ssh_remote_url(group_name, repo_name)
+	params["http_clone_url"] = generate_http_remote_url(group_path, repo_name)
+	params["ssh_clone_url"] = generate_ssh_remote_url(group_path, repo_name)
 
 	render_template(w, "repo_index", params)
 }

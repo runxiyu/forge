@@ -1,0 +1,48 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "group_view" -}}
+{{ if .subgroups }}
+	<table class="wide">
+		<thead>
+			<tr>
+				<th colspan="2" class="title-row">Subgroups</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{- range .subgroups }}
+				<tr>
+					<td>
+						<a href="{{ .Name }}/">{{ .Name }}</a>
+					</td>
+					<td>
+						{{ .Description }}
+					</td>
+				</tr>
+			{{- end }}
+		</tbody>
+	</table>
+{{ end }}
+{{ if .repos }}
+<table class="wide">
+	<thead>
+		<tr>
+			<th colspan="2" class="title-row">Repos</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{- range .repos }}
+			<tr>
+				<td>
+					<a href=":/repos/{{ .Name }}/">{{ .Name }}</a>
+				</td>
+				<td>
+					{{ .Description }}
+				</td>
+			</tr>
+		{{- end }}
+	</tbody>
+</table>
+{{ end }}
+{{- end -}}

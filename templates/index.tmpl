@@ -12,28 +12,25 @@
 	<body class="index">
 		{{ template "header" . }}
 		<div class="padding-wrapper">
-			<table class="wide">
-				<thead>
+		<table class="wide">
+			<thead>
+				<tr>
+					<th colspan="2" class="title-row">Groups</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{- range .groups }}
 					<tr>
-						<th colspan="2" class="title-row">
-							Groups
-						</th>
+						<td>
+							<a href="{{ .Name }}/">{{ .Name }}</a>
+						</td>
+						<td>
+							{{ .Description }}
+						</td>
 					</tr>
-				</thead>
-				<tbody>
-					{{- range .groups }}
-						<tr>
-							<td>
-								<a href="{{ .Name }}/:/repos/">{{ .Name }}</a>
-							</td>
-							<td>
-								{{ .Description }}
-							</td>
-						</tr>
-					{{- end }}
-				</tbody>
-			</table>
-		</div>
+				{{- end }}
+			</tbody>
+		</table>
 		<div class="padding-wrapper">
 			<table class="wide">
 				<thead>

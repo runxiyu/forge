@@ -98,3 +98,10 @@ func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
 	}
 	return false
 }
+
+func path_escape_cat_segments(segments []string) string {
+	for i, segment := range segments {
+		segments[i] = url.PathEscape(segment)
+	}
+	return strings.Join(segments, "/")
+}
