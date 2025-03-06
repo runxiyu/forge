@@ -37,7 +37,7 @@ func serve_ssh(listener net.Listener) error {
 
 	server_public_key = host_key.PublicKey()
 	server_public_key_string = string(go_ssh.MarshalAuthorizedKey(server_public_key))
-	server_public_key_fingerprint = string(go_ssh.FingerprintSHA256(server_public_key))
+	server_public_key_fingerprint = go_ssh.FingerprintSHA256(server_public_key)
 
 	server = &glider_ssh.Server{
 		Handler: func(session glider_ssh.Session) {
