@@ -84,7 +84,7 @@ func handle_repo_tree(w http.ResponseWriter, r *http.Request, params map[string]
 				http.Error(w, "Error formatting code: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			formatted_encapsulated = template.HTML(formatted_unencapsulated.Bytes())
+			formatted_encapsulated = template.HTML(formatted_unencapsulated.Bytes()) //#nosec G203
 			params["file_contents"] = formatted_encapsulated
 
 			render_template(w, "repo_tree_file", params)

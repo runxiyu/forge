@@ -29,7 +29,7 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
 		}
 
-		return "README", template.HTML("<pre>" + html.EscapeString(readme_file_contents) + "</pre>")
+		return "README", template.HTML("<pre>" + html.EscapeString(readme_file_contents) + "</pre>") //#nosec G203
 	}
 
 	if readme_file, err = tree.File("README.md"); err == nil {
@@ -41,7 +41,7 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
 		}
 
-		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes()))
+		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes())) //#nosec G203
 	}
 
 	if readme_file, err = tree.File("README.org"); err == nil {
@@ -54,12 +54,12 @@ func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_co
 			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
 		}
 
-		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(org_html))
+		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(org_html)) //#nosec G203
 	}
 
 	return "", ""
 }
 
 func string_escape_html(s string) template.HTML {
-	return template.HTML(html.EscapeString(s))
+	return template.HTML(html.EscapeString(s)) //#nosec G203
 }
