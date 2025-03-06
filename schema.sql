@@ -3,8 +3,10 @@
 
 CREATE TABLE groups (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	name TEXT NOT NULL UNIQUE,
-	description TEXT
+	name TEXT NOT NULL,
+	parent_group INTEGER REFERENCES groups(id) ON DELETE CASCADE,
+	description TEXT,
+	UNIQUE NULLS NOT DISTINCT (parent_group, name)
 );
 
 CREATE TABLE repos (
