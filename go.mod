@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-git/go-git/v5 v5.12.1-0.20250305133605-a1c915412f99
+	github.com/go-git/go-git/v5 v5.12.1-0.20250306065839-cc0ed3acb41b
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
