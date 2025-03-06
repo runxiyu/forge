@@ -17,8 +17,7 @@ import (
 //go:embed *.go go.mod go.sum
 //go:embed *.scfg
 //go:embed Makefile
-//go:embed schema.sql
-//go:embed static/* templates/*
+//go:embed static/* templates/* scripts/* sql/*
 //go:embed git_hooks_client/*.c
 //go:embed vendor/*
 var source_fs embed.FS
