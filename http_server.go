@@ -157,8 +157,6 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			fmt.Println(non_empty_last_segments_len, separator_index, segments)
-
 			if non_empty_last_segments_len == separator_index+3 {
 				if redirect_with_slash(w, r) {
 					return

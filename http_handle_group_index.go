@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
@@ -130,8 +129,6 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 	params["subgroups"] = subgroups
 	params["description"] = group_description
 	params["direct_access"] = direct_access
-
-	fmt.Println(group_path)
 
 	render_template(w, "group", params)
 }
