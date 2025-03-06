@@ -14,6 +14,9 @@
 		{{ template "header" . }}
 		<div class="padding-wrapper">
 			<p>{{ range $i, $s := .group_path }}{{ $s }}{{ if ne $i (len $group_path) }} / {{ end }}{{ end }}
+			{{ if .description }}
+			<p>{{ .description }}</p>
+			{{ end }}
 			{{ template "group_view" . }}
 		</div>
 		<footer>
