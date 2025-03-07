@@ -5,6 +5,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -20,8 +21,13 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	var recent_commits []*object.Commit
 	var commit_object *object.Commit
 	var tree *object.Tree
+	var notes []string
 
 	repo, repo_name, group_path = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
+
+	if strings.Contains(repo_name, "\n") || slice_contains_newline(group_path) {
+		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
+	}
 
 	ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {
@@ -48,6 +54,7 @@ no_ref:
 
 	params["http_clone_url"] = generate_http_remote_url(group_path, repo_name)
 	params["ssh_clone_url"] = generate_ssh_remote_url(group_path, repo_name)
+	params["notes"] = notes
 
 	render_template(w, "repo_index", params)
 }

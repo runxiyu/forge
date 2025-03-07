@@ -33,6 +33,12 @@
 						<th scope="row">SSH remote</th>
 						<td><code>{{ .ssh_clone_url }}</code></td>
 					</tr>
+					{{ if .notes }}
+						<tr>
+							<th scope="row">Notes</th>
+							<td><ul>{{ range .notes }}<li>{{ . }}</li>{{ end }}</ul></td>
+						</tr>
+					{{ end }}
 				</tbody>
 			</table>
 		</div>

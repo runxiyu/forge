@@ -355,6 +355,14 @@ header#main-header > div#main-header-user {
 	display: flex;
 	align-items: center;
 }
+
+/* Uncategorized */
 table + table {
 	margin-top: 1rem;
+}
+
+td > ul {
+	padding-left: 1.5rem;
+	margin-top: 0;
+	margin-bottom: 0;
 }
