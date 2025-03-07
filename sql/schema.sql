@@ -12,7 +12,7 @@ CREATE TABLE groups (
 CREATE TABLE repos (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE RESTRICT, -- I mean, should be CASCADE but deleting Git repos on disk also needs to be considered
-	contrib_requirements TEXT NOT NULL CHECK (contrib_requirements IN ('closed', 'registered_user', 'ssh_pubkey', 'public')),
+	contrib_requirements TEXT NOT NULL CHECK (contrib_requirements IN ('closed', 'registered_user', 'federated', 'ssh_pubkey', 'public')),
 	name TEXT NOT NULL,
 	UNIQUE(group_id, name),
 	description TEXT,
@@ -54,7 +54,7 @@ CREATE TABLE mailing_list_emails (
 CREATE TABLE users (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username TEXT UNIQUE,
-	type TEXT NOT NULL CHECK (type IN ('pubkey_only', 'registered')),
+	type TEXT NOT NULL CHECK (type IN ('pubkey_only', 'federated', 'registered')),
 	password TEXT
 );
 
