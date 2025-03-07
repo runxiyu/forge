@@ -295,6 +295,9 @@ td.tdinput select {
 	right: 0;
 	bottom: 0;
 }
+select:active {
+	outline: 1.5px var(--primary-color) solid;
+}
 
 
 /* Button styles */
