@@ -140,8 +140,12 @@ th, thead, tfoot {
 th[scope=row] {
 	text-align: left;
 }
+th {
+	font-weight: normal;
+}
 tr.title-row > th, th.title-row, .title-row {
 	background-color: var(--lighter-box-background-color);
+	font-weight: bold;
 }
 td > pre {
 	margin: 0;
