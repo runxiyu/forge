@@ -24,6 +24,7 @@ func git_bare_init_with_default_hooks(repo_path string) (err error) {
 	}
 
 	git_config.Raw.SetOption("core", git_format_config.NoSubsection, "hooksPath", config.Hooks.Execs)
+	git_config.Raw.SetOption("receive", git_format_config.NoSubsection, "advertisePushOptions", "true")
 
 	if err = repo.SetConfig(git_config); err != nil {
 		return err

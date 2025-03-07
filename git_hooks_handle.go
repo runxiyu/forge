@@ -151,6 +151,53 @@ func hooks_handle_connection(conn net.Conn) {
 					var found bool
 					var old_hash, new_hash plumbing.Hash
 					var old_commit, new_commit *object.Commit
+					var git_push_option_count int
+
+					git_push_option_count, err = strconv.Atoi(git_env["GIT_PUSH_OPTION_COUNT"])
+					if err != nil {
+						wf_error(ssh_stderr, "Failed to parse GIT_PUSH_OPTION_COUNT: %v", err)
+						return 1
+					}
+
+					// TODO: Allow existing users (even if they are already federated or registered) to add a federated user ID... though perhaps this should be in the normal SSH interface instead of the git push interface?
+					// Also it'd be nice to be able to combine users or whatever
+					if pack_to_hook.contrib_requirements == "federated" && pack_to_hook.user_type != "federated" && pack_to_hook.user_type != "registered" {
+						if git_push_option_count == 0 {
+							wf_error(ssh_stderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
+							return 1
+						}
+						for i := 0; i < git_push_option_count; i++ {
+							push_option, ok := git_env[fmt.Sprintf("GIT_PUSH_OPTION_%d", i)]
+							if !ok {
+								wf_error(ssh_stderr, "Failed to get push option %d", i)
+								return 1
+							}
+							if strings.HasPrefix(push_option, "fedid=") {
+								federated_user_identifier := strings.TrimPrefix(push_option, "fedid=")
+								service, username, found := strings.Cut(federated_user_identifier, ":")
+								if !found {
+									wf_error(ssh_stderr, "Invalid federated user identifier %#v does not contain a colon", federated_user_identifier)
+									return 1
+								}
+
+								ok, err := check_and_update_federated_user_status(ctx, pack_to_hook.user_id, service, username, pack_to_hook.pubkey)
+								if err != nil {
+									wf_error(ssh_stderr, "Failed to verify federated user identifier %#v: %v", federated_user_identifier, err)
+									return 1
+								}
+								if !ok {
+									wf_error(ssh_stderr, "Failed to verify federated user identifier %#v: you don't seem to be on the list", federated_user_identifier)
+									return 1
+								}
+
+								break
+							}
+							if i == git_push_option_count-1 {
+								wf_error(ssh_stderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
+								return 1
+							}
+						}
+					}
 
 					line, err = stdin.ReadString('\n')
 					if errors.Is(err, io.EOF) {

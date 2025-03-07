@@ -89,3 +89,10 @@ CREATE TABLE user_group_roles (
 	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id, group_id)
 );
+
+CREATE TABLE federated_identities (
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	service TEXT NOT NULL,
+	remote_username TEXT NOT NULL,
+	PRIMARY KEY(user_id, service)
+);

@@ -15,15 +15,17 @@ import (
 )
 
 type pack_to_hook_t struct {
-	session       glider_ssh.Session
-	repo          *git.Repository
-	pubkey        string
-	direct_access bool
-	repo_path     string
-	user_id       int
-	repo_id       int
-	group_path    []string
-	repo_name     string
+	session              glider_ssh.Session
+	repo                 *git.Repository
+	pubkey               string
+	direct_access        bool
+	repo_path            string
+	user_id              int
+	user_type            string
+	repo_id              int
+	group_path           []string
+	repo_name            string
+	contrib_requirements string
 }
 
 var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
@@ -65,6 +67,8 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 				return errors.New("You need to be a registered user to push to this repo.")
 			}
 		case "ssh_pubkey":
+			fallthrough
+		case "federated":
 			if pubkey == "" {
 				return errors.New("You need to have an SSH public key to push to this repo.")
 			}
@@ -74,7 +78,9 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 					return err
 				}
 				fmt.Fprintln(session.Stderr(), "You are now registered as user ID", user_id)
+				user_type = "pubkey_only"
 			}
+
 		case "public":
 		default:
 			panic("unknown contrib_requirements value " + contrib_requirements)
@@ -87,15 +93,17 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_ide
 	}
 
 	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
-		session:       session,
-		pubkey:        pubkey,
-		direct_access: direct_access,
-		repo_path:     repo_path,
-		user_id:       user_id,
-		repo_id:       repo_id,
-		group_path:    group_path,
-		repo_name:     repo_name,
-		repo:          repo,
+		session:              session,
+		pubkey:               pubkey,
+		direct_access:        direct_access,
+		repo_path:            repo_path,
+		user_id:              user_id,
+		repo_id:              repo_id,
+		group_path:           group_path,
+		repo_name:            repo_name,
+		repo:                 repo,
+		contrib_requirements: contrib_requirements,
+		user_type:            user_type,
 	})
 	defer pack_to_hook_by_cookie.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
