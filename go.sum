@@ -41,10 +41,10 @@ github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMj
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
 github.com/go-git/go-git-fixtures/v5 v5.0.0-20241203230421-0753e18f8f03 h1:LumE+tQdnYW24a9RoO08w64LHTzkNkdUqBD/0QPtlEY=
 github.com/go-git/go-git-fixtures/v5 v5.0.0-20241203230421-0753e18f8f03/go.mod h1:hMKrMnUE4W0SJ7bFyM00dyz/HoknZoptGWzrj6M+dEM=
-github.com/go-git/go-git/v5 v5.12.1-0.20250305133605-a1c915412f99 h1:YZwHQncMPXR2A1CD1gS3w2f8vUb/dTJtMPJp06mm1a4=
-github.com/go-git/go-git/v5 v5.12.1-0.20250305133605-a1c915412f99/go.mod h1:sFBXkITeIW/teSFKDcfpPHF95h2YPURY4rZCdzzEEmo=
 github.com/go-git/go-git/v5 v5.12.1-0.20250306065839-cc0ed3acb41b h1:oKgLff/2/aGGeTJA6jZZTS0ptie++sSkjTw2KETnLNU=
 github.com/go-git/go-git/v5 v5.12.1-0.20250306065839-cc0ed3acb41b/go.mod h1:sFBXkITeIW/teSFKDcfpPHF95h2YPURY4rZCdzzEEmo=
+github.com/go-git/go-git/v5 v5.12.1-0.20250306131248-f7eb53c2ef7e h1:AkZEV+Im2c8zzqkXrcpxQE/RRSxi51MFjMpGCFCFAH4=
+github.com/go-git/go-git/v5 v5.12.1-0.20250306131248-f7eb53c2ef7e/go.mod h1:1FgBmxmy7D4Qz3VI3gypi8qPD/UMP3eAjwQ9Vz4q5qM=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 h1:f+oWsMOmNPc8JmEHVZIycC7hBoQxHH9pNKQORJNozsQ=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8/go.mod h1:wcDNUvekVysuuOpQKo3191zZyTpiI6se1N1ULghS0sw=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
