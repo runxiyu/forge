@@ -135,8 +135,6 @@ func hooks_handle_connection(conn net.Conn) {
 			git_env[parts[0]] = parts[1]
 		}
 
-		fmt.Printf("%#v\n", git_env)
-
 		var stdin bytes.Buffer
 		if _, err = io.Copy(&stdin, conn); err != nil {
 			wf_error(conn, "Failed to read to the stdin buffer: %v", err)
