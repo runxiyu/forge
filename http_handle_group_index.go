@@ -83,7 +83,7 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 		}
 
 		repo_name := r.FormValue("repo_name")
-		repo_description := r.FormValue("repo_description")
+		repo_description := r.FormValue("repo_desc")
 		contrib_requirements := r.FormValue("repo_contrib")
 		if repo_name == "" {
 			http.Error(w, "Repo name is required", http.StatusBadRequest)
