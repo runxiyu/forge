@@ -24,6 +24,9 @@ func check_and_update_federated_user_status(ctx context.Context, user_id int, se
 		resp, err = http.Get("https://github.com/" + username_escaped + ".keys")
 	case "codeberg":
 		resp, err = http.Get("https://codeberg.org/" + username_escaped + ".keys")
+	case "tangled":
+		resp, err = http.Get("https://tangled.sh/keys/" + username_escaped)
+		// TODO: Don't rely on one webview
 	default:
 		return false, errors.New("unknown federated service")
 	}
