@@ -8,6 +8,9 @@ import (
 	"html/template"
 	"io/fs"
 	"net/http"
+
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/html"
 )
 
 // We embed all source for easy AGPL compliance.
@@ -33,12 +36,38 @@ var resources_fs embed.FS
 var templates *template.Template
 
 func load_templates() (err error) {
-	templates, err = template.New("templates").Funcs(template.FuncMap{
+	m := minify.New()
+	m.Add("text/html", &html.Minifier{ TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true })
+
+	templates = template.New("templates").Funcs(template.FuncMap{
 		"first_line":   first_line,
 		"base_name":    base_name,
 		"path_escape":  path_escape,
 		"query_escape": query_escape,
-	}).ParseFS(resources_fs, "templates/*")
+	})
+
+	err = fs.WalkDir(resources_fs, "templates", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() {
+			content, err := fs.ReadFile(resources_fs, path)
+			if err != nil {
+				return err
+			}
+
+			minified, err := m.Bytes("text/html", content)
+			if err != nil {
+				return err
+			}
+
+			_, err = templates.Parse(string(minified))
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	return err
 }
 

@@ -10,6 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
+	github.com/tdewolff/minify/v2 v2.21.3
 	github.com/yuin/goldmark v1.7.8
 	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250220024148-a3640b47317b
 	golang.org/x/crypto v0.36.0
@@ -35,6 +36,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
+	github.com/tdewolff/parse/v2 v2.7.19 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect

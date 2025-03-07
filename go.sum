@@ -41,8 +41,6 @@ github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMj
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
 github.com/go-git/go-git-fixtures/v5 v5.0.0-20241203230421-0753e18f8f03 h1:LumE+tQdnYW24a9RoO08w64LHTzkNkdUqBD/0QPtlEY=
 github.com/go-git/go-git-fixtures/v5 v5.0.0-20241203230421-0753e18f8f03/go.mod h1:hMKrMnUE4W0SJ7bFyM00dyz/HoknZoptGWzrj6M+dEM=
-github.com/go-git/go-git/v5 v5.12.1-0.20250306065839-cc0ed3acb41b h1:oKgLff/2/aGGeTJA6jZZTS0ptie++sSkjTw2KETnLNU=
-github.com/go-git/go-git/v5 v5.12.1-0.20250306065839-cc0ed3acb41b/go.mod h1:sFBXkITeIW/teSFKDcfpPHF95h2YPURY4rZCdzzEEmo=
 github.com/go-git/go-git/v5 v5.12.1-0.20250306131248-f7eb53c2ef7e h1:AkZEV+Im2c8zzqkXrcpxQE/RRSxi51MFjMpGCFCFAH4=
 github.com/go-git/go-git/v5 v5.12.1-0.20250306131248-f7eb53c2ef7e/go.mod h1:1FgBmxmy7D4Qz3VI3gypi8qPD/UMP3eAjwQ9Vz4q5qM=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 h1:f+oWsMOmNPc8JmEHVZIycC7hBoQxHH9pNKQORJNozsQ=
@@ -92,6 +90,13 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+github.com/tdewolff/minify/v2 v2.21.3 h1:KmhKNGrN/dGcvb2WDdB5yA49bo37s+hcD8RiF+lioV8=
+github.com/tdewolff/minify/v2 v2.21.3/go.mod h1:iGxHaGiONAnsYuo8CRyf8iPUcqRJVB/RhtEcTpqS7xw=
+github.com/tdewolff/parse/v2 v2.7.19 h1:7Ljh26yj+gdLFEq/7q9LT4SYyKtwQX4ocNrj45UCePg=
+github.com/tdewolff/parse/v2 v2.7.19/go.mod h1:3FbJWZp3XT9OWVN3Hmfp0p/a08v4h8J9W1aghka0soA=
+github.com/tdewolff/test v1.0.11-0.20231101010635-f1265d231d52/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
+github.com/tdewolff/test v1.0.11-0.20240106005702-7de5f7df4739 h1:IkjBCtQOOjIn03u/dMQK9g+Iw9ewps4mCl1nB8Sscbo=
+github.com/tdewolff/test v1.0.11-0.20240106005702-7de5f7df4739/go.mod h1:XPuWBzvdUzhCuxWO1ojpXsyzsA5bFoS3tO/Q3kFuTG8=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/yuin/goldmark v1.7.8 h1:iERMLn0/QJeHFhxSt3p6PeN9mGnvIKSpG9YYorDMnic=
 github.com/yuin/goldmark v1.7.8/go.mod h1:uzxRWxtg69N339t3louHJ7+O03ezfj6PlliRlaOzY1E=
