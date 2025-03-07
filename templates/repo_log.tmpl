@@ -6,16 +6,16 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>Log &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>Log &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-log">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="scroll">
 			<table id="commits" class="wide">
 				<thead>
 					<tr class="title-row">
-						<th colspan="4">Commits {{ if .ref_name }} on {{ .ref_name }}{{ end }}</th>
+						<th colspan="4">Commits {{ if .ref_name }} on {{ .ref_name }}{{ end -}}</th>
 					</tr>
 					<tr>
 						<th scope="col">ID</th>
@@ -25,23 +25,23 @@
 					</tr>
 				</thead>
 				<tbody>
-					{{- range .commits }}
+					{{- range .commits -}}
 						<tr>
-							<td class="commit-id"><a href="../commit/{{ .ID }}">{{ .ID }}</a></td>
-							<td class="commit-title">{{ .Message | first_line }}</td>
+							<td class="commit-id"><a href="../commit/{{- .ID -}}">{{- .ID -}}</a></td>
+							<td class="commit-title">{{- .Message | first_line -}}</td>
 							<td class="commit-author">
-								<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
+								<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
 							</td>
 							<td class="commit-time">
-								{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
+								{{- .Author.When.Format "2006-01-02 15:04:05 -0700" -}}
 							</td>
 						</tr>
-					{{- end }}
+					{{- end -}}
 				</tbody>
 			</table>
 		</div>
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

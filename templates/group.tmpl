@@ -3,24 +3,23 @@
 	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "group" -}}
-{{ $group_path := .group_path }}
+{{- $group_path := .group_path -}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>{{ range $i, $s := .group_path }}{{ $s }}{{ if ne $i (len $group_path) }} / {{ end }}{{ end }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>{{- range $i, $s := .group_path -}}{{- $s -}}{{- if ne $i (len $group_path) -}}/{{- end -}}{{- end }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="group">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding-wrapper">
-			<p>{{ range $i, $s := .group_path }}{{ $s }}{{ if ne $i (len $group_path) }} / {{ end }}{{ end }}
-			{{ if .description }}
-			<p>{{ .description }}</p>
-			{{ end }}
-
-			{{ template "group_view" . }}
+			<p>{{- range $i, $s := .group_path -}}{{- $s -}}{{- if ne $i (len $group_path) }} / {{ end -}}{{- end -}}
+			{{- if .description -}}
+			<p>{{- .description -}}</p>
+			{{- end -}}
+			{{- template "group_view" . -}}
 		</div>
-		{{ if .direct_access }}
+		{{- if .direct_access -}}
 			<div class="padding-wrapper">
 				<form method="POST" enctype="application/x-www-form-urlencoded">
 					<table>
@@ -73,9 +72,9 @@
 					</table>
 				</form>
 			</div>
-		{{ end }}
+		{{- end -}}
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

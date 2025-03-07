@@ -6,20 +6,20 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
+		{{- template "head_common" . -}}
 		<link rel="stylesheet" href="/:/static/chroma.css" />
-		<title>/{{ .path_spec }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		<title>/{{ .path_spec }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-tree-file">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding">
 			<p>
 				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">raw</a>)
 			</p>
-			{{ .file_contents }}
+			{{- .file_contents -}}
 		</div>
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

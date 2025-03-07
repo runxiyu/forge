@@ -6,11 +6,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>Commit {{ .commit_id }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>Commit {{ .commit_id }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-commit">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding-wrapper scroll">
 			<table id="commit-info-table">
 				<thead>
@@ -21,73 +21,73 @@
 				<tbody>
 					<tr>
 						<th scope="row">ID</th>
-						<td>{{ .commit_id }}</td>
+						<td>{{- .commit_id -}}</td>
 					</tr>
 					<tr>
 						<th scope="row">Author</th>
-						<td>{{ .commit_object.Author.Name }} &lt;<a href="mailto:{{ .commit_object.Author.Email }}">{{ .commit_object.Author.Email }}</a>&gt;</td>
+						<td>{{- .commit_object.Author.Name -}} &lt;<a href="mailto:{{- .commit_object.Author.Email -}}">{{- .commit_object.Author.Email -}}</a>&gt;</td>
 					</tr>
 					<tr>
 						<th scope="row">Author date</th>
-						<td>{{ .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
+						<td>{{- .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</td>
 					</tr>
 					<tr>
 						<th scope="row">Committer</th>
-						<td>{{ .commit_object.Committer.Name }} &lt;<a href="mailto:{{ .commit_object.Committer.Email }}">{{ .commit_object.Committer.Email }}</a>&gt;</td>
+						<td>{{- .commit_object.Committer.Name -}} &lt;<a href="mailto:{{- .commit_object.Committer.Email -}}">{{- .commit_object.Committer.Email -}}</a>&gt;</td>
 					</tr>
 					<tr>
 						<th scope="row">Committer date</th>
-						<td>{{ .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</td>
+						<td>{{- .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</td>
 					</tr>
 					<tr>
 						<th scope="row">Actions</th>
-						<td><pre><a href="{{ .commit_object.Hash }}.patch">Get patch</a></pre></td>
+						<td><pre><a href="{{- .commit_object.Hash -}}.patch">Get patch</a></pre></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 		<div class="padding-wrapper scroll" id="this-commit-message">
-			<pre>{{ .commit_object.Message }}</pre>
+			<pre>{{- .commit_object.Message -}}</pre>
 		</div>
 		<div class="padding-wrapper">
-			{{ $parent_commit_hash := .parent_commit_hash }}
-			{{ $commit_object := .commit_object }}
-			{{ range .file_patches }}
+			{{- $parent_commit_hash := .parent_commit_hash -}}
+			{{- $commit_object := .commit_object -}}
+			{{- range .file_patches -}}
 				<div class="file-patch toggle-on-wrapper">
-					<input type="checkbox" id="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-toggle toggle-on-toggle">
-					<label for="toggle-{{ .From.Hash }}{{ .To.Hash }}" class="file-header toggle-on-header">
+					<input type="checkbox" id="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-toggle toggle-on-toggle">
+					<label for="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-header toggle-on-header">
 						<div>
-							{{ if eq .From.Path "" }}
+							{{- if eq .From.Path "" -}}
 								--- /dev/null
-							{{ else }}
-								--- a/<a href="../tree/{{ .From.Path }}?commit={{ $parent_commit_hash }}">{{ .From.Path }}</a> {{ .From.Mode }}
-							{{ end }}
+							{{- else -}}
+								--- a/<a href="../tree/{{- .From.Path -}}?commit={{- $parent_commit_hash -}}">{{- .From.Path -}}</a> {{ .From.Mode -}}
+							{{- end -}}
 							<br />
-							{{ if eq .To.Path "" }}
+							{{- if eq .To.Path "" -}}
 								+++ /dev/null
-							{{ else }}
-								+++ b/<a href="../tree/{{ .To.Path }}?commit={{ $commit_object.Hash }}">{{ .To.Path }}</a> {{ .To.Mode }}
-							{{ end }}
+							{{- else -}}
+								+++ b/<a href="../tree/{{- .To.Path -}}?commit={{- $commit_object.Hash -}}">{{- .To.Path -}}</a> {{ .To.Mode -}}
+							{{- end -}}
 						</div>
 					</label>
 					<div class="file-content toggle-on-content scroll">
-						{{ range .Chunks }}
-							{{ if eq .Operation 0 }}
+						{{- range .Chunks -}}
+							{{- if eq .Operation 0 -}}
 								<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
-							{{ else if eq .Operation 1 }}
+							{{- else if eq .Operation 1 -}}
 								<pre class="chunk chunk-addition">{{ .Content }}</pre>
-							{{ else if eq .Operation 2 }}
+							{{- else if eq .Operation 2 -}}
 								<pre class="chunk chunk-deletion">{{ .Content }}</pre>
-							{{ else }}
+							{{- else -}}
 								<pre class="chunk chunk-unknown">{{ .Content }}</pre>
-							{{ end }}
-						{{ end }}
+							{{- end -}}
+						{{- end -}}
 					</div>
 				</div>
-			{{ end }}
+			{{- end -}}
 		</div>
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

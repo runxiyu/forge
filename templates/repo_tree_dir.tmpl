@@ -6,17 +6,17 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-tree-dir">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding-wrapper scroll">
 			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">
 						<th colspan="3">
-							/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end }}
+							/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end -}}
 						</th>
 						<tr>
 							<th scope="col">Mode</th>
@@ -26,16 +26,16 @@
 					</tr>
 				</thead>
 				<tbody>
-					{{- $path_spec := .path_spec }}
-					{{- $ref := .ref_name }}
-					{{- $ref_type := .ref_type }}
-					{{- range .files }}
+					{{- $path_spec := .path_spec -}}
+					{{- $ref := .ref_name -}}
+					{{- $ref_type := .ref_type -}}
+					{{- range .files -}}
 						<tr>
-							<td class="file-mode">{{ .Mode }}</td>
-							<td class="file-name"><a href="{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref_type }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
-							<td class="file-size">{{ .Size }}</td>
+							<td class="file-mode">{{- .Mode -}}</td>
+							<td class="file-name"><a href="{{- .Name -}}{{- if not .Is_file -}}/{{- end -}}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{- .Name -}}</a>{{- if not .Is_file -}}/{{- end -}}</td>
+							<td class="file-size">{{- .Size -}}</td>
 						</tr>
-					{{- end }}
+					{{- end -}}
 				</tbody>
 			</table>
 		</div>
@@ -43,13 +43,13 @@
 			<div id="refs">
 			</div>
 		</div>
-		{{ if .readme }}
+		{{- if .readme -}}
 		<div class="padding-wrapper" id="readme">
-			{{ .readme -}}
+			{{- .readme -}}
 		</div>
-		{{ end }}
+		{{- end -}}
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

@@ -6,11 +6,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>Merge requests &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>Merge requests &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-contrib-index">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding-wrapper">
 			<table id="recent-merge_requests" class="wide">
 				<thead>
@@ -24,18 +24,18 @@
 					<th scope="col">Status</th>
 				</tr>
 				<tbody>
-					{{- range .merge_requests }}
+					{{- range .merge_requests -}}
 						<tr>
-							<td class="merge_request-id">{{ .ID }}</td>
-							<td class="merge_request-title"><a href="{{ .ID }}/">{{ .Title }}</a></td>
-							<td class="merge_request-status">{{ .Status }}</td>
+							<td class="merge_request-id">{{- .ID -}}</td>
+							<td class="merge_request-title"><a href="{{- .ID -}}/">{{- .Title -}}</a></td>
+							<td class="merge_request-status">{{- .Status -}}</td>
 						</tr>
-					{{- end }}
+					{{- end -}}
 				</tbody>
 			</table>
 		</div>
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

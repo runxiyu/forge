@@ -3,6 +3,6 @@
 	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "group_path_plain" -}}
-{{ $p := . }}
-{{ range $i, $s := . }}{{ $s }}{{ if ne $i (len $p) }}/{{ end }}{{ end }}
-{{ end }}
+{{- $p := . -}}
+{{- range $i, $s := . -}}{{- $s -}}{{- if ne $i (len $p) -}}/{{- end -}}{{- end -}}
+{{- end -}}

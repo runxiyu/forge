@@ -6,11 +6,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>{{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>{{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-index">
-		{{ template "header" . }}
+		{{- template "header" . -}}
 		<div class="padding-wrapper">
 			<table id="repo-info-table">
 				<thead>
@@ -21,24 +21,24 @@
 				<tbody>
 					<tr>
 						<th scope="row">Name</th>
-						<td>{{ .repo_name }}</td>
+						<td>{{- .repo_name -}}</td>
 					</tr>
-					{{ if .repo_description }}
+					{{- if .repo_description -}}
 						<tr>
 							<th scope="row">Description</th>
-							<td>{{ .repo_description }}</td>
+							<td>{{- .repo_description -}}</td>
 						</tr>
-					{{ end }}
+					{{- end -}}
 					<tr>
 						<th scope="row">SSH remote</th>
-						<td><code>{{ .ssh_clone_url }}</code></td>
+						<td><code>{{- .ssh_clone_url -}}</code></td>
 					</tr>
-					{{ if .notes }}
+					{{- if .notes -}}
 						<tr>
 							<th scope="row">Notes</th>
-							<td><ul>{{ range .notes }}<li>{{ . }}</li>{{ end }}</ul></td>
+							<td><ul>{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}</ul></td>
 						</tr>
-					{{ end }}
+					{{- end -}}
 				</tbody>
 			</table>
 		</div>
@@ -47,12 +47,12 @@
 				<a href="contrib/" class="btn-normal">Merge requests</a>
 			</p>
 		</div>
-		{{ if .commits }}
+		{{- if .commits -}}
 			<div class="padding-wrapper scroll">
 				<table id="recent-commits" class="wide">
 					<thead>
 						<tr class="title-row">
-							<th colspan="3">Recent commits (<a href="log/{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">see all</a>)</th>
+							<th colspan="3">Recent commits (<a href="log/{{- if .ref_type -}}?{{- .ref_type -}}={{- .ref_name -}}{{- end -}}">see all</a>)</th>
 						</tr>
 						<tr>
 							<th scope="col">Title</th>
@@ -61,27 +61,27 @@
 						</tr>
 					</thead>
 					<tbody>
-						{{- range .commits }}
+						{{- range .commits -}}
 							<tr>
-								<td class="commit-title"><a href="commit/{{ .ID }}">{{ .Message | first_line }}</a></td>
+								<td class="commit-title"><a href="commit/{{- .ID -}}">{{- .Message | first_line -}}</a></td>
 								<td class="commit-author">
-									<a class="email-name" href="mailto:{{ .Author.Email }}">{{ .Author.Name }}</a>
+									<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
 								</td>
 								<td class="commit-time">
-									{{ .Author.When.Format "2006-01-02 15:04:05 -0700" }}
+									{{- .Author.When.Format "2006-01-02 15:04:05 -0700" -}}
 								</td>
 							</tr>
-						{{- end }}
+						{{- end -}}
 					</tbody>
 				</table>
 			</div>
-		{{ end }}
-		{{ if .files }}
+		{{- end -}}
+		{{- if .files -}}
 			<div class="padding-wrapper scroll">
 				<table id="file-tree" class="wide">
 					<thead>
 						<tr class="title-row">
-							<th colspan="3">/{{ if .ref_name }} on {{ .ref_name }}{{ end }}</th>
+							<th colspan="3">/{{- if .ref_name -}} on {{- .ref_name -}}{{- end -}}</th>
 						</tr>
 						<tr>
 							<th scope="col">Mode</th>
@@ -90,26 +90,26 @@
 						</tr>
 					</thead>
 					<tbody>
-						{{- $ref_type := .ref_type }}
-						{{- $ref := .ref_name }}
-						{{- range .files }}
+						{{- $ref_type := .ref_type -}}
+						{{- $ref := .ref_name -}}
+						{{- range .files -}}
 							<tr>
-								<td class="file-mode">{{ .Mode }}</td>
-								<td class="file-name"><a href="tree/{{ .Name }}{{ if not .Is_file }}/{{ end }}{{ if $ref_type }}?{{ $ref_type }}={{ $ref }}{{ end }}">{{ .Name }}</a>{{ if not .Is_file }}/{{ end }}</td>
-								<td class="file-size">{{ .Size }}</td>
+								<td class="file-mode">{{- .Mode -}}</td>
+								<td class="file-name"><a href="tree/{{- .Name -}}{{- if not .Is_file -}}/{{- end -}}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{- .Name -}}</a>{{- if not .Is_file -}}/{{- end -}}</td>
+								<td class="file-size">{{- .Size -}}</td>
 							</tr>
-						{{- end }}
+						{{- end -}}
 					</tbody>
 				</table>
 			</div>
-		{{ end }}
-		{{ if .readme }}
+		{{- end -}}
+		{{- if .readme -}}
 			<div class="padding-wrapper" id="readme">
-				{{ .readme }}
+				{{- .readme -}}
 			</div>
-		{{ end }}
+		{{- end -}}
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>

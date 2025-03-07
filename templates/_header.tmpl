@@ -5,14 +5,14 @@
 {{- define "header" -}}
 <header id="main-header">
 	<div id="main-header-forge-title">
-		<a href="/">{{ .global.forge_title }}</a>
+		<a href="/">{{- .global.forge_title -}}</a>
 	</div>
 	<div id="main-header-user">
-		{{ if ne .user_id_string "" }}
-			<a href="/:/users/{{ .user_id_string }}">{{ .username }}</a>
-		{{ else }}
+		{{- if ne .user_id_string "" -}}
+			<a href="/:/users/{{- .user_id_string -}}">{{- .username -}}</a>
+		{{- else -}}
 			<a href="/:/login/">Login</a>
-		{{ end }}
+		{{- end -}}
 	</div>
 </header>
 {{- end -}}

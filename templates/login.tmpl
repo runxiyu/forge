@@ -6,11 +6,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		{{ template "head_common" . }}
-		<title>Login &ndash; {{ .global.forge_title }}</title>
+		{{- template "head_common" . -}}
+		<title>Login &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="index">
-		{{ .login_error }}
+		{{- .login_error -}}
 		<div class="padding-wrapper">
 				<form method="POST" enctype="application/x-www-form-urlencoded">
 					<table>
@@ -52,7 +52,7 @@
 				</form>
 		</div>
 		<footer>
-			{{ template "footer" . }}
+			{{- template "footer" . -}}
 		</footer>
 	</body>
 </html>
