@@ -36,6 +36,8 @@ func load_templates() (err error) {
 	templates, err = template.New("templates").Funcs(template.FuncMap{
 		"first_line": first_line,
 		"base_name":  base_name,
+		"path_escape": path_escape,
+		"query_escape": query_escape,
 	}).ParseFS(resources_fs, "templates/*")
 	return err
 }

@@ -6,6 +6,7 @@ package main
 import (
 	"path"
 	"strings"
+	"net/url"
 )
 
 func first_line(s string) string {
@@ -15,4 +16,12 @@ func first_line(s string) string {
 
 func base_name(s string) string {
 	return path.Base(s)
+}
+
+func path_escape(s string) string {
+	return url.PathEscape(s)
+}
+
+func query_escape(s string) string {
+	return url.QueryEscape(s)
 }
