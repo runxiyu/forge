@@ -4,9 +4,9 @@
 package main
 
 import (
+	"net/url"
 	"path"
 	"strings"
-	"net/url"
 )
 
 func first_line(s string) string {

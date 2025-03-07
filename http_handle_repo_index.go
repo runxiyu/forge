@@ -23,29 +23,28 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 
 	repo, repo_name, group_path = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
-	if ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
-		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
-		return
+	ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
+	if err != nil {
+		goto no_ref
 	}
 
 	if recent_commits, err = get_recent_commits(repo, ref_hash, 3); err != nil {
-		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
-		return
+		goto no_ref
 	}
 	params["commits"] = recent_commits
-	commit_object, err = repo.CommitObject(ref_hash)
-	if err != nil {
-		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tree, err = commit_object.Tree()
-	if err != nil {
-		http.Error(w, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
-		return
+
+	if commit_object, err = repo.CommitObject(ref_hash); err != nil {
+		goto no_ref
 	}
 
-	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
+	if tree, err = commit_object.Tree(); err != nil {
+		goto no_ref
+	}
+
 	params["files"] = build_display_git_tree(tree)
+	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
+
+no_ref:
 
 	params["http_clone_url"] = generate_http_remote_url(group_path, repo_name)
 	params["ssh_clone_url"] = generate_ssh_remote_url(group_path, repo_name)
