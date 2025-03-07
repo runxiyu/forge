@@ -16,6 +16,11 @@
 #include <fcntl.h>
 #include <signal.h>
 
+/*
+ * FIXME: splice(2) is not portable and will only work on Linux. Alternative
+ * implementations should be supplied for other environments.
+ */
+
 int main(int argc, char *argv[]) {
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 		perror("signal");
@@ -40,12 +45,7 @@ int main(int argc, char *argv[]) {
 	/*
 	 * All hooks in git (see builtin/receive-pack.c) use a pipe by setting
 	 * .in = -1 on the child_process struct, which enables us to use
-	 * splice(2) to move the data to the UNIX domain socket. Just to be
-	 * safe, we check that stdin is a pipe; and additionally we fetch the
-	 * buffer size of the pipe to use as the maximum size for the splice.
-	 *
-	 * We connect to the UNIX domain socket after ensuring that standard
-	 * input matches our expectations.
+	 * splice(2) to move the data to the UNIX domain socket.
 	 */
 	struct stat stdin_stat;
 	if (fstat(STDIN_FILENO, &stdin_stat) == -1) {
@@ -63,8 +63,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * ... And we do the same for stderr. Later we will splice from the
-	 * socket to stderr, to let the daemon report back to the user.
+	 * Same for stderr.
 	 */
 	struct stat stderr_stat;
 	if (fstat(STDERR_FILENO, &stderr_stat) == -1) {
@@ -81,13 +80,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	/*
-	 * Now that we know that stdin and stderr are pipes, we can connect to
-	 * the UNIX domain socket. We don't do this earlier because we don't
-	 * want to create unnecessary connections if the hook was called
-	 * inappropriately (such as by a user with shell access in their
-	 * terminal).
-	 */
+	/* Connecting back to the main daemon */
 	int sock;
 	struct sockaddr_un addr;
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -105,7 +98,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * We first send the 64-byte cookie to the UNIX domain socket
+	 * Send the 64-byte cookit back.
 	 */
 	ssize_t cookie_bytes_sent = send(sock, cookie, 64, 0);
 	switch (cookie_bytes_sent) {
@@ -122,7 +115,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * Next we can report argc and argv to the UNIX domain socket.
+	 * Report arguments.
 	 */
 	uint64_t argc64 = (uint64_t)argc;
 	ssize_t bytes_sent = send(sock, &argc64, sizeof(argc64), 0);
@@ -154,7 +147,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * Then send all environment variables that begin with "GIT_"
+	 * Report GIT_* environment.
 	 */
 	extern char **environ;
 	for (char **env = environ; *env != NULL; env++) {
@@ -186,9 +179,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * Now we can start splicing data from stdin to the UNIX domain socket.
-	 * The format is irrelevant and depends on the hook being called. All we
-	 * do is pass it to the socket for it to handle.
+	 * Splice stdin to the daemon. For pre-receive it's just old/new/ref.
 	 */
 	ssize_t stdin_bytes_spliced;
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
@@ -209,17 +200,17 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-        /*
-         * The first byte of the response from the UNIX domain socket is the
-         * status code. We read it and record it as our return value.
-         *
-         * FIXME: It doesn't make sense to require the return value to be
-         * sent before the log message. However, if we were to keep splicing,
-         * it's difficult to get the last byte before EOF. Perhaps we could
-         * hack together some sort of OOB message or ancillary data, or perhaps
-         * even use signals.
-         */
-        char status_buf[1];
+	/*
+	 * The first byte of the response from the UNIX domain socket is the
+	 * status code to return.
+	 *
+	 * FIXME: It doesn't make sense to require the return value to be
+	 * sent before the log message. However, if we were to keep splicing,
+	 * it's difficult to get the last byte before EOF. Perhaps we could
+	 * hack together some sort of OOB message or ancillary data, or perhaps
+	 * even use signals.
+	 */
+	char status_buf[1];
 	ssize_t bytes_read = read(sock, status_buf, 1);
 	switch (bytes_read) {
 	case -1:
@@ -241,6 +232,9 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Now we can splice data from the UNIX domain socket to stderr.
 	 * This data is directly passed to the user (with "remote: " prepended).
+	 *
+	 * We usually don't actually use this as the daemon could easily write
+	 * to the SSH connection's stderr directly anyway.
 	 */
 	ssize_t stderr_bytes_spliced;
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
