@@ -154,6 +154,38 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
+	 * Then send all environment variables that begin with "GIT_"
+	 */
+	extern char **environ;
+	for (char **env = environ; *env != NULL; env++) {
+		if (strncmp(*env, "GIT_", 4) == 0) {
+			unsigned long len = strlen(*env) + 1;
+			bytes_sent = send(sock, *env, len, 0);
+			if (bytes_sent == -1) {
+				perror("send env");
+				close(sock);
+				exit(EXIT_FAILURE);
+			} else if ((unsigned long)bytes_sent == len) {
+			} else {
+				dprintf(STDERR_FILENO, "send returned unexpected value on internal socket\n");
+				close(sock);
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	bytes_sent = send(sock, "", 1, 0);
+	if (bytes_sent == -1) {
+		perror("send env terminator");
+		close(sock);
+		exit(EXIT_FAILURE);
+	} else if (bytes_sent == 1) {
+	} else {
+		dprintf(STDERR_FILENO, "send returned unexpected value on internal socket\n");
+		close(sock);
+		exit(EXIT_FAILURE);
+	}
+
+	/*
 	 * Now we can start splicing data from stdin to the UNIX domain socket.
 	 * The format is irrelevant and depends on the hook being called. All we
 	 * do is pass it to the socket for it to handle.

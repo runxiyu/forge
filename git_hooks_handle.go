@@ -108,6 +108,35 @@ func hooks_handle_connection(conn net.Conn) {
 			args = append(args, arg.String())
 		}
 
+		git_env := make(map[string]string)
+		for {
+			var env_line bytes.Buffer
+			for {
+				b := make([]byte, 1)
+				n, err := conn.Read(b)
+				if err != nil || n != 1 {
+					wf_error(ssh_stderr, "Failed to read environment variable: %v", err)
+					return 1
+				}
+				if b[0] == 0 {
+					break
+				}
+				env_line.WriteByte(b[0])
+			}
+			if env_line.Len() == 0 {
+				break
+			}
+			kv := env_line.String()
+			parts := strings.SplitN(kv, "=", 2)
+			if len(parts) < 2 {
+				wf_error(ssh_stderr, "Invalid environment variable line: %v", kv)
+				return 1
+			}
+			git_env[parts[0]] = parts[1]
+		}
+
+		fmt.Printf("%#v\n", git_env)
+
 		var stdin bytes.Buffer
 		if _, err = io.Copy(&stdin, conn); err != nil {
 			wf_error(conn, "Failed to read to the stdin buffer: %v", err)
