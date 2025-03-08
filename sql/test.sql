@@ -1,3 +1,6 @@
+-- SPDX-License-Identifier: AGPL-3.0-only
+-- SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+
 WITH parent_group AS (
 	INSERT INTO groups (name, description)
 	VALUES ('lindenii', 'The Lindenii Project')
