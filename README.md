@@ -28,7 +28,7 @@ primarily designed for self-hosting by small organizations and individuals.
 * Discussions
   * Email integration with IMAP archives
   * Web interface
-* Multiple user interfaces: web, SSH, custom API
+* Multiple user interfaces: web, SSH, email, custom API
 * Federated authentication
 
 ## License
