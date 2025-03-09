@@ -5,6 +5,7 @@ package main
 
 import (
 	"net/http"
+	"runtime"
 )
 
 func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -17,5 +18,10 @@ func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any)
 		return
 	}
 	params["groups"] = groups
+
+	// Memory currently allocated
+	memstats := runtime.MemStats{}
+	runtime.ReadMemStats(&memstats)
+	params["mem"] = memstats.Alloc
 	render_template(w, "index", params)
 }

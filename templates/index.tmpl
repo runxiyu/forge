@@ -53,11 +53,14 @@
 						<th scope="row">SSH fingerprint</th>
 						<td><code>{{- .global.server_public_key_fingerprint -}}</code></td>
 					</tr>
+					<tr>
+						<th scope="row">Memory usage</th>
+						<td>
+							Allocated {{ .mem }} bytes <a href="/:/gc/" class="btn btn-danger">Collect garbage</a>
+						</td>
+					</tr>
 				</tbody>
 			</table>
-		</div>
-		<div class="padding-wrapper">
-			<a href="/:/gc" class="btn btn-danger">Run the garbage collector</a>
 		</div>
 		<footer>
 			{{- template "footer" . -}}
