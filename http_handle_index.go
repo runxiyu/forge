@@ -6,6 +6,8 @@ package main
 import (
 	"net/http"
 	"runtime"
+
+	"github.com/dustin/go-humanize"
 )
 
 func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -22,6 +24,6 @@ func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any)
 	// Memory currently allocated
 	memstats := runtime.MemStats{}
 	runtime.ReadMemStats(&memstats)
-	params["mem"] = memstats.Alloc
+	params["mem"] = humanize.IBytes(memstats.Alloc)
 	render_template(w, "index", params)
 }
