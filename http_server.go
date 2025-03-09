@@ -78,6 +78,9 @@ func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "users":
 			handle_users(w, r, params)
 			return
+		case "gc":
+			handle_gc(w, r, params)
+			return
 		default:
 			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
 			return
