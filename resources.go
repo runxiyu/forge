@@ -37,7 +37,7 @@ var templates *template.Template
 
 func load_templates() (err error) {
 	m := minify.New()
-	m.Add("text/html", &html.Minifier{ TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true })
+	m.Add("text/html", &html.Minifier{TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true})
 
 	templates = template.New("templates").Funcs(template.FuncMap{
 		"first_line":   first_line,
