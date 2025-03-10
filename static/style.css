@@ -76,7 +76,7 @@ html, code, pre {
 	display: table-row-group;
 }
 
-table.rounded {
+table.rounded, table.rounded-footed {
 	overflow: hidden;
 	border-spacing: 0;
 	border-collapse: separate;
@@ -84,28 +84,34 @@ table.rounded {
 	border: var(--lighter-border-color) solid 1px;
 }
 
-table.rounded th, table.rounded td {
+table.rounded th, table.rounded td,
+table.rounded-footed th, table.rounded-footed td {
 	border: none;
 }
 
 table.rounded th:not(:last-child),
-table.rounded td:not(:last-child) {
+table.rounded td:not(:last-child),
+table.rounded-footed th:not(:last-child),
+table.rounded-footed td:not(:last-child) {
 	border-right: var(--lighter-border-color) solid 1px;
 }
 
-table.rounded>thead>tr:not(:last-child)>th,
-table.rounded>thead>tr:not(:last-child)>td,
+table.rounded>thead>tr>th,
+table.rounded>thead>tr>td,
 table.rounded>tbody>tr:not(:last-child)>th,
-table.rounded>tbody>tr:not(:last-child)>td,
-table.rounded>tfoot>tr:not(:last-child)>th,
-table.rounded>tfoot>tr:not(:last-child)>td,
-table.rounded>tr:not(:last-child)>td,
-table.rounded>tr:not(:last-child)>th,
-table.rounded>thead:not(:last-child),
-table.rounded>tbody:not(:last-child),
-table.rounded>tfoot:not(:last-child) {
+table.rounded>tbody>tr:not(:last-child)>td {
 	border-bottom: var(--lighter-border-color) solid 1px;
 }
+
+table.rounded-footed>thead>tr>th,
+table.rounded-footed>thead>tr>td,
+table.rounded-footed>tbody>tr>th,
+table.rounded-footed>tbody>tr>td,
+table.rounded-footed>tfoot>tr:not(:last-child)>th,
+table.rounded-footed>tfoot>tr:not(:last-child)>td {
+	border-bottom: var(--lighter-border-color) solid 1px;
+}
+
 
 /* Footer styles */
 footer {
