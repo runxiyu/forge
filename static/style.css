@@ -9,6 +9,7 @@ html {
 	font-family: sans-serif;
 	background-color: var(--background-color);
 	color: var(--text-color);
+	--radius-1: 0.32rem;
 	--background-color: hsl(0, 0%, 100%);
 	--text-color: hsl(0, 0%, 0%);
 	--link-color: hsl(320, 50%, 36%);
@@ -73,6 +74,37 @@ html, code, pre {
 }
 .toggle-table-on:checked + table > tbody {
 	display: table-row-group;
+}
+
+table.rounded {
+	overflow: hidden;
+	border-spacing: 0;
+	border-collapse: separate;
+	border-radius: var(--radius-1);
+	border: var(--lighter-border-color) solid 1px;
+}
+
+table.rounded th, table.rounded td {
+	border: none;
+}
+
+table.rounded th:not(:last-child),
+table.rounded td:not(:last-child) {
+	border-right: var(--lighter-border-color) solid 1px;
+}
+
+table.rounded>thead>tr:not(:last-child)>th,
+table.rounded>thead>tr:not(:last-child)>td,
+table.rounded>tbody>tr:not(:last-child)>th,
+table.rounded>tbody>tr:not(:last-child)>td,
+table.rounded>tfoot>tr:not(:last-child)>th,
+table.rounded>tfoot>tr:not(:last-child)>td,
+table.rounded>tr:not(:last-child)>td,
+table.rounded>tr:not(:last-child)>th,
+table.rounded>thead:not(:last-child),
+table.rounded>tbody:not(:last-child),
+table.rounded>tfoot:not(:last-child) {
+	border-bottom: var(--lighter-border-color) solid 1px;
 }
 
 /* Footer styles */
@@ -334,7 +366,7 @@ input[type=file]::file-selector-button {
 	display: inline-block;
 	width: auto;
 	min-width: fit-content;
-	border-radius: 0;
+	border-radius: var(--radius-1);
 	padding: .1rem .75rem;
 	font-size: 0.9rem;
 	transition: background .1s linear;
