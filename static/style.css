@@ -20,8 +20,8 @@ html {
 	--lighter-box-background-color: hsl(0, 0%, 95%);
 	--primary-color: hsl(320, 50%, 36%);
 	--primary-color-contrast: hsl(320, 0%, 100%);
-	--danger-color: hsl(0, 50%, 36%);
-	--danger-color-contrast: hsl(0, 0%, 100%);
+	--danger-color: #ff0000;
+	--danger-color-contrast: #ffffff;
 }
 
 /* Dark mode overrides */
