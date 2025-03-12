@@ -2,6 +2,10 @@
 
 **Work in progress.**
 
+**Note: Because of limitations with Go's memory model, we are developing
+[a new version](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/?branch=hare)
+in [Hare](https://harelang.org/). The Go version will still be used for prototyping.**
+
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
 primarily designed for self-hosting by small organizations and individuals.
 
