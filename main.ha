@@ -36,7 +36,7 @@ export fn main() void = {
 				ip_addr = ip::parsev4(value.0)!;
 				port = value.1;
 			case dial::invalid_address =>
-				abort("Invalid address");
+				abort("invalid address");
 			};
 		case => abort(); // unreachable
 		};
