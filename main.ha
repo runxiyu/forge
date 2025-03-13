@@ -18,8 +18,8 @@ use bufio;
 use strings;
 
 const usage: [_]getopt::help = [
-	"HTTP server",
-	('a', "address", "listened address")
+	"Lindenii Forge Server",
+	('c', "config", "path to configuration file")
 ];
 
 export fn main() void = {
@@ -31,14 +31,7 @@ export fn main() void = {
 
 	for (let opt .. cmd.opts) {
 		switch (opt.0) {
-		case 'a' =>
-			match (dial::splitaddr(opt.1, "")) {
-			case let value: (str, u16) =>
-				ip_addr = ip::parsev4(value.0)!;
-				port = value.1;
-			case dial::invalid_address =>
-				abort("invalid address");
-			};
+		case 'c' => yield; // TODO: actually handle the config
 		case => abort(); // unreachable
 		};
 	};
