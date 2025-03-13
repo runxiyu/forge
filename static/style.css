@@ -209,18 +209,18 @@ td > pre {
 	color: grey;
 }
 .chunk-addition {
-	background-color: green;
+	color: green;
 }
 @media (prefers-color-scheme: dark) {
 	.chunk-addition {
-		background-color: lime;
+		color: lime;
 	}
 }
 .chunk-deletion {
-	background-color: red;
+	color: red;
 }
 .chunk-unknown {
-	background-color: yellow;
+	color: yellow;
 }
 pre.chunk {
 	margin-top: 0;
