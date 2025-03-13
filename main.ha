@@ -27,8 +27,7 @@ export fn main() void = {
 	let port: u16 = 8080;
 	let ip_addr: ip::addr4 = [127, 0, 0, 1];
 
-	for (let i = 0z; i < len(cmd.opts); i += 1) {
-		const opt = cmd.opts[i];
+	for (let opt .. cmd.opts) {
 		switch (opt.0) {
 		case 'a' =>
 			match (dial::splitaddr(opt.1, "")) {
