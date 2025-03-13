@@ -3,6 +3,7 @@
 // Adapted from template by Willow Barraco <contact@willowbarraco.fr>
 
 use getopt;
+use htmpl;
 use log;
 use net;
 use net::ip;
@@ -17,7 +18,7 @@ use strings;
 
 const usage: [_]getopt::help = [
 	"HTTP server",
-	('a', "address", "listened address (ex: 127.0.0.1:8080)")
+	('a', "address", "listened address")
 ];
 
 export fn main() void = {
@@ -63,9 +64,10 @@ export fn main() void = {
 	};
 };
 
-export fn handlereq(conn: io::handle, request: *http::request) (void | io::error)  = {
-	fmt::fprint(conn, "HTTP/1.1 200 OK\r\n")?;
-	fmt::fprint(conn, "Content-Type: text/plain\r\n\r\n")?;
-
-	fmt::fprintln(conn, "Hi there!")?;
+export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem)  = {
+	htmpl::write(conn, "HTTP/1.1 200 OK\r\n")?;
+	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
+	htmpl::write(conn, "<!DOCTYPE html><html><body><h1>")?;
+	htmpl::write_escape_html(conn, "Hey there <3")?;
+	htmpl::write(conn, "</h1></body></html>")?;
 };
