@@ -1,0 +1,6 @@
+{{ define _tp_footer(handle: io::handle) (void | io::error | nomem) }}
+<a href="https://lindenii.runxiyu.org/forge/">Lindenii Forge</a>
+{{ global.version }}
+(<a href="/:/source/">source</a>,
+<a href="https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/">upstream</a>)
+{{ end }}

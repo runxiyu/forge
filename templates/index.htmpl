@@ -1,14 +1,50 @@
 {{ define tp_index(handle: io::handle) (void | io::error | nomem) }}
-{!
-	let title: str = "Test";
-!}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-{{ render _tp_head_common(handle, title) }}
+{{ render _tp_head_common(handle) }}
+<title>Index &ndash; {{ global.title }}</title>
 </head>
 <body>
-<h1>{{ title }}</h1>
+{{ render _tp_header(handle, "test", "test") }}
+<div class="padding-wrapper">
+<table class="wide rounded">
+	<thead>
+		<tr>
+			<th colspan="2" class="title-row">Groups</th>
+		</tr>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Description</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+<div class="padding-wrapper">
+	<table class="wide rounded">
+		<thead>
+			<tr>
+				<th colspan="2" class="title-row">
+					Info
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">SSH public key</th>
+				<td><code>{{ global.ssh_pubkey }}</code></td>
+			</tr>
+			<tr>
+				<th scope="row">SSH fingerprint</th>
+				<td><code>{{ global.ssh_fp }}</code></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<footer>
+	{{ render _tp_footer(handle) }}
+</footer>
 </body>
 </html>
 {{ end }}

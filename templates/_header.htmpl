@@ -1,0 +1,14 @@
+{{ define _tp_header(handle: io::handle, user_id_str: str, username: str) (void | io::error | nomem) }}
+<header id="main-header">
+	<div id="main-header-forge-title">
+		<a href="/">{{ global.title }}</a>
+	</div>
+	<div id="main-header-user">
+		{{ if user_id_str != "" }}
+			<a href="/:/users/{{ user_id_str }}">{{ username }}</a>
+		{{ else }}
+			<a href="/:/login/">Login</a>
+		{{ end }}
+	</div>
+</header>
+{{ end }}
