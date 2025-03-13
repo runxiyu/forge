@@ -6,9 +6,10 @@ use getopt;
 use htmpl;
 use log;
 use net;
-use net::ip;
-use net::http;
 use net::dial;
+use net::http;
+use net::ip;
+use net::tcp;
 use os;
 use memio;
 use io;
@@ -42,7 +43,7 @@ export fn main() void = {
 		};
 	};
 
-	const server = match (http::listen(ip_addr, port)) {
+	const server = match (http::listen(ip_addr, port, net::tcp::reuseport, net::tcp::reuseaddr)) {
 	case let this: *http::server =>
 		yield this;
 	case net::error => abort("failure while listening");
