@@ -39,7 +39,7 @@ export fn main() void = {
 	const server = match (http::listen(ip_addr, port, net::tcp::reuseport, net::tcp::reuseaddr)) {
 	case let this: *http::server =>
 		yield this;
-	case net::error => abort("failure while listening");
+	case => abort("failure while listening");
 	};
 	defer http::server_finish(server);
 
