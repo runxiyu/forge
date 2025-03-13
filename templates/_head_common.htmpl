@@ -1,0 +1,3 @@
+{{ define _tp_head_common(handle: io::handle, title: str = "Untitled") (void | io::error | nomem) }}
+<title>{{ title }}</title>
+{{ end }}

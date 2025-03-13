@@ -1,0 +1,14 @@
+{{ define tp_index(handle: io::handle) (void | io::error | nomem) }}
+{!
+	let title: str = "Test";
+!}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{ render _tp_head_common(handle, title) }}
+</head>
+<body>
+<h1>{{ title }}</h1>
+</body>
+</html>
+{{ end }}
