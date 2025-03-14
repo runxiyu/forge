@@ -48,7 +48,9 @@ export fn main() void = {
 		const serv_req = match (http::serve(server)) {
 		case let this: *http::server_request =>
 			yield this;
-		case net::error => abort("failure while serving");
+		case =>
+			log::println("failure while serving");
+			continue;
 		};
 		defer http::serve_finish(serv_req);
 
