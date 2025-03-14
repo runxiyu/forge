@@ -1,4 +1,4 @@
-{{ define tp_index(handle: io::handle) (void | io::error | nomem) }}
+{{ define tp_index(handle: io::handle, segments: []str) (void | io::error | nomem) }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +7,12 @@
 </head>
 <body>
 {{ render _tp_header(handle, "test", "test") }}
+<h2>Path segments</h2>
+<ul>
+	{{ for let s .. segments }}
+	<li>{{ s }}</li>
+	{{ end }}
+</ul>
 <div class="padding-wrapper">
 <table class="wide rounded">
 	<thead>

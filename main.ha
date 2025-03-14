@@ -10,6 +10,7 @@ use net::dial;
 use net::http;
 use net::ip;
 use net::tcp;
+use net::uri;
 use os;
 use memio;
 use io;
@@ -58,8 +59,10 @@ export fn main() void = {
 	};
 };
 
-export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem) = {
+export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem | net::uri::invalid) = {
 	htmpl::write(conn, "HTTP/1.1 200 OK\r\n")?;
 	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
-	tp_index(conn)?;
+	let segments = segments_from_path(request.target.raw_path)?;
+	defer free_segments(segments);
+	tp_index(conn, segments)?;
 };
