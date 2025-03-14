@@ -9,7 +9,5 @@ fn segments_from_path(s: str) ([]str | nomem | net::uri::invalid) = {
 };
 
 fn free_segments(ss: []str) void = {
-	for (let s .. ss) {
-		free(s);
-	};
+	strings::freeall(ss);
 };
