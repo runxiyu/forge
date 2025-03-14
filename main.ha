@@ -58,7 +58,7 @@ export fn main() void = {
 	};
 };
 
-export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem)  = {
+export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem) = {
 	htmpl::write(conn, "HTTP/1.1 200 OK\r\n")?;
 	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
 	tp_index(conn)?;
