@@ -30,6 +30,29 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 		if (len(segments) == 1) {
 			start_response(conn, 404, "text/plain")?;
 			fmt::fprintln(conn, "Error: Blank system endpoint")?;
+			return;
+		};
+
+		switch (segments[1]) {
+		case "static" =>
+			if (len(segments) == 2) {
+				start_response(conn, 404, "text/plain")?;
+				fmt::fprintln(conn, "Error: Blank static endpoint")?;
+				return;
+			};
+			let fs_segments = segments[2 ..];
+			for (let fs_segment .. fs_segments) {
+				if (strings::contains(fs_segment, "/")) {
+					start_response(conn, 400, "text/plain")?;
+					fmt::fprintln(conn, "Error: Slash found in filesystem path")?;
+					return;
+				};
+			};
+			start_response(conn, 501, "text/plain")?;
+			fmt::fprintln(conn, "Not implemented yet")?;
+		case =>
+			start_response(conn, 404, "text/plain")?;
+			fmt::fprintln(conn, "Error: Unknown system endpoint")?;
 		};
 	};
 };
