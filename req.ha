@@ -9,8 +9,19 @@ use net::uri;
 use strconv;
 use strings;
 
-fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem | uri::invalid) = {
-	let segments = segments_from_path(request.target.raw_path)?;
+fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem) = {
+	let segments = match(segments_from_path(request.target.raw_path)) {
+	case let s: []str =>
+		yield s;
+	case uri::invalid =>
+		start_response(conn, 400, "text/plain")?;
+		fmt::fprintln(conn, "Invalid URI")?;
+		return void;
+	case nomem =>
+		return nomem;
+	case =>
+		abort("unreachable");
+	};
 	defer strings::freeall(segments);
 
 	let trailing_slash: bool = false;
