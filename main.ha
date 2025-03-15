@@ -65,6 +65,6 @@ export fn handlereq(conn: io::handle, request: *http::request) (void | io::error
 	htmpl::write(conn, "HTTP/1.1 200 OK\r\n")?;
 	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
 	let segments = segments_from_path(request.target.raw_path)?;
-	defer free_segments(segments);
+	defer strings::freeall(segments);
 	tp_index(conn, segments)?;
 };
