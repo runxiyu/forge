@@ -39,6 +39,7 @@ export fn main() void = {
 	};
 
 	static_fs = os::diropen("static")!;
+	defer fs::close(static_fs as *fs::fs);
 
 	const server = match (http::listen(ip_addr, port, net::tcp::reuseport, net::tcp::reuseaddr)) {
 	case let this: *http::server =>
