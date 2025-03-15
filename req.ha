@@ -5,6 +5,7 @@ use fmt;
 use fs;
 use htmpl;
 use io;
+use mime;
 use net::http;
 use net::uri;
 use strconv;
@@ -73,7 +74,16 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 			};
 			defer io::close(file)!;
 
-			start_response(conn, 200, "text/css")?;
+			fmt::println(fs_segments[len(fs_segments) - 1])!;
+
+			let ext = strings::rcut(fs_segments[len(fs_segments) - 1], ".").1;
+
+			let mimetype = match (mime::lookup_ext(ext)) {
+			case let m: *mime::mimetype => yield m.mime;
+			case null => yield "application/octet-stream";
+			};
+
+			start_response(conn, 200, mimetype)?;
 			io::copy(conn, file)?;
 
 		case =>
