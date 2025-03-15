@@ -34,7 +34,7 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 
 	if (len(segments) == 0) {
 		start_response(conn, 200, "text/html")?;
-		return tp_index(conn, segments);
+		return tp_index(conn);
 	};
 	
 	if (segments[0] == ":") {
