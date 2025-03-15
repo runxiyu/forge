@@ -1,0 +1,410 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+ * SPDX-FileContributor: luk3yx <https://luk3yx.github.io>
+ */
+
+/* Base styles and variables */
+html {
+	font-family: sans-serif;
+	background-color: var(--background-color);
+	color: var(--text-color);
+	--radius-1: 0.32rem;
+	--background-color: hsl(0, 0%, 100%);
+	--text-color: hsl(0, 0%, 0%);
+	--link-color: hsl(320, 50%, 36%);
+	--light-text-color: hsl(0, 0%, 45%);
+	--darker-border-color: hsl(0, 0%, 72%);
+	--lighter-border-color: hsl(0, 0%, 85%);
+	--text-decoration-color: hsl(0, 0%, 72%);
+	--darker-box-background-color: hsl(0, 0%, 92%);
+	--lighter-box-background-color: hsl(0, 0%, 95%);
+	--primary-color: hsl(320, 50%, 36%);
+	--primary-color-contrast: hsl(320, 0%, 100%);
+	--danger-color: #ff0000;
+	--danger-color-contrast: #ffffff;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+	html {
+		--background-color: hsl(0, 0%, 0%);
+		--text-color: hsl(0, 0%, 100%);
+		--link-color: hsl(320, 50%, 76%);
+		--light-text-color: hsl(0, 0%, 78%);
+		--darker-border-color: hsl(0, 0%, 35%);
+		--lighter-border-color: hsl(0, 0%, 25%);
+		--text-decoration-color: hsl(0, 0%, 30%);
+		--darker-box-background-color: hsl(0, 0%, 20%);
+		--lighter-box-background-color: hsl(0, 0%, 15%);
+	}
+}
+
+/* Global layout */
+body {
+	margin: 0;
+}
+html, code, pre {
+	font-size: 0.96rem; /* TODO: Not always correct */
+}
+
+/* Toggle table controls */
+.toggle-table-off, .toggle-table-on {
+	opacity: 0;
+	position: absolute;
+}
+.toggle-table-off:focus-visible + table > thead > tr > th > label,
+.toggle-table-on:focus-visible + table > thead > tr > th > label {
+	outline: 1.5px var(--primary-color) solid;
+}
+.toggle-table-off + table > thead > tr > th, .toggle-table-on + table > thead > tr > th {
+	padding: 0;
+}
+.toggle-table-off + table > thead > tr > th > label, .toggle-table-on + table > thead > tr > th > label {
+	width: 100%;
+	display: inline-block;
+	padding: 3px 0;
+	cursor: pointer;
+}
+.toggle-table-off:checked + table > tbody {
+	display: none;
+}
+.toggle-table-on + table > tbody {
+	display: none;
+}
+.toggle-table-on:checked + table > tbody {
+	display: table-row-group;
+}
+
+table.rounded, table.rounded-footed {
+	overflow: hidden;
+	border-spacing: 0;
+	border-collapse: separate;
+	border-radius: var(--radius-1);
+	border: var(--lighter-border-color) solid 1px;
+}
+
+table.rounded th, table.rounded td,
+table.rounded-footed th, table.rounded-footed td {
+	border: none;
+}
+
+table.rounded th:not(:last-child),
+table.rounded td:not(:last-child),
+table.rounded-footed th:not(:last-child),
+table.rounded-footed td:not(:last-child) {
+	border-right: var(--lighter-border-color) solid 1px;
+}
+
+table.rounded>thead>tr>th,
+table.rounded>thead>tr>td,
+table.rounded>tbody>tr:not(:last-child)>th,
+table.rounded>tbody>tr:not(:last-child)>td {
+	border-bottom: var(--lighter-border-color) solid 1px;
+}
+
+table.rounded-footed>thead>tr>th,
+table.rounded-footed>thead>tr>td,
+table.rounded-footed>tbody>tr>th,
+table.rounded-footed>tbody>tr>td,
+table.rounded-footed>tfoot>tr:not(:last-child)>th,
+table.rounded-footed>tfoot>tr:not(:last-child)>td {
+	border-bottom: var(--lighter-border-color) solid 1px;
+}
+
+
+/* Footer styles */
+footer {
+	margin-top: 1rem;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	padding: 0 5px;
+	width: fit-content;
+	text-align: center;
+	color: var(--light-text-color);
+}
+footer a:link, footer a:visited {
+	color: inherit;
+}
+
+/* Padding containers */
+.padding-wrapper {
+	margin: 1rem auto;
+	max-width: 60rem;
+	padding: 0 5px;
+}
+.padding {
+	padding: 0 5px;
+}
+
+/* Link styles */
+a:link, a:visited {
+	text-decoration-color: var(--text-decoration-color);
+	color: var(--link-color);
+}
+
+/* Readme inline code styling */
+#readme code:not(pre > code) {
+	background-color: var(--lighter-box-background-color);
+	border-radius: 2px;
+	padding: 2px;
+}
+
+/* Readme word breaks to avoid overfull hboxes */
+#readme {
+	word-break: break-word;
+}
+
+/* Table styles */
+table {
+	border: var(--lighter-border-color) solid 1px;
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+table.wide {
+	width: 100%;
+}
+td, th {
+	padding: 3px 5px;
+	border: var(--lighter-border-color) solid 1px;
+}
+.pad {
+	padding: 3px 5px;
+}
+th, thead, tfoot {
+	background-color: var(--lighter-box-background-color);
+}
+th[scope=row] {
+	text-align: left;
+}
+th {
+	font-weight: normal;
+}
+tr.title-row > th, th.title-row, .title-row {
+	background-color: var(--lighter-box-background-color);
+	font-weight: bold;
+}
+td > pre {
+	margin: 0;
+}
+#readme > *:last-child {
+	margin-bottom: 0;
+}
+#readme > *:first-child {
+	margin-top: 0;
+}
+
+/* Table misc and scrolling */
+.commit-id {
+	font-family: monospace;
+	word-break: break-word;
+}
+.scroll {
+	overflow-x: auto;
+}
+
+/* Diff/chunk styles */
+.chunk-unchanged {
+	color: grey;
+}
+.chunk-addition {
+	color: green;
+}
+@media (prefers-color-scheme: dark) {
+	.chunk-addition {
+		color: lime;
+	}
+}
+.chunk-deletion {
+	color: red;
+}
+.chunk-unknown {
+	color: yellow;
+}
+pre.chunk {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.centering {
+	text-align: center;
+}
+
+/* Toggle content sections */
+.toggle-off-wrapper, .toggle-on-wrapper {
+	border: var(--lighter-border-color) solid 1px;
+}
+.toggle-off-toggle, .toggle-on-toggle {
+	opacity: 0;
+	position: absolute;
+}
+.toggle-off-header, .toggle-on-header {
+	font-weight: bold;
+	cursor: pointer;
+	display: block;
+	width: 100%;
+	background-color: var(--lighter-box-background-color);
+}
+.toggle-off-header > div, .toggle-on-header > div {
+	padding: 3px 5px;
+	display: block;
+}
+.toggle-on-content {
+	display: none;
+}
+.toggle-on-toggle:focus-visible + .toggle-on-header, .toggle-off-toggle:focus-visible + .toggle-off-header {
+	outline: 1.5px var(--primary-color) solid;
+}
+.toggle-on-toggle:checked + .toggle-on-header + .toggle-on-content {
+	display: block;
+}
+.toggle-off-content {
+	display: block;
+}
+.toggle-off-toggle:checked + .toggle-off-header + .toggle-off-content {
+	display: none;
+}
+
+*:focus-visible {
+	outline: 1.5px var(--primary-color) solid;
+}
+
+/* File display styles */
+.file-patch + .file-patch {
+	margin-top: 0.5rem;
+}
+.file-content {
+	padding: 3px 5px;
+}
+.file-header {
+	font-family: monospace;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.file-header::after {
+	content: "\25b6";
+	font-family: sans-serif;
+	margin-left: auto;
+	line-height: 100%;
+	margin-right: 0.25em;
+}
+.file-toggle:checked + .file-header::after {
+	content: "\25bc";
+}
+
+/* Form elements */
+textarea {
+	box-sizing: border-box;
+	background-color: var(--lighter-box-background-color);
+	resize: vertical;
+}
+textarea,
+input[type=text],
+input[type=password] {
+	font-family: sans-serif;
+	font-size: smaller;
+	background-color: var(--lighter-box-background-color);
+	color: var(--text-color);
+	border: none;
+	padding: 0.3rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+td.tdinput, th.tdinput {
+	padding: 0;
+	position: relative;
+}
+td.tdinput textarea,
+td.tdinput input[type=text],
+td.tdinput input[type=password],
+th.tdinput textarea,
+th.tdinput input[type=text],
+th.tdinput input[type=password] {
+	background-color: transparent;
+}
+td.tdinput select {
+	position: absolute;
+	background-color: var(--background-color);
+	border: none;
+	/*
+	width: 100%;
+	height: 100%;
+	*/
+	box-sizing: border-box;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+select:active {
+	outline: 1.5px var(--primary-color) solid;
+}
+
+
+/* Button styles */
+.btn-primary, a.btn-primary {
+	background: var(--primary-color);
+	color: var(--primary-color-contrast);
+	border: var(--lighter-border-color) 1px solid;
+	font-weight: bold;
+}
+.btn-danger, a.btn-danger {
+	background: var(--danger-color);
+	color: var(--danger-color-contrast);
+	border: var(--lighter-border-color) 1px solid;
+	font-weight: bold;
+}
+.btn-white, a.btn-white {
+	background: var(--primary-color-contrast);
+	color: var(--primary-color);
+	border: var(--lighter-border-color) 1px solid;
+}
+.btn-normal, a.btn-normal,
+input[type=file]::file-selector-button {
+	background: var(--lighter-box-background-color);
+	border: var(--lighter-border-color) 1px solid !important;
+	color: var(--text-color);
+}
+.btn, .btn-white, .btn-danger, .btn-normal, .btn-primary,
+input[type=submit],
+input[type=file]::file-selector-button {
+	display: inline-block;
+	width: auto;
+	min-width: fit-content;
+	border-radius: var(--radius-1);
+	padding: .1rem .75rem;
+	font-size: 0.9rem;
+	transition: background .1s linear;
+	cursor: pointer;
+}
+a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
+	text-decoration: none;
+}
+
+/* Header layout */
+header#main-header {
+	background-color: var(--lighter-box-background-color);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+}
+header#main-header > div#main-header-forge-title {
+	flex-grow: 1;
+}
+header#main-header > div#main-header-user {
+	display: flex;
+	align-items: center;
+}
+
+/* Uncategorized */
+table + table {
+	margin-top: 1rem;
+}
+
+td > ul {
+	padding-left: 1.5rem;
+	margin-top: 0;
+	margin-bottom: 0;
+}
