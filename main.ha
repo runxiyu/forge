@@ -54,7 +54,7 @@ export fn main() void = {
 
 		match (handlereq(serv_req.socket, &serv_req.request)) {
 		case void => yield;
-		case io::error => log::println("error while handling request");
+		case => log::println("error while handling request");
 		};
 	};
 };
