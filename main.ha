@@ -16,6 +16,7 @@ use memio;
 use io;
 use fmt;
 use bufio;
+use unix::signal;
 
 const usage: [_]getopt::help = [
 	"Lindenii Forge Server",
@@ -24,7 +25,15 @@ const usage: [_]getopt::help = [
 
 let static_fs: nullable *fs::fs = null;
 
+let running: bool = true;
+
+export fn sigint_handler(sig: signal::sig, info: *signal::siginfo, ucontext: *opaque) void = {
+	running = false;
+};
+
 export fn main() void = {
+	signal::handle(signal::sig::INT, &sigint_handler, signal::flag::NONE, null);
+
 	const cmd = getopt::parse(os::args, usage...);
 	defer getopt::finish(&cmd);
 
@@ -48,7 +57,7 @@ export fn main() void = {
 	};
 	defer http::server_finish(server);
 
-	for (true) {
+	for (running) {
 		const serv_req = match (http::serve(server)) {
 		case let this: *http::server_request =>
 			yield this;
