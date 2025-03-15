@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/storer"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -22,6 +23,8 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	var commit_object *object.Commit
 	var tree *object.Tree
 	var notes []string
+	var branches []string
+	var branches_ storer.ReferenceIter
 
 	repo, repo_name, group_path = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
@@ -33,6 +36,15 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	if err != nil {
 		goto no_ref
 	}
+
+	branches_, err = repo.Branches()
+	if err != nil {}
+	err = branches_.ForEach(func (branch *plumbing.Reference) error {
+		branches = append(branches, branch.Name().Short())
+		return nil
+	})
+	if err != nil {}
+	params["branches"] = branches
 
 	if recent_commits, err = get_recent_commits(repo, ref_hash, 3); err != nil {
 		goto no_ref

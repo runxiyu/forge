@@ -43,6 +43,24 @@
 			</table>
 		</div>
 		<div class="padding-wrapper">
+			<table id="branches" class="rounded">
+				<thead>
+					<tr class="title-row">
+						<th colspan="1">Branches</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range .branches }}
+					<tr>
+						<td>
+							<a href="./?branch={{ . }}">{{ . }}</a>
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+		<div class="padding-wrapper">
 			<p>
 				<a href="contrib/" class="btn-normal">Merge requests</a>
 			</p>
