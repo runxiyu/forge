@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
 use fmt;
+use fs;
 use htmpl;
 use io;
 use net::http;
@@ -9,7 +10,7 @@ use net::uri;
 use strconv;
 use strings;
 
-fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem) = {
+fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem | fs::error) = {
 	let segments = match(segments_from_path(request.target.raw_path)) {
 	case let s: []str =>
 		yield s;
@@ -51,6 +52,7 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 				fmt::fprintln(conn, "Error: Blank static endpoint")?;
 				return;
 			};
+
 			let fs_segments = segments[2 ..];
 			for (let fs_segment .. fs_segments) {
 				if (strings::contains(fs_segment, "/")) {
@@ -59,8 +61,21 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 					return;
 				};
 			};
-			start_response(conn, 501, "text/plain")?;
-			fmt::fprintln(conn, "Not implemented yet")?;
+			let fs_segment_path = strings::join("/", fs_segments...)?;
+			defer free(fs_segment_path);
+
+			let file = match (fs::open(static_fs as *fs::fs, fs_segment_path)) {
+			case let f: io::handle => yield f;
+			case fs::error =>
+				start_response(conn, 500, "text/plain")?;
+				fmt::fprintln(conn, "Filesystem error")?;
+				return;
+			};
+			defer io::close(file)!;
+
+			start_response(conn, 200, "text/css")?;
+			io::copy(conn, file)?;
+
 		case =>
 			start_response(conn, 404, "text/plain")?;
 			fmt::fprintln(conn, "Error: Unknown system endpoint")?;

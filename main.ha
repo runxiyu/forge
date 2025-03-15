@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 // Adapted from template by Willow Barraco <contact@willowbarraco.fr>
 
+use fs;
 use getopt;
 use log;
 use net;
@@ -21,6 +22,8 @@ const usage: [_]getopt::help = [
 	('c', "config", "path to configuration file")
 ];
 
+let static_fs: nullable *fs::fs = null;
+
 export fn main() void = {
 	const cmd = getopt::parse(os::args, usage...);
 	defer getopt::finish(&cmd);
@@ -34,6 +37,8 @@ export fn main() void = {
 		case => abort("unreachable");
 		};
 	};
+
+	static_fs = os::diropen("static")!;
 
 	const server = match (http::listen(ip_addr, port, net::tcp::reuseport, net::tcp::reuseaddr)) {
 	case let this: *http::server =>
