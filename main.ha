@@ -3,7 +3,6 @@
 // Adapted from template by Willow Barraco <contact@willowbarraco.fr>
 
 use getopt;
-use htmpl;
 use log;
 use net;
 use net::dial;
@@ -16,7 +15,6 @@ use memio;
 use io;
 use fmt;
 use bufio;
-use strings;
 
 const usage: [_]getopt::help = [
 	"Lindenii Forge Server",
@@ -59,12 +57,4 @@ export fn main() void = {
 		case io::error => log::println("error while handling request");
 		};
 	};
-};
-
-export fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nomem | net::uri::invalid) = {
-	htmpl::write(conn, "HTTP/1.1 200 OK\r\n")?;
-	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
-	let segments = segments_from_path(request.target.raw_path)?;
-	defer strings::freeall(segments);
-	tp_index(conn, segments)?;
 };
