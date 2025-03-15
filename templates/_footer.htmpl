@@ -5,5 +5,5 @@
 {{ " " }}
 (<a href="/:/source/">source</a>,
 {{ " " }}
-<a href="https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/?branch=hare">upstream</a>)
+<a href="https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/">upstream</a>)
 {{ end }}
