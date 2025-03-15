@@ -74,8 +74,6 @@ fn handlereq(conn: io::handle, request: *http::request) (void | io::error | nome
 			};
 			defer io::close(file)!;
 
-			fmt::println(fs_segments[len(fs_segments) - 1])!;
-
 			let ext = strings::rcut(fs_segments[len(fs_segments) - 1], ".").1;
 
 			let mimetype = match (mime::lookup_ext(ext)) {
