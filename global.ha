@@ -5,7 +5,7 @@ let global: struct {
 	ssh_fp: str,
 } = struct {
 	title: str = "Test Forge",
-	version: str = "v0.0.0",
+	version: str = VERSION,
 	ssh_pubkey: str = "pubkey",
 	ssh_fp: str = "fp",
 };
