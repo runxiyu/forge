@@ -1,5 +1,5 @@
 forge: templates.ha *.ha
-	hare build -o $@ .
+	hare build $(HAREFLAGS) -o $@ .
 
 templates.ha: templates/*.htmpl
 	htmplgen -o $@ $^
