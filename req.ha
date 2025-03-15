@@ -12,5 +12,14 @@ export fn handlereq(conn: io::handle, request: *http::request) (void | io::error
 	htmpl::write(conn, "Content-Type: text/html\r\n\r\n")?;
 	let segments = segments_from_path(request.target.raw_path)?;
 	defer strings::freeall(segments);
+
+	let trailing_slash: bool = false;
+
+	if (segments[len(segments) - 1] == "") {
+		trailing_slash = true;
+		free(segments[len(segments) - 1]);
+		segments = segments[.. len(segments) - 1];
+	};
+	
 	tp_index(conn, segments)?;
 };
