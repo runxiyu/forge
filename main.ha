@@ -31,7 +31,7 @@ export fn main() void = {
 	for (let opt .. cmd.opts) {
 		switch (opt.0) {
 		case 'c' => yield; // TODO: actually handle the config
-		case => abort(); // unreachable
+		case => abort("unreachable");
 		};
 	};
 
