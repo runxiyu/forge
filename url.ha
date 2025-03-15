@@ -4,10 +4,19 @@
 use strings;
 use net::uri;
 
-// The result must be freed with strings::freeall;
-fn segments_from_path(s: str) ([]str | nomem | net::uri::invalid) = {
+// The result must be freed with strings::freeall.
+fn segments_from_path(s: str) ([]str | nomem | uri::invalid) = {
 	let sp: []str = strings::split(s, "/")?;
-	for (let i = 1z; i < len(sp); i += 1)
-		sp[i - 1] = net::uri::percent_decode(sp[i])?;
+	for (let i = 1z; i < len(sp); i += 1) {
+		match (uri::percent_decode(sp[i])) {
+		case let s: str =>
+			sp[i - 1] = s;
+		case uri::invalid =>
+			for (let j = 0z; j < i - 1; j += 1) {
+				free(sp[j]);
+			};
+			return uri::invalid;
+		};
+	};
 	return sp[.. len(sp) - 1];
 };
