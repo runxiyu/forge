@@ -6,7 +6,7 @@
 
 /* Base styles and variables */
 html {
-	font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif; /* Yes */
+	font-family: sans-serif;
 	background-color: var(--background-color);
 	color: var(--text-color);
 	--radius-1: 0.32rem;
