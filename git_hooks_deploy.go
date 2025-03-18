@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 )
 
-// deploy_hooks_to_filesystem deploys the git hooks client to the filesystem.
+// deployHooks deploys the git hooks client to the filesystem.
 // The git hooks client is expected to be embedded in resources_fs and must be
 // pre-compiled during the build process; see the Makefile.
-func deploy_hooks_to_filesystem() (err error) {
+func deployHooks() (err error) {
 	err = func() (err error) {
 		var src_fd fs.File
 		var dst_fd *os.File

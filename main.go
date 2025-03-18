@@ -15,33 +15,33 @@ import (
 )
 
 func main() {
-	config_path := flag.String(
+	configPath := flag.String(
 		"config",
 		"/etc/lindenii/forge.scfg",
 		"path to configuration file",
 	)
 	flag.Parse()
 
-	if err := load_config(*config_path); err != nil {
+	if err := loadConfig(*configPath); err != nil {
 		clog.Fatal(1, "Loading configuration: "+err.Error())
 	}
-	if err := deploy_hooks_to_filesystem(); err != nil {
+	if err := deployHooks(); err != nil {
 		clog.Fatal(1, "Deploying hooks to filesystem: "+err.Error())
 	}
-	if err := load_templates(); err != nil {
+	if err := loadTemplates(); err != nil {
 		clog.Fatal(1, "Loading templates: "+err.Error())
 	}
 
 	// UNIX socket listener for hooks
-	var hooks_listener net.Listener
+	var hooksListener net.Listener
 	var err error
-	hooks_listener, err = net.Listen("unix", config.Hooks.Socket)
+	hooksListener, err = net.Listen("unix", config.Hooks.Socket)
 	if errors.Is(err, syscall.EADDRINUSE) {
 		clog.Warn("Removing stale socket " + config.Hooks.Socket)
 		if err = syscall.Unlink(config.Hooks.Socket); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		if hooks_listener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
+		if hooksListener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
 			clog.Fatal(1, "Listening hooks: "+err.Error())
 		}
 	} else if err != nil {
@@ -49,19 +49,19 @@ func main() {
 	}
 	clog.Info("Listening hooks on unix " + config.Hooks.Socket)
 	go func() {
-		if err = serve_git_hooks(hooks_listener); err != nil {
+		if err = serveGitHooks(hooksListener); err != nil {
 			clog.Fatal(1, "Serving hooks: "+err.Error())
 		}
 	}()
 
 	// SSH listener
-	ssh_listener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
+	sshListener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.SSH.Net == "unix" {
 		clog.Warn("Removing stale socket " + config.SSH.Addr)
 		if err = syscall.Unlink(config.SSH.Addr); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		if ssh_listener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
+		if sshListener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
 			clog.Fatal(1, "Listening SSH: "+err.Error())
 		}
 	} else if err != nil {
@@ -69,19 +69,19 @@ func main() {
 	}
 	clog.Info("Listening SSH on " + config.SSH.Net + " " + config.SSH.Addr)
 	go func() {
-		if err = serve_ssh(ssh_listener); err != nil {
+		if err = serveSSH(sshListener); err != nil {
 			clog.Fatal(1, "Serving SSH: "+err.Error())
 		}
 	}()
 
 	// HTTP listener
-	http_listener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
+	httpListener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.HTTP.Net == "unix" {
 		clog.Warn("Removing stale socket " + config.HTTP.Addr)
 		if err = syscall.Unlink(config.HTTP.Addr); err != nil {
 			clog.Fatal(1, "Removing stale socket: "+err.Error())
 		}
-		if http_listener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
+		if httpListener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
 			clog.Fatal(1, "Listening HTTP: "+err.Error())
 		}
 	} else if err != nil {
@@ -89,19 +89,19 @@ func main() {
 	}
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 	go func() {
-		if err = http.Serve(http_listener, &http_router_t{}); err != nil {
+		if err = http.Serve(httpListener, &httpRouter{}); err != nil {
 			clog.Fatal(1, "Serving HTTP: "+err.Error())
 		}
 	}()
 
 	// Pprof listener
-	pprof_listener, err := net.Listen("tcp", "localhost:6060")
+	pprofListener, err := net.Listen("tcp", "localhost:6060")
 	if err != nil {
 		clog.Fatal(1, "Listening pprof: "+err.Error())
 	}
 	clog.Info("Listening pprof on tcp localhost:6060")
 	go func() {
-		if err = http.Serve(pprof_listener, nil); err != nil {
+		if err = http.Serve(pprofListener, nil); err != nil {
 			clog.Fatal(1, "Serving pprof: "+err.Error())
 		}
 	}()

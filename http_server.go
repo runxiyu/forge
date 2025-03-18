@@ -14,9 +14,9 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
-type http_router_t struct{}
+type httpRouter struct{}
 
-func (router *http_router_t) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	clog.Info("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
 
 	var segments []string

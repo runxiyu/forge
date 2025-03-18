@@ -15,8 +15,6 @@ import (
 
 var database *pgxpool.Pool
 
-var err_unsupported_database_type = errors.New("unsupported database type")
-
 var config struct {
 	HTTP struct {
 		Net          string `scfg:"net"`
@@ -46,22 +44,22 @@ var config struct {
 	} `scfg:"db"`
 }
 
-func load_config(path string) (err error) {
-	var config_file *os.File
+func loadConfig(path string) (err error) {
+	var configFile *os.File
 	var decoder *scfg.Decoder
 
-	if config_file, err = os.Open(path); err != nil {
+	if configFile, err = os.Open(path); err != nil {
 		return err
 	}
-	defer config_file.Close()
+	defer configFile.Close()
 
-	decoder = scfg.NewDecoder(bufio.NewReader(config_file))
+	decoder = scfg.NewDecoder(bufio.NewReader(configFile))
 	if err = decoder.Decode(&config); err != nil {
 		return err
 	}
 
 	if config.DB.Type != "postgres" {
-		return err_unsupported_database_type
+		return errors.New("unsupported database type")
 	}
 
 	if database, err = pgxpool.New(context.Background(), config.DB.Conn); err != nil {

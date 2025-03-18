@@ -319,7 +319,7 @@ func hooks_handle_connection(conn net.Conn) {
 	_, _ = conn.Write([]byte{hook_return_value})
 }
 
-func serve_git_hooks(listener net.Listener) error {
+func serveGitHooks(listener net.Listener) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {

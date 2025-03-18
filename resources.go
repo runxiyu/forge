@@ -35,7 +35,7 @@ var resources_fs embed.FS
 
 var templates *template.Template
 
-func load_templates() (err error) {
+func loadTemplates() (err error) {
 	m := minify.New()
 	m.Add("text/html", &html.Minifier{TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true})
 

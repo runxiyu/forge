@@ -21,7 +21,7 @@ var (
 	server_public_key             go_ssh.PublicKey
 )
 
-func serve_ssh(listener net.Listener) error {
+func serveSSH(listener net.Listener) error {
 	var host_key_bytes []byte
 	var host_key go_ssh.Signer
 	var err error
