@@ -5,11 +5,11 @@
 
 CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -D_GNU_SOURCE
 
-forge: $(filter-out forge,$(wildcard *)) version.go git_hooks_client/*.c git_hooks_client/git_hooks_client
+forge: $(filter-out forge,$(wildcard *)) version.go hookc/*.c hookc/hookc
 	go mod vendor
 	go build .
 
-git_hooks_client/git_hooks_client:
+hookc/hookc:
 
 version.go:
 	printf 'package main\nconst VERSION="%s"\n' $(shell git describe --tags --always --dirty) > $@

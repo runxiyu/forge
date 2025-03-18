@@ -28,7 +28,7 @@ var (
 	err_get_ucred = errors.New("failed getsockopt")
 )
 
-// hooks_handle_connection handles a connection from git_hooks_client via the
+// hooks_handle_connection handles a connection from hookc via the
 // unix socket.
 func hooks_handle_connection(conn net.Conn) {
 	var ctx context.Context

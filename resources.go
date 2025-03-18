@@ -21,7 +21,7 @@ import (
 //go:embed *.scfg
 //go:embed Makefile
 //go:embed static/* templates/* scripts/* sql/*
-//go:embed git_hooks_client/*.c
+//go:embed hookc/*.c
 //go:embed vendor/*
 var source_fs embed.FS
 
@@ -30,7 +30,7 @@ var source_handler = http.StripPrefix(
 	http.FileServer(http.FS(source_fs)),
 )
 
-//go:embed templates/* static/* git_hooks_client/git_hooks_client
+//go:embed templates/* static/* hookc/hookc
 var resources_fs embed.FS
 
 var templates *template.Template

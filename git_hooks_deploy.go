@@ -18,12 +18,12 @@ func deploy_hooks_to_filesystem() (err error) {
 		var src_fd fs.File
 		var dst_fd *os.File
 
-		if src_fd, err = resources_fs.Open("git_hooks_client/git_hooks_client"); err != nil {
+		if src_fd, err = resources_fs.Open("hookc/hookc"); err != nil {
 			return err
 		}
 		defer src_fd.Close()
 
-		if dst_fd, err = os.OpenFile(filepath.Join(config.Hooks.Execs, "git_hooks_client"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+		if dst_fd, err = os.OpenFile(filepath.Join(config.Hooks.Execs, "hookc"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 			return err
 		}
 		defer dst_fd.Close()
@@ -40,14 +40,14 @@ func deploy_hooks_to_filesystem() (err error) {
 
 	// Go's embed filesystems do not store permissions; but in any case,
 	// they would need to be 0o755:
-	if err = os.Chmod(filepath.Join(config.Hooks.Execs, "git_hooks_client"), 0o755); err != nil {
+	if err = os.Chmod(filepath.Join(config.Hooks.Execs, "hookc"), 0o755); err != nil {
 		return err
 	}
 
 	for _, hook_name := range []string{
 		"pre-receive",
 	} {
-		if err = os.Symlink(filepath.Join(config.Hooks.Execs, "git_hooks_client"), filepath.Join(config.Hooks.Execs, hook_name)); err != nil {
+		if err = os.Symlink(filepath.Join(config.Hooks.Execs, "hookc"), filepath.Join(config.Hooks.Execs, hook_name)); err != nil {
 			return err
 		}
 	}
