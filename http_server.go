@@ -53,7 +53,7 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params["url_segments"] = segments
-	params["global"] = global_data
+	params["global"] = globalData
 	var _user_id int // 0 for none
 	_user_id, params["username"], err = get_user_info_from_request(r)
 	params["user_id"] = _user_id

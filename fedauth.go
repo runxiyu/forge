@@ -15,7 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func check_and_update_federated_user_status(ctx context.Context, user_id int, service, remote_username, pubkey string) (bool, error) {
+func fedauth(ctx context.Context, user_id int, service, remote_username, pubkey string) (bool, error) {
 	var err error
 	var resp *http.Response
 	matched := false
@@ -51,11 +51,11 @@ func check_and_update_federated_user_status(ctx context.Context, user_id int, se
 			return false, err
 		}
 
-		line_split := strings.Split(line, " ")
-		if len(line_split) < 2 {
+		lineSplit := strings.Split(line, " ")
+		if len(lineSplit) < 2 {
 			continue
 		}
-		line = strings.Join(line_split[:2], " ")
+		line = strings.Join(lineSplit[:2], " ")
 
 		if line == pubkey {
 			matched = true

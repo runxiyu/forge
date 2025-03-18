@@ -9,9 +9,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// query_name_desc_list is a helper function that executes a query and returns a
+// queryNameDesc is a helper function that executes a query and returns a
 // list of name_desc_t results.
-func query_name_desc_list(ctx context.Context, query string, args ...any) (result []name_desc_t, err error) {
+func queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
 	var rows pgx.Rows
 
 	if rows, err = database.Query(ctx, query, args...); err != nil {
@@ -24,13 +24,13 @@ func query_name_desc_list(ctx context.Context, query string, args ...any) (resul
 		if err = rows.Scan(&name, &description); err != nil {
 			return nil, err
 		}
-		result = append(result, name_desc_t{name, description})
+		result = append(result, nameDesc{name, description})
 	}
 	return result, rows.Err()
 }
 
-// name_desc_t holds a name and a description.
-type name_desc_t struct {
+// nameDesc holds a name and a description.
+type nameDesc struct {
 	Name        string
 	Description string
 }

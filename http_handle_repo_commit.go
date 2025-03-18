@@ -49,7 +49,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	}
 	if commit_id_specified_string_without_suffix != commit_id_specified_string {
 		var formatted_patch string
-		if formatted_patch, err = format_patch_from_commit(commit_object); err != nil {
+		if formatted_patch, err = fmtCommitPatch(commit_object); err != nil {
 			http.Error(w, "Error formatting patch: "+err.Error(), http.StatusInternalServerError)
 			return
 		}

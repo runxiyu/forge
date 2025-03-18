@@ -14,8 +14,8 @@ import (
 
 func handle_group_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var group_path []string
-	var repos []name_desc_t
-	var subgroups []name_desc_t
+	var repos []nameDesc
+	var subgroups []nameDesc
 	var err error
 	var group_id int
 	var group_description string
@@ -149,7 +149,7 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 			http.Error(w, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		repos = append(repos, name_desc_t{name, description})
+		repos = append(repos, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
 		http.Error(w, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
@@ -174,7 +174,7 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 			http.Error(w, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		subgroups = append(subgroups, name_desc_t{name, description})
+		subgroups = append(subgroups, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
 		http.Error(w, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)

@@ -31,7 +31,7 @@ var source_handler = http.StripPrefix(
 )
 
 //go:embed templates/* static/* hookc/hookc
-var resources_fs embed.FS
+var resourcesFS embed.FS
 
 var templates *template.Template
 
@@ -46,12 +46,12 @@ func loadTemplates() (err error) {
 		"query_escape": query_escape,
 	})
 
-	err = fs.WalkDir(resources_fs, "templates", func(path string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(resourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if !d.IsDir() {
-			content, err := fs.ReadFile(resources_fs, path)
+			content, err := fs.ReadFile(resourcesFS, path)
 			if err != nil {
 				return err
 			}
@@ -74,7 +74,7 @@ func loadTemplates() (err error) {
 var static_handler http.Handler
 
 func init() {
-	static_fs, err := fs.Sub(resources_fs, "static")
+	static_fs, err := fs.Sub(resourcesFS, "static")
 	if err != nil {
 		panic(err)
 	}

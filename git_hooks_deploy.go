@@ -15,20 +15,20 @@ import (
 // pre-compiled during the build process; see the Makefile.
 func deployHooks() (err error) {
 	err = func() (err error) {
-		var src_fd fs.File
-		var dst_fd *os.File
+		var srcFD fs.File
+		var dstFD *os.File
 
-		if src_fd, err = resources_fs.Open("hookc/hookc"); err != nil {
+		if srcFD, err = resourcesFS.Open("hookc/hookc"); err != nil {
 			return err
 		}
-		defer src_fd.Close()
+		defer srcFD.Close()
 
-		if dst_fd, err = os.OpenFile(filepath.Join(config.Hooks.Execs, "hookc"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+		if dstFD, err = os.OpenFile(filepath.Join(config.Hooks.Execs, "hookc"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 			return err
 		}
-		defer dst_fd.Close()
+		defer dstFD.Close()
 
-		if _, err = io.Copy(dst_fd, src_fd); err != nil {
+		if _, err = io.Copy(dstFD, srcFD); err != nil {
 			return err
 		}
 

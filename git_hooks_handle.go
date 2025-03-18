@@ -24,13 +24,13 @@ import (
 )
 
 var (
-	err_get_fd    = errors.New("unable to get file descriptor")
-	err_get_ucred = errors.New("failed getsockopt")
+	errGetFD    = errors.New("unable to get file descriptor")
+	errGetUcred = errors.New("failed getsockopt")
 )
 
-// hooks_handle_connection handles a connection from hookc via the
+// hooksHandler handles a connection from hookc via the
 // unix socket.
-func hooks_handle_connection(conn net.Conn) {
+func hooksHandler(conn net.Conn) {
 	var ctx context.Context
 	var cancel context.CancelFunc
 	var ucred *syscall.Ucred
@@ -47,7 +47,7 @@ func hooks_handle_connection(conn net.Conn) {
 
 	// There aren't reasonable cases where someone would run this as
 	// another user.
-	if ucred, err = get_ucred(conn); err != nil {
+	if ucred, err = getUcred(conn); err != nil {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
@@ -180,7 +180,7 @@ func hooks_handle_connection(conn net.Conn) {
 									return 1
 								}
 
-								ok, err := check_and_update_federated_user_status(ctx, pack_to_hook.user_id, service, username, pack_to_hook.pubkey)
+								ok, err := fedauth(ctx, pack_to_hook.user_id, service, username, pack_to_hook.pubkey)
 								if err != nil {
 									wf_error(ssh_stderr, "Failed to verify federated user identifier %#v: %v", federated_user_identifier, err)
 									return 1
@@ -325,21 +325,21 @@ func serveGitHooks(listener net.Listener) error {
 		if err != nil {
 			return err
 		}
-		go hooks_handle_connection(conn)
+		go hooksHandler(conn)
 	}
 }
 
-func get_ucred(conn net.Conn) (ucred *syscall.Ucred, err error) {
+func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
 	var unix_conn *net.UnixConn = conn.(*net.UnixConn)
 	var fd *os.File
 
 	if fd, err = unix_conn.File(); err != nil {
-		return nil, err_get_fd
+		return nil, errGetFD
 	}
 	defer fd.Close()
 
 	if ucred, err = syscall.GetsockoptUcred(int(fd.Fd()), syscall.SOL_SOCKET, syscall.SO_PEERCRED); err != nil {
-		return nil, err_get_ucred
+		return nil, errGetUcred
 	}
 	return ucred, nil
 }

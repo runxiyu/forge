@@ -66,7 +66,7 @@ func loadConfig(path string) (err error) {
 		return err
 	}
 
-	global_data["forge_title"] = config.General.Title
+	globalData["forge_title"] = config.General.Title
 
 	return nil
 }

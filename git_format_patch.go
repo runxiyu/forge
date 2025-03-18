@@ -14,12 +14,12 @@ import (
 
 // get_patch_from_commit formats a commit object as if it was returned by
 // git-format-patch.
-func format_patch_from_commit(commit *object.Commit) (final string, err error) {
+func fmtCommitPatch(commit *object.Commit) (final string, err error) {
 	var patch *object.Patch
 	var buf bytes.Buffer
 	var author object.Signature
 	var date string
-	var commit_msg_title, commit_msg_details string
+	var commitTitle, commitDetails string
 
 	if _, patch, err = get_patch_from_commit(commit); err != nil {
 		return "", err
@@ -28,20 +28,20 @@ func format_patch_from_commit(commit *object.Commit) (final string, err error) {
 	author = commit.Author
 	date = author.When.Format(time.RFC1123Z)
 
-	commit_msg_title, commit_msg_details, _ = strings.Cut(commit.Message, "\n")
+	commitTitle, commitDetails, _ = strings.Cut(commit.Message, "\n")
 
 	// This date is hardcoded in Git.
 	fmt.Fprintf(&buf, "From %s Mon Sep 17 00:00:00 2001\n", commit.Hash)
 	fmt.Fprintf(&buf, "From: %s <%s>\n", author.Name, author.Email)
 	fmt.Fprintf(&buf, "Date: %s\n", date)
-	fmt.Fprintf(&buf, "Subject: [PATCH] %s\n\n", commit_msg_title)
+	fmt.Fprintf(&buf, "Subject: [PATCH] %s\n\n", commitTitle)
 
-	if commit_msg_details != "" {
-		commit_msg_details_first_line, commit_msg_details_rest, _ := strings.Cut(commit_msg_details, "\n")
-		if strings.TrimSpace(commit_msg_details_first_line) == "" {
-			commit_msg_details = commit_msg_details_rest
+	if commitDetails != "" {
+		commitDetails1, commitDetails2, _ := strings.Cut(commitDetails, "\n")
+		if strings.TrimSpace(commitDetails1) == "" {
+			commitDetails = commitDetails2
 		}
-		buf.WriteString(commit_msg_details)
+		buf.WriteString(commitDetails)
 		buf.WriteString("\n")
 	}
 	buf.WriteString("---\n")

@@ -59,7 +59,7 @@ func get_repo_path_perms_from_ssh_path_pubkey(ctx context.Context, ssh_path, ssh
 	repo_name = module_name
 	switch module_type {
 	case "repos":
-		_1, _2, _3, _4, _5, _6, _7 := get_path_perm_by_group_repo_key(ctx, group_path, module_name, ssh_pubkey)
+		_1, _2, _3, _4, _5, _6, _7 := getRepoInfo(ctx, group_path, module_name, ssh_pubkey)
 		return group_path, repo_name, _1, _2, _3, _4, _5, _6, _7
 	default:
 		return []string{}, "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint

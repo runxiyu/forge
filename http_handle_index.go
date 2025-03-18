@@ -12,9 +12,9 @@ import (
 
 func handle_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var err error
-	var groups []name_desc_t
+	var groups []nameDesc
 
-	groups, err = query_name_desc_list(r.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
+	groups, err = queryNameDesc(r.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
 	if err != nil {
 		http.Error(w, "Error querying groups: "+err.Error(), http.StatusInternalServerError)
 		return
