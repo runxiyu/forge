@@ -11,7 +11,7 @@ import (
 
 // get_path_perm_by_group_repo_key returns the filesystem path and direct
 // access permission for a given repo and a provided ssh public key.
-func get_path_perm_by_group_repo_key(ctx context.Context, group_path []string, repo_name, ssh_pubkey string) (repo_id int, filesystem_path string, access bool, contrib_requirements string, user_type string, user_id int, err error) {
+func get_path_perm_by_group_repo_key(ctx context.Context, group_path []string, repo_name, ssh_pubkey string) (repo_id int, filesystem_path string, access bool, contrib_requirements, user_type string, user_id int, err error) {
 	err = database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (
 	-- Start: match the first name in the path where parent_group IS NULL

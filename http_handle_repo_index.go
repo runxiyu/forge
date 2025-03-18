@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/storer"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
 func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
@@ -38,12 +38,14 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	}
 
 	branches_, err = repo.Branches()
-	if err != nil {}
-	err = branches_.ForEach(func (branch *plumbing.Reference) error {
+	if err != nil {
+	}
+	err = branches_.ForEach(func(branch *plumbing.Reference) error {
 		branches = append(branches, branch.Name().Short())
 		return nil
 	})
-	if err != nil {}
+	if err != nil {
+	}
 	params["branches"] = branches
 
 	if recent_commits, err = get_recent_commits(repo, ref_hash, 3); err != nil {

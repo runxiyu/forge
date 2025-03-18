@@ -31,7 +31,7 @@ type pack_to_hook_t struct {
 var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
-func ssh_handle_receive_pack(session glider_ssh.Session, pubkey string, repo_identifier string) (err error) {
+func ssh_handle_receive_pack(session glider_ssh.Session, pubkey, repo_identifier string) (err error) {
 	group_path, repo_name, repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
 	if err != nil {
 		return err
