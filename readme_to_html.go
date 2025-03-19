@@ -16,50 +16,50 @@ import (
 	"github.com/yuin/goldmark/extension"
 )
 
-var markdown_converter = goldmark.New(goldmark.WithExtensions(extension.GFM))
+var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM))
 
-func render_readme_at_tree(tree *object.Tree) (readme_filename string, readme_content template.HTML) {
-	var readme_rendered_unsafe bytes.Buffer
-	var readme_file *object.File
-	var readme_file_contents string
+func renderReadmeAtTree(tree *object.Tree) (readmeFilename string, readmeRenderedSafeHTML template.HTML) {
+	var readmeRenderedUnsafe bytes.Buffer
+	var readmeFile *object.File
+	var readmeFileContents string
 	var err error
 
-	if readme_file, err = tree.File("README"); err == nil {
-		if readme_file_contents, err = readme_file.Contents(); err != nil {
-			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
+	if readmeFile, err = tree.File("README"); err == nil {
+		if readmeFileContents, err = readmeFile.Contents(); err != nil {
+			return "Error fetching README", escapeHTML("Unable to fetch contents of README: " + err.Error())
 		}
 
-		return "README", template.HTML("<pre>" + html.EscapeString(readme_file_contents) + "</pre>") //#nosec G203
+		return "README", template.HTML("<pre>" + html.EscapeString(readmeFileContents) + "</pre>") //#nosec G203
 	}
 
-	if readme_file, err = tree.File("README.md"); err == nil {
-		if readme_file_contents, err = readme_file.Contents(); err != nil {
-			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
+	if readmeFile, err = tree.File("README.md"); err == nil {
+		if readmeFileContents, err = readmeFile.Contents(); err != nil {
+			return "Error fetching README", escapeHTML("Unable to fetch contents of README: " + err.Error())
 		}
 
-		if err = markdown_converter.Convert([]byte(readme_file_contents), &readme_rendered_unsafe); err != nil {
-			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
+		if err = markdownConverter.Convert([]byte(readmeFileContents), &readmeRenderedUnsafe); err != nil {
+			return "Error fetching README", escapeHTML("Unable to render README: " + err.Error())
 		}
 
-		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readme_rendered_unsafe.Bytes())) //#nosec G203
+		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(readmeRenderedUnsafe.Bytes())) //#nosec G203
 	}
 
-	if readme_file, err = tree.File("README.org"); err == nil {
-		if readme_file_contents, err = readme_file.Contents(); err != nil {
-			return "Error fetching README", string_escape_html("Unable to fetch contents of README: " + err.Error())
+	if readmeFile, err = tree.File("README.org"); err == nil {
+		if readmeFileContents, err = readmeFile.Contents(); err != nil {
+			return "Error fetching README", escapeHTML("Unable to fetch contents of README: " + err.Error())
 		}
 
-		org_html, err := org.New().Parse(strings.NewReader(readme_file_contents), readme_filename).Write(org.NewHTMLWriter())
+		orgHTML, err := org.New().Parse(strings.NewReader(readmeFileContents), readmeFilename).Write(org.NewHTMLWriter())
 		if err != nil {
-			return "Error fetching README", string_escape_html("Unable to render README: " + err.Error())
+			return "Error fetching README", escapeHTML("Unable to render README: " + err.Error())
 		}
 
-		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(org_html)) //#nosec G203
+		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(orgHTML)) //#nosec G203
 	}
 
 	return "", ""
 }
 
-func string_escape_html(s string) template.HTML {
+func escapeHTML(s string) template.HTML {
 	return template.HTML(html.EscapeString(s)) //#nosec G203
 }

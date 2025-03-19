@@ -9,107 +9,107 @@ import (
 	"os"
 	"os/exec"
 
-	glider_ssh "github.com/gliderlabs/ssh"
+	gliderSSH "github.com/gliderlabs/ssh"
 	"github.com/go-git/go-git/v5"
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
 type packPass struct {
-	session              glider_ssh.Session
-	repo                 *git.Repository
-	pubkey               string
-	directAccess        bool
-	repo_path            string
-	userID              int
-	userType            string
-	repoID              int
-	group_path           []string
-	repo_name            string
-	contribReq string
+	session      gliderSSH.Session
+	repo         *git.Repository
+	pubkey       string
+	directAccess bool
+	repoPath     string
+	userID       int
+	userType     string
+	repoID       int
+	groupPath    []string
+	repoName     string
+	contribReq   string
 }
 
 var packPasses = cmap.Map[string, packPass]{}
 
-// ssh_handle_receive_pack handles attempts to push to repos.
-func ssh_handle_receive_pack(session glider_ssh.Session, pubkey, repo_identifier string) (err error) {
-	group_path, repo_name, repo_id, repo_path, direct_access, contrib_requirements, user_type, user_id, err := get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey)
+// sshHandleRecvPack handles attempts to push to repos.
+func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
+	groupPath, repoName, repoID, repoPath, directAccess, contribReq, userType, userID, err := getRepoInfo2(session.Context(), repoIdentifier, pubkey)
 	if err != nil {
 		return err
 	}
-	repo, err := git.PlainOpen(repo_path)
-	if err != nil {
-		return err
-	}
-
-	repo_config, err := repo.Config()
+	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
 		return err
 	}
 
-	repo_config_core := repo_config.Raw.Section("core")
-	if repo_config_core == nil {
-		return errors.New("Repository has no core section in config")
+	repoConf, err := repo.Config()
+	if err != nil {
+		return err
 	}
 
-	hooksPath := repo_config_core.OptionAll("hooksPath")
+	repoConfCore := repoConf.Raw.Section("core")
+	if repoConfCore == nil {
+		return errors.New("repository has no core section in config")
+	}
+
+	hooksPath := repoConfCore.OptionAll("hooksPath")
 	if len(hooksPath) != 1 || hooksPath[0] != config.Hooks.Execs {
-		return errors.New("Repository has hooksPath set to an unexpected value")
+		return errors.New("repository has hooksPath set to an unexpected value")
 	}
 
-	if !direct_access {
-		switch contrib_requirements {
+	if !directAccess {
+		switch contribReq {
 		case "closed":
-			if !direct_access {
-				return errors.New("You need direct access to push to this repo.")
+			if !directAccess {
+				return errors.New("you need direct access to push to this repo.")
 			}
 		case "registered_user":
-			if user_type != "registered" {
-				return errors.New("You need to be a registered user to push to this repo.")
+			if userType != "registered" {
+				return errors.New("you need to be a registered user to push to this repo.")
 			}
 		case "ssh_pubkey":
 			fallthrough
 		case "federated":
 			if pubkey == "" {
-				return errors.New("You need to have an SSH public key to push to this repo.")
+				return errors.New("you need to have an SSH public key to push to this repo.")
 			}
-			if user_type == "" {
-				user_id, err = add_user_ssh(session.Context(), pubkey)
+			if userType == "" {
+				userID, err = addUserSSH(session.Context(), pubkey)
 				if err != nil {
 					return err
 				}
-				fmt.Fprintln(session.Stderr(), "You are now registered as user ID", user_id)
-				user_type = "pubkey_only"
+				fmt.Fprintln(session.Stderr(), "you are now registered as user ID", userID)
+				userType = "pubkey_only"
 			}
 
 		case "public":
 		default:
-			panic("unknown contrib_requirements value " + contrib_requirements)
+			panic("unknown contrib_requirements value " + contribReq)
 		}
 	}
 
-	cookie, err := random_urlsafe_string(16)
+	cookie, err := randomUrlsafeStr(16)
 	if err != nil {
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
 	packPasses.Store(cookie, packPass{
-		session:              session,
-		pubkey:               pubkey,
-		directAccess:        direct_access,
-		repo_path:            repo_path,
-		userID:              user_id,
-		repoID:              repo_id,
-		group_path:           group_path,
-		repo_name:            repo_name,
-		repo:                 repo,
-		contribReq: contrib_requirements,
-		userType:            user_type,
+		session:      session,
+		pubkey:       pubkey,
+		directAccess: directAccess,
+		repoPath:     repoPath,
+		userID:       userID,
+		repoID:       repoID,
+		groupPath:    groupPath,
+		repoName:     repoName,
+		repo:         repo,
+		contribReq:   contribReq,
+		userType:     userType,
 	})
 	defer packPasses.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
 	// horribly wrong such as a panic occurs.
 
-	proc := exec.CommandContext(session.Context(), "git-receive-pack", repo_path)
+	proc := exec.CommandContext(session.Context(), "git-receive-pack", repoPath)
 	proc.Env = append(os.Environ(),
 		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket,
 		"LINDENII_FORGE_HOOKS_COOKIE="+cookie,

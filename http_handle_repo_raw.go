@@ -14,7 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var raw_path_spec, path_spec string
 	var repo *git.Repository
 	var ref_hash plumbing.Hash
@@ -71,5 +71,5 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	params["files"] = makeDisplayTree(target)
 
-	render_template(w, "repo_raw_dir", params)
+	renderTemplate(w, "repo_raw_dir", params)
 }

@@ -21,42 +21,42 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var segments []string
 	var err error
-	var non_empty_last_segments_len int
-	var separator_index int
+	var contentfulSegmentsLen int
+	var sepIndex int
 	params := make(map[string]any)
 
-	if segments, _, err = parse_request_uri(r.RequestURI); err != nil {
+	if segments, _, err = parseReqURI(r.RequestURI); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	non_empty_last_segments_len = len(segments)
+	contentfulSegmentsLen = len(segments)
 	if segments[len(segments)-1] == "" {
-		non_empty_last_segments_len--
+		contentfulSegmentsLen--
 	}
 
 	if segments[0] == ":" {
 		if len(segments) < 2 {
 			http.Error(w, "Blank system endpoint", http.StatusNotFound)
 			return
-		} else if len(segments) == 2 && redirect_with_slash(w, r) {
+		} else if len(segments) == 2 && redirectDir(w, r) {
 			return
 		}
 
 		switch segments[1] {
 		case "static":
-			static_handler.ServeHTTP(w, r)
+			staticHandler.ServeHTTP(w, r)
 			return
 		case "source":
-			source_handler.ServeHTTP(w, r)
+			sourceHandler.ServeHTTP(w, r)
 			return
 		}
 	}
 
 	params["url_segments"] = segments
 	params["global"] = globalData
-	var _user_id int // 0 for none
-	_user_id, params["username"], err = get_user_info_from_request(r)
-	params["user_id"] = _user_id
+	var userID int // 0 for none
+	userID, params["username"], err = getUserFromRequest(r)
+	params["user_id"] = userID
 	if errors.Is(err, http.ErrNoCookie) {
 	} else if errors.Is(err, pgx.ErrNoRows) {
 	} else if err != nil {
@@ -64,22 +64,22 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _user_id == 0 {
+	if userID == 0 {
 		params["user_id_string"] = ""
 	} else {
-		params["user_id_string"] = strconv.Itoa(_user_id)
+		params["user_id_string"] = strconv.Itoa(userID)
 	}
 
 	if segments[0] == ":" {
 		switch segments[1] {
 		case "login":
-			handle_login(w, r, params)
+			httpHandleLogin(w, r, params)
 			return
 		case "users":
-			handle_users(w, r, params)
+			httpHandleUsers(w, r, params)
 			return
 		case "gc":
-			handle_gc(w, r, params)
+			httpHandleGC(w, r, params)
 			return
 		default:
 			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
@@ -87,65 +87,65 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	separator_index = -1
+	sepIndex = -1
 	for i, part := range segments {
 		if part == ":" {
-			separator_index = i
+			sepIndex = i
 			break
 		}
 	}
 
-	params["separator_index"] = separator_index
+	params["separator_index"] = sepIndex
 
-	var group_path []string
-	var module_type string
-	var module_name string
+	var groupPath []string
+	var moduleType string
+	var moduleName string
 
-	if separator_index > 0 {
-		group_path = segments[:separator_index]
+	if sepIndex > 0 {
+		groupPath = segments[:sepIndex]
 	} else {
-		group_path = segments[:len(segments)-1]
+		groupPath = segments[:len(segments)-1]
 	}
-	params["group_path"] = group_path
+	params["group_path"] = groupPath
 
 	switch {
-	case non_empty_last_segments_len == 0:
-		handle_index(w, r, params)
-	case separator_index == -1:
-		if redirect_with_slash(w, r) {
+	case contentfulSegmentsLen == 0:
+		httpHandleIndex(w, r, params)
+	case sepIndex == -1:
+		if redirectDir(w, r) {
 			return
 		}
-		handle_group_index(w, r, params)
-	case non_empty_last_segments_len == separator_index+1:
+		httpHandleGroupIndex(w, r, params)
+	case contentfulSegmentsLen == sepIndex+1:
 		http.Error(w, "Illegal path 1", http.StatusNotImplemented)
 		return
-	case non_empty_last_segments_len == separator_index+2:
+	case contentfulSegmentsLen == sepIndex+2:
 		http.Error(w, "Illegal path 2", http.StatusNotImplemented)
 		return
 	default:
-		module_type = segments[separator_index+1]
-		module_name = segments[separator_index+2]
-		switch module_type {
+		moduleType = segments[sepIndex+1]
+		moduleName = segments[sepIndex+2]
+		switch moduleType {
 		case "repos":
-			params["repo_name"] = module_name
+			params["repo_name"] = moduleName
 
-			if non_empty_last_segments_len > separator_index+3 {
-				switch segments[separator_index+3] {
+			if contentfulSegmentsLen > sepIndex+3 {
+				switch segments[sepIndex+3] {
 				case "info":
-					if err = handle_repo_info(w, r, params); err != nil {
+					if err = httpHandleRepoInfo(w, r, params); err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				case "git-upload-pack":
-					if err = handle_upload_pack(w, r, params); err != nil {
+					if err = httpHandleUploadPack(w, r, params); err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				}
 			}
 
-			if params["ref_type"], params["ref_name"], err = get_param_ref_and_type(r); err != nil {
-				if errors.Is(err, err_no_ref_spec) {
+			if params["ref_type"], params["ref_name"], err = getParamRefTypeName(r); err != nil {
+				if errors.Is(err, errNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
 					http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
@@ -155,66 +155,66 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// TODO: subgroups
 
-			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(r.Context(), group_path, module_name); err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(r.Context(), groupPath, moduleName); err != nil {
 				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			if non_empty_last_segments_len == separator_index+3 {
-				if redirect_with_slash(w, r) {
+			if contentfulSegmentsLen == sepIndex+3 {
+				if redirectDir(w, r) {
 					return
 				}
-				handle_repo_index(w, r, params)
+				httpHandleRepoIndex(w, r, params)
 				return
 			}
 
-			repo_feature := segments[separator_index+3]
-			switch repo_feature {
+			repoFeature := segments[sepIndex+3]
+			switch repoFeature {
 			case "tree":
-				params["rest"] = strings.Join(segments[separator_index+4:], "/")
-				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
+				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				if len(segments) < sepIndex+5 && redirectDir(w, r) {
 					return
 				}
-				handle_repo_tree(w, r, params)
+				httpHandleRepoTree(w, r, params)
 			case "raw":
-				params["rest"] = strings.Join(segments[separator_index+4:], "/")
-				if len(segments) < separator_index+5 && redirect_with_slash(w, r) {
+				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				if len(segments) < sepIndex+5 && redirectDir(w, r) {
 					return
 				}
-				handle_repo_raw(w, r, params)
+				httpHandleRepoRaw(w, r, params)
 			case "log":
-				if non_empty_last_segments_len > separator_index+4 {
+				if contentfulSegmentsLen > sepIndex+4 {
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 					return
 				}
-				if redirect_with_slash(w, r) {
+				if redirectDir(w, r) {
 					return
 				}
-				handle_repo_log(w, r, params)
+				httpHandleRepoLog(w, r, params)
 			case "commit":
-				if redirect_without_slash(w, r) {
+				if redirectNoDir(w, r) {
 					return
 				}
-				params["commit_id"] = segments[separator_index+4]
-				handle_repo_commit(w, r, params)
+				params["commit_id"] = segments[sepIndex+4]
+				httpHandleRepoCommit(w, r, params)
 			case "contrib":
-				if redirect_with_slash(w, r) {
+				if redirectDir(w, r) {
 					return
 				}
-				switch non_empty_last_segments_len {
-				case separator_index + 4:
-					handle_repo_contrib_index(w, r, params)
-				case separator_index + 5:
-					params["mr_id"] = segments[separator_index+4]
-					handle_repo_contrib_one(w, r, params)
+				switch contentfulSegmentsLen {
+				case sepIndex + 4:
+					httpHandleRepoContribIndex(w, r, params)
+				case sepIndex + 5:
+					params["mr_id"] = segments[sepIndex+4]
+					httpHandleRepoContribOne(w, r, params)
 				default:
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 				}
 			default:
-				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repo_feature), http.StatusNotFound)
+				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repoFeature), http.StatusNotFound)
 			}
 		default:
-			http.Error(w, fmt.Sprintf("Unknown module type: %s", module_type), http.StatusNotFound)
+			http.Error(w, fmt.Sprintf("Unknown module type: %s", moduleType), http.StatusNotFound)
 		}
 	}
 }

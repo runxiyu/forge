@@ -13,7 +13,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
-func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repo_name string
 	var group_path []string
@@ -62,13 +62,13 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	}
 
 	params["files"] = makeDisplayTree(tree)
-	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
+	params["readme_filename"], params["readme"] = renderReadmeAtTree(tree)
 
 no_ref:
 
-	params["http_clone_url"] = generate_http_remote_url(group_path, repo_name)
-	params["ssh_clone_url"] = generate_ssh_remote_url(group_path, repo_name)
+	params["http_clone_url"] = genHTTPRemoteURL(group_path, repo_name)
+	params["ssh_clone_url"] = genSSHRemoteURL(group_path, repo_name)
 	params["notes"] = notes
 
-	render_template(w, "repo_index", params)
+	renderTemplate(w, "repo_index", params)
 }

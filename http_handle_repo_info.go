@@ -12,9 +12,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
-	var group_path []string
-	var repo_name, repo_path string
+func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
+	var groupPath []string
+	var repoName, repoPath string
 
 	if err := database.QueryRow(r.Context(), `
 	WITH RECURSIVE group_path_cte AS (
@@ -47,16 +47,16 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 	WHERE c.depth = cardinality($1::text[])
 		AND r.name = $2
 	`,
-		pgtype.FlatArray[string](group_path),
-		repo_name,
-	).Scan(&repo_path); err != nil {
+		pgtype.FlatArray[string](groupPath),
+		repoName,
+	).Scan(&repoPath); err != nil {
 		return err
 	}
 
 	w.Header().Set("Content-Type", "application/x-git-upload-pack-advertisement")
 	w.WriteHeader(http.StatusOK)
 
-	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", "--advertise-refs", repo_path)
+	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", "--advertise-refs", repoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -70,11 +70,11 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 		return err
 	}
 
-	if err = pack_line(w, "# service=git-upload-pack\n"); err != nil {
+	if err = packLine(w, "# service=git-upload-pack\n"); err != nil {
 		return err
 	}
 
-	if err = pack_flush(w); err != nil {
+	if err = packFlush(w); err != nil {
 		return
 	}
 
@@ -90,13 +90,13 @@ func handle_repo_info(w http.ResponseWriter, r *http.Request, params map[string]
 }
 
 // Taken from https://github.com/icyphox/legit, MIT license
-func pack_line(w io.Writer, s string) error {
+func packLine(w io.Writer, s string) error {
 	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
 	return err
 }
 
 // Taken from https://github.com/icyphox/legit, MIT license
-func pack_flush(w io.Writer) error {
+func packFlush(w io.Writer) error {
 	_, err := fmt.Fprint(w, "0000")
 	return err
 }

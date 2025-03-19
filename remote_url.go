@@ -10,10 +10,10 @@ import (
 
 // We don't use path.Join because it collapses multiple slashes into one.
 
-func generate_ssh_remote_url(group_path []string, repo_name string) string {
-	return strings.TrimSuffix(config.SSH.Root, "/") + "/" + path_escape_cat_segments(group_path) + "/:/repos/" + url.PathEscape(repo_name)
+func genSSHRemoteURL(group_path []string, repo_name string) string {
+	return strings.TrimSuffix(config.SSH.Root, "/") + "/" + segmentsToURL(group_path) + "/:/repos/" + url.PathEscape(repo_name)
 }
 
-func generate_http_remote_url(group_path []string, repo_name string) string {
-	return strings.TrimSuffix(config.HTTP.Root, "/") + "/" + path_escape_cat_segments(group_path) + "/:/repos/" + url.PathEscape(repo_name)
+func genHTTPRemoteURL(group_path []string, repo_name string) string {
+	return strings.TrimSuffix(config.HTTP.Root, "/") + "/" + segmentsToURL(group_path) + "/:/repos/" + url.PathEscape(repo_name)
 }

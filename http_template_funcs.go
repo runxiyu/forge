@@ -9,19 +9,19 @@ import (
 	"strings"
 )
 
-func first_line(s string) string {
+func firstLine(s string) string {
 	before, _, _ := strings.Cut(s, "\n")
 	return before
 }
 
-func base_name(s string) string {
+func baseName(s string) string {
 	return path.Base(s)
 }
 
-func path_escape(s string) string {
+func pathEscape(s string) string {
 	return url.PathEscape(s)
 }
 
-func query_escape(s string) string {
+func queryEscape(s string) string {
 	return url.QueryEscape(s)
 }

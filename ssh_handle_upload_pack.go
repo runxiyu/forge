@@ -11,15 +11,15 @@ import (
 	glider_ssh "github.com/gliderlabs/ssh"
 )
 
-// ssh_handle_upload_pack handles clones/fetches. It just uses git-upload-pack
+// sshHandleUploadPack handles clones/fetches. It just uses git-upload-pack
 // and has no ACL checks.
-func ssh_handle_upload_pack(session glider_ssh.Session, pubkey, repo_identifier string) (err error) {
-	var repo_path string
-	if _, _, _, repo_path, _, _, _, _, err = get_repo_path_perms_from_ssh_path_pubkey(session.Context(), repo_identifier, pubkey); err != nil {
+func sshHandleUploadPack(session glider_ssh.Session, pubkey, repoIdentifier string) (err error) {
+	var repoPath string
+	if _, _, _, repoPath, _, _, _, _, err = getRepoInfo2(session.Context(), repoIdentifier, pubkey); err != nil {
 		return err
 	}
 
-	proc := exec.CommandContext(session.Context(), "git-upload-pack", repo_path)
+	proc := exec.CommandContext(session.Context(), "git-upload-pack", repoPath)
 	proc.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
 	proc.Stdin = session
 	proc.Stdout = session

@@ -15,19 +15,19 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleLogin(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var username, password string
-	var user_id int
-	var password_hash string
+	var userID int
+	var passwordHash string
 	var err error
-	var password_matches bool
-	var cookie_value string
+	var passwordMatches bool
+	var cookieValue string
 	var now time.Time
 	var expiry time.Time
 	var cookie http.Cookie
 
 	if r.Method != "POST" {
-		render_template(w, "login", params)
+		renderTemplate(w, "login", params)
 		return
 	}
 
@@ -37,34 +37,34 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	err = database.QueryRow(r.Context(),
 		"SELECT id, COALESCE(password, '') FROM users WHERE username = $1",
 		username,
-	).Scan(&user_id, &password_hash)
+	).Scan(&userID, &passwordHash)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			params["login_error"] = "Unknown username"
-			render_template(w, "login", params)
+			renderTemplate(w, "login", params)
 			return
 		}
 		http.Error(w, "Error querying user information: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if password_hash == "" {
+	if passwordHash == "" {
 		params["login_error"] = "User has no password"
-		render_template(w, "login", params)
+		renderTemplate(w, "login", params)
 		return
 	}
 
-	if password_matches, err = argon2id.ComparePasswordAndHash(password, password_hash); err != nil {
+	if passwordMatches, err = argon2id.ComparePasswordAndHash(password, passwordHash); err != nil {
 		http.Error(w, "Error comparing password and hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if !password_matches {
+	if !passwordMatches {
 		params["login_error"] = "Invalid password"
-		render_template(w, "login", params)
+		renderTemplate(w, "login", params)
 		return
 	}
 
-	if cookie_value, err = random_urlsafe_string(16); err != nil {
+	if cookieValue, err = randomUrlsafeStr(16); err != nil {
 		http.Error(w, "Error getting random string: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -74,7 +74,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 
 	cookie = http.Cookie{
 		Name:     "session",
-		Value:    cookie_value,
+		Value:    cookieValue,
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
 		Secure:   false, // TODO
@@ -85,7 +85,7 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 
 	http.SetCookie(w, &cookie)
 
-	_, err = database.Exec(r.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", user_id, cookie_value)
+	_, err = database.Exec(r.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
 		http.Error(w, "Error inserting session: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -94,10 +94,10 @@ func handle_login(w http.ResponseWriter, r *http.Request, params map[string]any)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// random_urlsafe_string generates a random string of the given entropic size
+// randomUrlsafeStr generates a random string of the given entropic size
 // using the URL-safe base64 encoding. The actual size of the string returned
 // will be 4*sz.
-func random_urlsafe_string(sz int) (string, error) {
+func randomUrlsafeStr(sz int) (string, error) {
 	r := make([]byte, 3*sz)
 	_, err := rand.Read(r)
 	if err != nil {

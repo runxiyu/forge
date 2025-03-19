@@ -12,77 +12,77 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	var mr_id_string string
-	var mr_id int
+func httpHandleRepoContribOne(w http.ResponseWriter, r *http.Request, params map[string]any) {
+	var mrIDStr string
+	var mrIDInt int
 	var err error
-	var title, status, source_ref, destination_branch string
+	var title, status, srcRefStr, dstBranchStr string
 	var repo *git.Repository
-	var source_ref_hash plumbing.Hash
-	var source_commit, destination_commit, merge_base *object.Commit
-	var merge_bases []*object.Commit
+	var srcRefHash plumbing.Hash
+	var dstBranchHash plumbing.Hash
+	var srcCommit, dstCommit, mergeBaseCommit *object.Commit
+	var mergeBases []*object.Commit
 
-	mr_id_string = params["mr_id"].(string)
-	mr_id_int64, err := strconv.ParseInt(mr_id_string, 10, strconv.IntSize)
+	mrIDStr = params["mr_id"].(string)
+	mrIDInt64, err := strconv.ParseInt(mrIDStr, 10, strconv.IntSize)
 	if err != nil {
 		http.Error(w, "Merge request ID not an integer: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	mr_id = int(mr_id_int64)
+	mrIDInt = int(mrIDInt64)
 
 	if err = database.QueryRow(r.Context(),
 		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE id = $1",
-		mr_id,
-	).Scan(&title, &status, &source_ref, &destination_branch); err != nil {
+		mrIDInt,
+	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {
 		http.Error(w, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	repo = params["repo"].(*git.Repository)
 
-	if source_ref_hash, err = getRefHash(repo, "branch", source_ref); err != nil {
+	if srcRefHash, err = getRefHash(repo, "branch", srcRefStr); err != nil {
 		http.Error(w, "Error getting source ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if source_commit, err = repo.CommitObject(source_ref_hash); err != nil {
+	if srcCommit, err = repo.CommitObject(srcRefHash); err != nil {
 		http.Error(w, "Error getting source commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["source_commit"] = source_commit
+	params["source_commit"] = srcCommit
 
-	var destination_branch_hash plumbing.Hash
-	if destination_branch == "" {
-		destination_branch = "HEAD"
-		destination_branch_hash, err = getRefHash(repo, "", "")
+	if dstBranchStr == "" {
+		dstBranchStr = "HEAD"
+		dstBranchHash, err = getRefHash(repo, "", "")
 	} else {
-		destination_branch_hash, err = getRefHash(repo, "branch", destination_branch)
+		dstBranchHash, err = getRefHash(repo, "branch", dstBranchStr)
 	}
 	if err != nil {
 		http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if destination_commit, err = repo.CommitObject(destination_branch_hash); err != nil {
+	if dstCommit, err = repo.CommitObject(dstBranchHash); err != nil {
 		http.Error(w, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["destination_commit"] = destination_commit
+	params["destination_commit"] = dstCommit
 
-	if merge_bases, err = source_commit.MergeBase(destination_commit); err != nil {
+	if mergeBases, err = srcCommit.MergeBase(dstCommit); err != nil {
 		http.Error(w, "Error getting merge base: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	merge_base = merge_bases[0]
-	params["merge_base"] = merge_base
+	mergeBaseCommit = mergeBases[0]
+	params["merge_base"] = mergeBaseCommit
 
-	patch, err := merge_base.Patch(source_commit)
+	patch, err := mergeBaseCommit.Patch(srcCommit)
 	if err != nil {
 		http.Error(w, "Error getting patch: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["file_patches"] = make_usable_file_patches(patch)
+	params["file_patches"] = makeUsableFilePatches(patch)
 
-	params["mr_title"], params["mr_status"], params["mr_source_ref"], params["mr_destination_branch"] = title, status, source_ref, destination_branch
+	params["mr_title"], params["mr_status"], params["mr_source_ref"], params["mr_destination_branch"] = title, status, srcRefStr, dstBranchStr
 
-	render_template(w, "repo_contrib_one", params)
+	renderTemplate(w, "repo_contrib_one", params)
 }

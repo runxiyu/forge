@@ -15,7 +15,7 @@ type id_title_status_t struct {
 	Status string
 }
 
-func handle_repo_contrib_index(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoContribIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var rows pgx.Rows
 	var result []id_title_status_t
 	var err error
@@ -44,5 +44,5 @@ func handle_repo_contrib_index(w http.ResponseWriter, r *http.Request, params ma
 	}
 	params["merge_requests"] = result
 
-	render_template(w, "repo_contrib_index", params)
+	renderTemplate(w, "repo_contrib_index", params)
 }

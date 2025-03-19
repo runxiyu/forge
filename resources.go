@@ -23,11 +23,11 @@ import (
 //go:embed static/* templates/* scripts/* sql/*
 //go:embed hookc/*.c
 //go:embed vendor/*
-var source_fs embed.FS
+var sourceFS embed.FS
 
-var source_handler = http.StripPrefix(
+var sourceHandler = http.StripPrefix(
 	"/:/source/",
-	http.FileServer(http.FS(source_fs)),
+	http.FileServer(http.FS(sourceFS)),
 )
 
 //go:embed templates/* static/* hookc/hookc
@@ -40,10 +40,10 @@ func loadTemplates() (err error) {
 	m.Add("text/html", &html.Minifier{TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true})
 
 	templates = template.New("templates").Funcs(template.FuncMap{
-		"first_line":   first_line,
-		"base_name":    base_name,
-		"path_escape":  path_escape,
-		"query_escape": query_escape,
+		"first_line":   firstLine,
+		"base_name":    baseName,
+		"path_escape":  pathEscape,
+		"query_escape": queryEscape,
 	})
 
 	err = fs.WalkDir(resourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
@@ -71,12 +71,12 @@ func loadTemplates() (err error) {
 	return err
 }
 
-var static_handler http.Handler
+var staticHandler http.Handler
 
 func init() {
-	static_fs, err := fs.Sub(resourcesFS, "static")
+	staticFS, err := fs.Sub(resourcesFS, "static")
 	if err != nil {
 		panic(err)
 	}
-	static_handler = http.StripPrefix("/:/static/", http.FileServer(http.FS(static_fs)))
+	staticHandler = http.StripPrefix("/:/static/", http.FileServer(http.FS(staticFS)))
 }

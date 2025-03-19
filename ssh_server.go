@@ -63,13 +63,13 @@ func serveSSH(listener net.Listener) error {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = ssh_handle_upload_pack(session, client_public_key_string, cmd[1])
+				err = sshHandleUploadPack(session, client_public_key_string, cmd[1])
 			case "git-receive-pack":
 				if len(cmd) > 2 {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = ssh_handle_receive_pack(session, client_public_key_string, cmd[1])
+				err = sshHandleRecvPack(session, client_public_key_string, cmd[1])
 			default:
 				fmt.Fprintln(session.Stderr(), "Unsupported command: "+cmd[0]+"\r")
 				return

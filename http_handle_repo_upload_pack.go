@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handle_upload_pack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
+func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
 	var group_path []string
 	var repo_name string
 	var repo_path string

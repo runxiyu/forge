@@ -12,7 +12,7 @@ import (
 )
 
 // TODO: I probably shouldn't include *all* commits here...
-func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoLog(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var ref_hash plumbing.Hash
 	var err error
@@ -31,5 +31,5 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]a
 	}
 	params["commits"] = commits
 
-	render_template(w, "repo_log", params)
+	renderTemplate(w, "repo_log", params)
 }

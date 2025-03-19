@@ -18,125 +18,125 @@ import (
 
 // The file patch type from go-git isn't really usable in HTML templates
 // either.
-type usable_file_patch_t struct {
+type usableFilePatch struct {
 	From   diff.File
 	To     diff.File
-	Chunks []usable_chunk
+	Chunks []usableChunk
 }
 
-type usable_chunk struct {
+type usableChunk struct {
 	Operation diff.Operation
 	Content   string
 }
 
-func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
-	var commit_id_specified_string, commit_id_specified_string_without_suffix string
-	var commit_id plumbing.Hash
-	var parent_commit_hash plumbing.Hash
-	var commit_object *object.Commit
-	var commit_id_string string
+	var commitIDStrSpec, commitIDStrSpecNoSuffix string
+	var commitID plumbing.Hash
+	var parentCommitHash plumbing.Hash
+	var commitObj *object.Commit
+	var commitIDStr string
 	var err error
 	var patch *object.Patch
 
-	repo, commit_id_specified_string = params["repo"].(*git.Repository), params["commit_id"].(string)
+	repo, commitIDStrSpec = params["repo"].(*git.Repository), params["commit_id"].(string)
 
-	commit_id_specified_string_without_suffix = strings.TrimSuffix(commit_id_specified_string, ".patch")
-	commit_id = plumbing.NewHash(commit_id_specified_string_without_suffix)
-	if commit_object, err = repo.CommitObject(commit_id); err != nil {
+	commitIDStrSpecNoSuffix = strings.TrimSuffix(commitIDStrSpec, ".patch")
+	commitID = plumbing.NewHash(commitIDStrSpecNoSuffix)
+	if commitObj, err = repo.CommitObject(commitID); err != nil {
 		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if commit_id_specified_string_without_suffix != commit_id_specified_string {
-		var formatted_patch string
-		if formatted_patch, err = fmtCommitPatch(commit_object); err != nil {
+	if commitIDStrSpecNoSuffix != commitIDStrSpec {
+		var patchStr string
+		if patchStr, err = fmtCommitPatch(commitObj); err != nil {
 			http.Error(w, "Error formatting patch: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, formatted_patch)
+		fmt.Fprintln(w, patchStr)
 		return
 	}
-	commit_id_string = commit_object.Hash.String()
+	commitIDStr = commitObj.Hash.String()
 
-	if commit_id_string != commit_id_specified_string {
-		http.Redirect(w, r, commit_id_string, http.StatusSeeOther)
+	if commitIDStr != commitIDStrSpec {
+		http.Redirect(w, r, commitIDStr, http.StatusSeeOther)
 		return
 	}
 
-	params["commit_object"] = commit_object
-	params["commit_id"] = commit_id_string
+	params["commit_object"] = commitObj
+	params["commit_id"] = commitIDStr
 
-	parent_commit_hash, patch, err = fmtCommitAsPatch(commit_object)
+	parentCommitHash, patch, err = fmtCommitAsPatch(commitObj)
 	if err != nil {
 		http.Error(w, "Error getting patch from commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["parent_commit_hash"] = parent_commit_hash.String()
+	params["parent_commit_hash"] = parentCommitHash.String()
 	params["patch"] = patch
 
-	params["file_patches"] = make_usable_file_patches(patch)
+	params["file_patches"] = makeUsableFilePatches(patch)
 
-	render_template(w, "repo_commit", params)
+	renderTemplate(w, "repo_commit", params)
 }
 
-type fake_diff_file struct {
+type fakeDiffFile struct {
 	hash plumbing.Hash
 	mode filemode.FileMode
 	path string
 }
 
-func (f fake_diff_file) Hash() plumbing.Hash {
+func (f fakeDiffFile) Hash() plumbing.Hash {
 	return f.hash
 }
 
-func (f fake_diff_file) Mode() filemode.FileMode {
+func (f fakeDiffFile) Mode() filemode.FileMode {
 	return f.mode
 }
 
-func (f fake_diff_file) Path() string {
+func (f fakeDiffFile) Path() string {
 	return f.path
 }
 
-var fake_diff_file_null = fake_diff_file{
+var nullFakeDiffFile = fakeDiffFile{
 	hash: plumbing.NewHash("0000000000000000000000000000000000000000"),
 	mode: misc.First_or_panic(filemode.New("100644")),
 	path: "",
 }
 
-func make_usable_file_patches(patch diff.Patch) (usable_file_patches []usable_file_patch_t) {
+func makeUsableFilePatches(patch diff.Patch) (usableFilePatches []usableFilePatch) {
 	// TODO: Remove unnecessary context
 	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
 
-	for _, file_patch := range patch.FilePatches() {
+	for _, filePatch := range patch.FilePatches() {
 		var from, to diff.File
-		var usable_file_patch usable_file_patch_t
-		chunks := []usable_chunk{}
+		var ufp usableFilePatch
+		chunks := []usableChunk{}
 
-		from, to = file_patch.Files()
+		from, to = filePatch.Files()
 		if from == nil {
-			from = fake_diff_file_null
+			from = nullFakeDiffFile
 		}
 		if to == nil {
-			to = fake_diff_file_null
+			to = nullFakeDiffFile
 		}
-		for _, chunk := range file_patch.Chunks() {
+		for _, chunk := range filePatch.Chunks() {
 			var content string
 
 			content = chunk.Content()
 			if len(content) > 0 && content[0] == '\n' {
 				content = "\n" + content
 			} // Horrible hack to fix how browsers newlines that immediately proceed <pre>
-			chunks = append(chunks, usable_chunk{
+			chunks = append(chunks, usableChunk{
 				Operation: chunk.Type(),
 				Content:   content,
 			})
 		}
-		usable_file_patch = usable_file_patch_t{
+		ufp = usableFilePatch{
 			Chunks: chunks,
 			From:   from,
 			To:     to,
 		}
-		usable_file_patches = append(usable_file_patches, usable_file_patch)
+		usableFilePatches = append(usableFilePatches, ufp)
 	}
 	return
 }

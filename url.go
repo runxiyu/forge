@@ -11,42 +11,41 @@ import (
 )
 
 var (
-	err_duplicate_ref_spec = errors.New("duplicate ref spec")
-	err_no_ref_spec        = errors.New("no ref spec")
+	errDupRefSpec = errors.New("duplicate ref spec")
+	errNoRefSpec        = errors.New("no ref spec")
 )
 
-func get_param_ref_and_type(r *http.Request) (ref_type, ref string, err error) {
+func getParamRefTypeName(r *http.Request) (retRefType, retRefName string, err error) {
 	qr := r.URL.RawQuery
 	q, err := url.ParseQuery(qr)
 	if err != nil {
 		return
 	}
 	done := false
-	for _, _ref_type := range []string{"commit", "branch", "tag"} {
-		_ref, ok := q[_ref_type]
+	for _, refType := range []string{"commit", "branch", "tag"} {
+		refName, ok := q[refType]
 		if ok {
 			if done {
-				err = err_duplicate_ref_spec
+				err = errDupRefSpec
 				return
-			} else {
-				done = true
-				if len(_ref) != 1 {
-					err = err_duplicate_ref_spec
-					return
-				}
-				ref = _ref[0]
-				ref_type = _ref_type
 			}
+			done = true
+			if len(refName) != 1 {
+				err = errDupRefSpec
+				return
+			}
+			retRefName = refName[0]
+			retRefType = refType
 		}
 	}
 	if !done {
-		err = err_no_ref_spec
+		err = errNoRefSpec
 	}
 	return
 }
 
-func parse_request_uri(request_uri string) (segments []string, params url.Values, err error) {
-	path, params_string, _ := strings.Cut(request_uri, "?")
+func parseReqURI(requestURI string) (segments []string, params url.Values, err error) {
+	path, paramsStr, _ := strings.Cut(requestURI, "?")
 
 	segments = strings.Split(strings.TrimPrefix(path, "/"), "/")
 
@@ -57,20 +56,20 @@ func parse_request_uri(request_uri string) (segments []string, params url.Values
 		}
 	}
 
-	params, err = url.ParseQuery(params_string)
+	params, err = url.ParseQuery(paramsStr)
 	return
 }
 
-func redirect_with_slash(w http.ResponseWriter, r *http.Request) bool {
-	request_uri := r.RequestURI
+func redirectDir(w http.ResponseWriter, r *http.Request) bool {
+	requestURI := r.RequestURI
 
-	path_end := strings.IndexAny(request_uri, "?#")
+	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
-	if path_end == -1 {
-		path = request_uri
+	if pathEnd == -1 {
+		path = requestURI
 	} else {
-		path = request_uri[:path_end]
-		rest = request_uri[path_end:]
+		path = requestURI[:pathEnd]
+		rest = requestURI[pathEnd:]
 	}
 
 	if !strings.HasSuffix(path, "/") {
@@ -80,16 +79,16 @@ func redirect_with_slash(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
-	request_uri := r.RequestURI
+func redirectNoDir(w http.ResponseWriter, r *http.Request) bool {
+	requestURI := r.RequestURI
 
-	path_end := strings.IndexAny(request_uri, "?#")
+	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
-	if path_end == -1 {
-		path = request_uri
+	if pathEnd == -1 {
+		path = requestURI
 	} else {
-		path = request_uri[:path_end]
-		rest = request_uri[path_end:]
+		path = requestURI[:pathEnd]
+		rest = requestURI[pathEnd:]
 	}
 
 	if strings.HasSuffix(path, "/") {
@@ -99,22 +98,22 @@ func redirect_without_slash(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func redirect_unconditionally(w http.ResponseWriter, r *http.Request) {
-	request_uri := r.RequestURI
+func redirectUnconditionally(w http.ResponseWriter, r *http.Request) {
+	requestURI := r.RequestURI
 
-	path_end := strings.IndexAny(request_uri, "?#")
+	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
-	if path_end == -1 {
-		path = request_uri
+	if pathEnd == -1 {
+		path = requestURI
 	} else {
-		path = request_uri[:path_end]
-		rest = request_uri[path_end:]
+		path = requestURI[:pathEnd]
+		rest = requestURI[pathEnd:]
 	}
 
 	http.Redirect(w, r, path+rest, http.StatusSeeOther)
 }
 
-func path_escape_cat_segments(segments []string) string {
+func segmentsToURL(segments []string) string {
 	for i, segment := range segments {
 		segments[i] = url.PathEscape(segment)
 	}

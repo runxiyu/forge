@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func add_user_ssh(ctx context.Context, pubkey string) (user_id int, err error) {
+func addUserSSH(ctx context.Context, pubkey string) (user_id int, err error) {
 	var tx pgx.Tx
 
 	if tx, err = database.Begin(ctx); err != nil {

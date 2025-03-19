@@ -64,9 +64,9 @@ WHERE g.depth = cardinality($1::text[])
 
 // go-git's tree entries are not friendly for use in HTML templates.
 type displayTreeEntry struct {
-	Name       string
-	Mode       string
-	Size       int64
+	Name      string
+	Mode      string
+	Size      int64
 	IsFile    bool
 	IsSubtree bool
 }
