@@ -71,7 +71,7 @@ func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[str
 		http.Error(w, "Error getting patch from commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	params["parent_commit_hash"] = parentCommitHash.String()
+	params["parent_commitHash"] = parentCommitHash.String()
 	params["patch"] = patch
 
 	params["file_patches"] = makeUsableFilePatches(patch)

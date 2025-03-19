@@ -17,7 +17,7 @@ import (
 func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var raw_path_spec, path_spec string
 	var repo *git.Repository
-	var ref_hash plumbing.Hash
+	var refHash plumbing.Hash
 	var commit_object *object.Commit
 	var tree *object.Tree
 	var err error
@@ -26,12 +26,12 @@ func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string
 	repo, path_spec = params["repo"].(*git.Repository), strings.TrimSuffix(raw_path_spec, "/")
 	params["path_spec"] = path_spec
 
-	if ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
+	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if commit_object, err = repo.CommitObject(ref_hash); err != nil {
+	if commit_object, err = repo.CommitObject(refHash); err != nil {
 		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

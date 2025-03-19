@@ -14,18 +14,18 @@ import (
 // TODO: I probably shouldn't include *all* commits here...
 func httpHandleRepoLog(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
-	var ref_hash plumbing.Hash
+	var refHash plumbing.Hash
 	var err error
 	var commits []*object.Commit
 
 	repo = params["repo"].(*git.Repository)
 
-	if ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
+	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if commits, err = getRecentCommits(repo, ref_hash, -1); err != nil {
+	if commits, err = getRecentCommits(repo, refHash, -1); err != nil {
 		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

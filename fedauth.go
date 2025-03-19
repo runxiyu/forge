@@ -15,20 +15,20 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func fedauth(ctx context.Context, userID int, service, remote_username, pubkey string) (bool, error) {
+func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
 	var err error
 	var resp *http.Response
 	matched := false
-	username_escaped := url.PathEscape(remote_username)
+	usernameEscaped := url.PathEscape(remoteUsername)
 	switch service {
 	case "sr.ht":
-		resp, err = http.Get("https://meta.sr.ht/~" + username_escaped + ".keys")
+		resp, err = http.Get("https://meta.sr.ht/~" + usernameEscaped + ".keys")
 	case "github":
-		resp, err = http.Get("https://github.com/" + username_escaped + ".keys")
+		resp, err = http.Get("https://github.com/" + usernameEscaped + ".keys")
 	case "codeberg":
-		resp, err = http.Get("https://codeberg.org/" + username_escaped + ".keys")
+		resp, err = http.Get("https://codeberg.org/" + usernameEscaped + ".keys")
 	case "tangled":
-		resp, err = http.Get("https://tangled.sh/keys/" + username_escaped)
+		resp, err = http.Get("https://tangled.sh/keys/" + usernameEscaped)
 		// TODO: Don't rely on one webview
 	default:
 		return false, errors.New("unknown federated service")
@@ -77,7 +77,7 @@ func fedauth(ctx context.Context, userID int, service, remote_username, pubkey s
 	if _, err = tx.Exec(ctx, `UPDATE users SET type = 'federated' WHERE id = $1 AND type = 'pubkey_only'`, userID); err != nil {
 		return false, err
 	}
-	if _, err = tx.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, userID, service, remote_username); err != nil {
+	if _, err = tx.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, userID, service, remoteUsername); err != nil {
 		return false, err
 	}
 	if err = tx.Commit(ctx); err != nil {

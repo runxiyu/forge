@@ -44,10 +44,10 @@ func deployHooks() (err error) {
 		return err
 	}
 
-	for _, hook_name := range []string{
+	for _, hookName := range []string{
 		"pre-receive",
 	} {
-		if err = os.Symlink(filepath.Join(config.Hooks.Execs, "hookc"), filepath.Join(config.Hooks.Execs, hook_name)); err != nil {
+		if err = os.Symlink(filepath.Join(config.Hooks.Execs, "hookc"), filepath.Join(config.Hooks.Execs, hookName)); err != nil {
 			return err
 		}
 	}

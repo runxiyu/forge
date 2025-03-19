@@ -17,7 +17,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	var repo *git.Repository
 	var repo_name string
 	var group_path []string
-	var ref_hash plumbing.Hash
+	var refHash plumbing.Hash
 	var err error
 	var recent_commits []*object.Commit
 	var commit_object *object.Commit
@@ -32,7 +32,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 
-	ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string))
+	refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {
 		goto no_ref
 	}
@@ -48,12 +48,12 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	}
 	params["branches"] = branches
 
-	if recent_commits, err = getRecentCommits(repo, ref_hash, 3); err != nil {
+	if recent_commits, err = getRecentCommits(repo, refHash, 3); err != nil {
 		goto no_ref
 	}
 	params["commits"] = recent_commits
 
-	if commit_object, err = repo.CommitObject(ref_hash); err != nil {
+	if commit_object, err = repo.CommitObject(refHash); err != nil {
 		goto no_ref
 	}
 
