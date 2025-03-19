@@ -14,14 +14,14 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
 
-var err_ssh_illegal_endpoint = errors.New("illegal endpoint during SSH access")
+var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
 
-func getRepoInfo2(ctx context.Context, ssh_path, ssh_pubkey string) (group_path []string, repo_name string, repo_id int, repo_path string, direct_access bool, contrib_requirements, user_type string, user_id int, err error) {
+func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
 	var segments []string
-	var separator_index int
-	var module_type, module_name string
+	var sepIndex int
+	var moduleType, moduleName string
 
-	segments = strings.Split(strings.TrimPrefix(ssh_path, "/"), "/")
+	segments = strings.Split(strings.TrimPrefix(sshPath, "/"), "/")
 
 	for i, segment := range segments {
 		var err error
@@ -32,13 +32,13 @@ func getRepoInfo2(ctx context.Context, ssh_path, ssh_pubkey string) (group_path 
 	}
 
 	if segments[0] == ":" {
-		return []string{}, "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint
+		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath
 	}
 
-	separator_index = -1
+	sepIndex = -1
 	for i, part := range segments {
 		if part == ":" {
-			separator_index = i
+			sepIndex = i
 			break
 		}
 	}
@@ -47,22 +47,22 @@ func getRepoInfo2(ctx context.Context, ssh_path, ssh_pubkey string) (group_path 
 	}
 
 	switch {
-	case separator_index == -1:
-		return []string{}, "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint
-	case len(segments) <= separator_index+2:
-		return []string{}, "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint
+	case sepIndex == -1:
+		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath
+	case len(segments) <= sepIndex+2:
+		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath
 	}
 
-	group_path = segments[:separator_index]
-	module_type = segments[separator_index+1]
-	module_name = segments[separator_index+2]
-	repo_name = module_name
-	switch module_type {
+	groupPath = segments[:sepIndex]
+	moduleType = segments[sepIndex+1]
+	moduleName = segments[sepIndex+2]
+	repoName = moduleName
+	switch moduleType {
 	case "repos":
-		_1, _2, _3, _4, _5, _6, _7 := getRepoInfo(ctx, group_path, module_name, ssh_pubkey)
-		return group_path, repo_name, _1, _2, _3, _4, _5, _6, _7
+		_1, _2, _3, _4, _5, _6, _7 := getRepoInfo(ctx, groupPath, moduleName, sshPubkey)
+		return groupPath, repoName, _1, _2, _3, _4, _5, _6, _7
 	default:
-		return []string{}, "", 0, "", false, "", "", 0, err_ssh_illegal_endpoint
+		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath
 	}
 }
 

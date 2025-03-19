@@ -5,8 +5,8 @@ package main
 
 // globalData is passed as "global" when rendering HTML templates.
 var globalData = map[string]any{
-	"server_public_key_string":      &server_public_key_string,
-	"server_public_key_fingerprint": &server_public_key_fingerprint,
+	"server_public_key_string":      &serverPubkeyString,
+	"server_public_key_fingerprint": &serverPubkeyFP,
 	"forge_version":                 VERSION,
 	// Some other ones are populated after config parsing
 }

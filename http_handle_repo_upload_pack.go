@@ -13,14 +13,14 @@ import (
 )
 
 func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
-	var group_path []string
-	var repo_name string
-	var repo_path string
+	var groupPath []string
+	var repoName string
+	var repoPath string
 	var stdout io.ReadCloser
 	var stdin io.WriteCloser
 	var cmd *exec.Cmd
 
-	group_path, repo_name = params["group_path"].([]string), params["repo_name"].(string)
+	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
 
 	if err := database.QueryRow(r.Context(), `
 	WITH RECURSIVE group_path_cte AS (
@@ -53,9 +53,9 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 	WHERE c.depth = cardinality($1::text[])
 		AND r.name = $2
 	`,
-		pgtype.FlatArray[string](group_path),
-		repo_name,
-	).Scan(&repo_path); err != nil {
+		pgtype.FlatArray[string](groupPath),
+		repoName,
+	).Scan(&repoPath); err != nil {
 		return err
 	}
 
@@ -64,7 +64,7 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 	w.Header().Set("Transfer-Encoding", "chunked")
 	w.WriteHeader(http.StatusOK)
 
-	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repo_path)
+	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
 	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err

@@ -15,57 +15,57 @@ import (
 )
 
 func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string]any) {
-	var raw_path_spec, path_spec string
+	var rawPathSpec, pathSpec string
 	var repo *git.Repository
 	var refHash plumbing.Hash
-	var commit_object *object.Commit
+	var commitObj *object.Commit
 	var tree *object.Tree
 	var err error
 
-	raw_path_spec = params["rest"].(string)
-	repo, path_spec = params["repo"].(*git.Repository), strings.TrimSuffix(raw_path_spec, "/")
-	params["path_spec"] = path_spec
+	rawPathSpec = params["rest"].(string)
+	repo, pathSpec = params["repo"].(*git.Repository), strings.TrimSuffix(rawPathSpec, "/")
+	params["path_spec"] = pathSpec
 
 	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if commit_object, err = repo.CommitObject(refHash); err != nil {
+	if commitObj, err = repo.CommitObject(refHash); err != nil {
 		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if tree, err = commit_object.Tree(); err != nil {
+	if tree, err = commitObj.Tree(); err != nil {
 		http.Error(w, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	var target *object.Tree
-	if path_spec == "" {
+	if pathSpec == "" {
 		target = tree
 	} else {
-		if target, err = tree.Tree(path_spec); err != nil {
+		if target, err = tree.Tree(pathSpec); err != nil {
 			var file *object.File
-			var file_contents string
-			if file, err = tree.File(path_spec); err != nil {
+			var fileContent string
+			if file, err = tree.File(pathSpec); err != nil {
 				http.Error(w, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] == '/' {
-				http.Redirect(w, r, "../"+path_spec, http.StatusSeeOther)
+			if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] == '/' {
+				http.Redirect(w, r, "../"+pathSpec, http.StatusSeeOther)
 				return
 			}
-			if file_contents, err = file.Contents(); err != nil {
+			if fileContent, err = file.Contents(); err != nil {
 				http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			fmt.Fprint(w, file_contents)
+			fmt.Fprint(w, fileContent)
 			return
 		}
 	}
 
-	if len(raw_path_spec) != 0 && raw_path_spec[len(raw_path_spec)-1] != '/' {
-		http.Redirect(w, r, path.Base(path_spec)+"/", http.StatusSeeOther)
+	if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] != '/' {
+		http.Redirect(w, r, path.Base(pathSpec)+"/", http.StatusSeeOther)
 		return
 	}
 

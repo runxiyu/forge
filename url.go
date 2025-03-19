@@ -12,7 +12,7 @@ import (
 
 var (
 	errDupRefSpec = errors.New("duplicate ref spec")
-	errNoRefSpec        = errors.New("no ref spec")
+	errNoRefSpec  = errors.New("no ref spec")
 )
 
 func getParamRefTypeName(r *http.Request) (retRefType, retRefName string, err error) {

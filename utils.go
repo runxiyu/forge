@@ -5,7 +5,7 @@ package main
 
 import "strings"
 
-func slice_contains_newline(s []string) bool {
+func sliceContainsNewlines(s []string) bool {
 	for _, v := range s {
 		if strings.Contains(v, "\n") {
 			return true

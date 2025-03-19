@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type id_title_status_t struct {
+type idTitleStatus struct {
 	ID     int
 	Title  string
 	Status string
@@ -17,7 +17,7 @@ type id_title_status_t struct {
 
 func httpHandleRepoContribIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var rows pgx.Rows
-	var result []id_title_status_t
+	var result []idTitleStatus
 	var err error
 
 	if rows, err = database.Query(r.Context(),
@@ -36,7 +36,7 @@ func httpHandleRepoContribIndex(w http.ResponseWriter, r *http.Request, params m
 			http.Error(w, "Error scanning merge request: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		result = append(result, id_title_status_t{id, title, status})
+		result = append(result, idTitleStatus{id, title, status})
 	}
 	if err = rows.Err(); err != nil {
 		http.Error(w, "Error ranging over merge requests: "+err.Error(), http.StatusInternalServerError)

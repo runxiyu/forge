@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func addUserSSH(ctx context.Context, pubkey string) (user_id int, err error) {
+func addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
 	var tx pgx.Tx
 
 	if tx, err = database.Begin(ctx); err != nil {
@@ -19,11 +19,11 @@ func addUserSSH(ctx context.Context, pubkey string) (user_id int, err error) {
 		_ = tx.Rollback(ctx)
 	}()
 
-	if err = tx.QueryRow(ctx, `INSERT INTO users (type) VALUES ('pubkey_only') RETURNING id`).Scan(&user_id); err != nil {
+	if err = tx.QueryRow(ctx, `INSERT INTO users (type) VALUES ('pubkey_only') RETURNING id`).Scan(&userID); err != nil {
 		return
 	}
 
-	if _, err = tx.Exec(ctx, `INSERT INTO ssh_public_keys (key_string, user_id) VALUES ($1, $2)`, pubkey, user_id); err != nil {
+	if _, err = tx.Exec(ctx, `INSERT INTO ssh_public_keys (key_string, user_id) VALUES ($1, $2)`, pubkey, userID); err != nil {
 		return
 	}
 

@@ -15,20 +15,20 @@ import (
 
 func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
 	var repo *git.Repository
-	var repo_name string
-	var group_path []string
+	var repoName string
+	var groupPath []string
 	var refHash plumbing.Hash
 	var err error
-	var recent_commits []*object.Commit
-	var commit_object *object.Commit
+	var recentCommits []*object.Commit
+	var commitObj *object.Commit
 	var tree *object.Tree
 	var notes []string
 	var branches []string
-	var branches_ storer.ReferenceIter
+	var branchesIter storer.ReferenceIter
 
-	repo, repo_name, group_path = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
+	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
-	if strings.Contains(repo_name, "\n") || slice_contains_newline(group_path) {
+	if strings.Contains(repoName, "\n") || sliceContainsNewlines(groupPath) {
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 
@@ -37,27 +37,25 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 		goto no_ref
 	}
 
-	branches_, err = repo.Branches()
-	if err != nil {
-	}
-	err = branches_.ForEach(func(branch *plumbing.Reference) error {
-		branches = append(branches, branch.Name().Short())
-		return nil
-	})
-	if err != nil {
+	branchesIter, err = repo.Branches()
+	if err == nil {
+		branchesIter.ForEach(func(branch *plumbing.Reference) error {
+			branches = append(branches, branch.Name().Short())
+			return nil
+		})
 	}
 	params["branches"] = branches
 
-	if recent_commits, err = getRecentCommits(repo, refHash, 3); err != nil {
+	if recentCommits, err = getRecentCommits(repo, refHash, 3); err != nil {
 		goto no_ref
 	}
-	params["commits"] = recent_commits
+	params["commits"] = recentCommits
 
-	if commit_object, err = repo.CommitObject(refHash); err != nil {
+	if commitObj, err = repo.CommitObject(refHash); err != nil {
 		goto no_ref
 	}
 
-	if tree, err = commit_object.Tree(); err != nil {
+	if tree, err = commitObj.Tree(); err != nil {
 		goto no_ref
 	}
 
@@ -66,8 +64,8 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 
 no_ref:
 
-	params["http_clone_url"] = genHTTPRemoteURL(group_path, repo_name)
-	params["ssh_clone_url"] = genSSHRemoteURL(group_path, repo_name)
+	params["http_clone_url"] = genHTTPRemoteURL(groupPath, repoName)
+	params["ssh_clone_url"] = genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
 	renderTemplate(w, "repo_index", params)
