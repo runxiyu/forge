@@ -22,32 +22,32 @@ var (
 )
 
 func serveSSH(listener net.Listener) error {
-	var host_key_bytes []byte
-	var host_key goSSH.Signer
+	var hostKeyBytes []byte
+	var hostKey goSSH.Signer
 	var err error
 	var server *gliderSSH.Server
 
-	if host_key_bytes, err = os.ReadFile(config.SSH.Key); err != nil {
+	if hostKeyBytes, err = os.ReadFile(config.SSH.Key); err != nil {
 		return err
 	}
 
-	if host_key, err = goSSH.ParsePrivateKey(host_key_bytes); err != nil {
+	if hostKey, err = goSSH.ParsePrivateKey(hostKeyBytes); err != nil {
 		return err
 	}
 
-	serverPubkey = host_key.PublicKey()
+	serverPubkey = hostKey.PublicKey()
 	serverPubkeyString = string(goSSH.MarshalAuthorizedKey(serverPubkey))
 	serverPubkeyFP = goSSH.FingerprintSHA256(serverPubkey)
 
 	server = &gliderSSH.Server{
 		Handler: func(session gliderSSH.Session) {
-			client_public_key := session.PublicKey()
-			var client_public_key_string string
-			if client_public_key != nil {
-				client_public_key_string = strings.TrimSuffix(string(goSSH.MarshalAuthorizedKey(client_public_key)), "\n")
+			clientPubkey := session.PublicKey()
+			var clientPubkeyStr string
+			if clientPubkey != nil {
+				clientPubkeyStr = strings.TrimSuffix(string(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
 			}
 
-			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + client_public_key_string + " " + session.RawCommand())
+			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + clientPubkeyStr + " " + session.RawCommand())
 			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/:/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
@@ -63,13 +63,13 @@ func serveSSH(listener net.Listener) error {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = sshHandleUploadPack(session, client_public_key_string, cmd[1])
+				err = sshHandleUploadPack(session, clientPubkeyStr, cmd[1])
 			case "git-receive-pack":
 				if len(cmd) > 2 {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = sshHandleRecvPack(session, client_public_key_string, cmd[1])
+				err = sshHandleRecvPack(session, clientPubkeyStr, cmd[1])
 			default:
 				fmt.Fprintln(session.Stderr(), "Unsupported command: "+cmd[0]+"\r")
 				return
@@ -87,7 +87,7 @@ func serveSSH(listener net.Listener) error {
 		// push if it needs to.
 	}
 
-	server.AddHostKey(host_key)
+	server.AddHostKey(hostKey)
 
 	if err = server.Serve(listener); err != nil {
 		clog.Fatal(1, "Serving SSH: "+err.Error())

@@ -39,7 +39,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 
 	branchesIter, err = repo.Branches()
 	if err == nil {
-		branchesIter.ForEach(func(branch *plumbing.Reference) error {
+		_ = branchesIter.ForEach(func(branch *plumbing.Reference) error {
 			branches = append(branches, branch.Name().Short())
 			return nil
 		})

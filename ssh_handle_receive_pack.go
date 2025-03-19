@@ -60,17 +60,17 @@ func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string)
 		switch contribReq {
 		case "closed":
 			if !directAccess {
-				return errors.New("you need direct access to push to this repo.")
+				return errors.New("you need direct access to push to this repo")
 			}
 		case "registered_user":
 			if userType != "registered" {
-				return errors.New("you need to be a registered user to push to this repo.")
+				return errors.New("you need to be a registered user to push to this repo")
 			}
 		case "ssh_pubkey":
 			fallthrough
 		case "federated":
 			if pubkey == "" {
-				return errors.New("you need to have an SSH public key to push to this repo.")
+				return errors.New("you need to have an SSH public key to push to this repo")
 			}
 			if userType == "" {
 				userID, err = addUserSSH(session.Context(), pubkey)

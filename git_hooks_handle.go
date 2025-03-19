@@ -303,10 +303,9 @@ func hooksHandler(conn net.Conn) {
 			if allOK {
 				fmt.Fprintln(sshStderr, "Overall "+ansiec.Green+"ACK"+ansiec.Reset+" (all checks passed)")
 				return 0
-			} else {
-				fmt.Fprintln(sshStderr, "Overall "+ansiec.Red+"NAK"+ansiec.Reset+" (one or more branches failed checks)")
-				return 1
 			}
+			fmt.Fprintln(sshStderr, "Overall "+ansiec.Red+"NAK"+ansiec.Reset+" (one or more branches failed checks)")
+			return 1
 		default:
 			fmt.Fprintln(sshStderr, ansiec.Red+"Invalid hook:", args[0]+ansiec.Reset)
 			return 1
@@ -329,7 +328,7 @@ func serveGitHooks(listener net.Listener) error {
 }
 
 func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
-	var unixConn *net.UnixConn = conn.(*net.UnixConn)
+	var unixConn = conn.(*net.UnixConn)
 	var fd *os.File
 
 	if fd, err = unixConn.File(); err != nil {
