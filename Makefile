@@ -17,5 +17,3 @@ version.go:
 clean:
 	$(RM) forge version.go vendor
 
-htmpl.go: htmpl/*
-	gohtmplgen -o htmpl.go htmpl/*

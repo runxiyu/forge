@@ -20,7 +20,7 @@ import (
 //go:embed *.go go.mod go.sum
 //go:embed *.scfg
 //go:embed Makefile
-//go:embed static/* htmpl/* templates/* scripts/* sql/*
+//go:embed static/* templates/* scripts/* sql/*
 //go:embed hookc/*.c
 //go:embed vendor/*
 var sourceFS embed.FS
