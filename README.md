@@ -53,12 +53,3 @@ We have several Git repo mirrors on a few places:
 * [Codeberg](https://codeberg.org/lindenii/forge/)
 * [GitHub](https://github.com/runxiyu/forge/)
 
-## Code style
-
-We follow the Lindenii Project's general code style, which has a few important
-deviations from what most people may be used to:
-
-* We used tabs for indentation everywhere (Go, C, HTML, CSS, JS, SQL, etc.)
-* All names are in `snake_case`; exported identifiers in Go use
-  `Capitalized_snake_case`. Type identifiers end with `_t`.
-* We avoid `:=` in Go, and prefer to use `var`.
