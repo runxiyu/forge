@@ -155,7 +155,7 @@ func (router *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// TODO: subgroups
 
-			if params["repo"], params["repo_description"], params["repo_id"], err = open_git_repo(r.Context(), group_path, module_name); err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(r.Context(), group_path, module_name); err != nil {
 				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
 			}

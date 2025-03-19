@@ -36,10 +36,10 @@ func hooksHandler(conn net.Conn) {
 	var ucred *syscall.Ucred
 	var err error
 	var cookie []byte
-	var pack_to_hook pack_to_hook_t
-	var ssh_stderr io.Writer
+	var packPass packPass
+	var sshStderr io.Writer
 	var ok bool
-	var hook_return_value byte
+	var hookRet byte
 
 	defer conn.Close()
 	ctx, cancel = context.WithCancel(context.Background())
@@ -51,14 +51,14 @@ func hooksHandler(conn net.Conn) {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
-		wf_error(conn, "\nUnable to get peer credentials: %v", err)
+		writeRedError(conn, "\nUnable to get peer credentials: %v", err)
 		return
 	}
 	if ucred.Uid != uint32(os.Getuid()) {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
-		wf_error(conn, "\nUID mismatch")
+		writeRedError(conn, "\nUID mismatch")
 		return
 	}
 
@@ -67,27 +67,27 @@ func hooksHandler(conn net.Conn) {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
-		wf_error(conn, "\nFailed to read cookie: %v", err)
+		writeRedError(conn, "\nFailed to read cookie: %v", err)
 		return
 	}
 
-	pack_to_hook, ok = pack_to_hook_by_cookie.Load(string(cookie))
+	packPass, ok = packPasses.Load(string(cookie))
 	if !ok {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
-		wf_error(conn, "\nInvalid handler cookie")
+		writeRedError(conn, "\nInvalid handler cookie")
 		return
 	}
 
-	ssh_stderr = pack_to_hook.session.Stderr()
+	sshStderr = packPass.session.Stderr()
 
-	_, _ = ssh_stderr.Write([]byte{'\n'})
+	_, _ = sshStderr.Write([]byte{'\n'})
 
-	hook_return_value = func() byte {
+	hookRet = func() byte {
 		var argc64 uint64
 		if err = binary.Read(conn, binary.NativeEndian, &argc64); err != nil {
-			wf_error(ssh_stderr, "Failed to read argc: %v", err)
+			writeRedError(sshStderr, "Failed to read argc: %v", err)
 			return 1
 		}
 		var args []string
@@ -97,7 +97,7 @@ func hooksHandler(conn net.Conn) {
 				b := make([]byte, 1)
 				n, err := conn.Read(b)
 				if err != nil || n != 1 {
-					wf_error(ssh_stderr, "Failed to read arg: %v", err)
+					writeRedError(sshStderr, "Failed to read arg: %v", err)
 					return 1
 				}
 				if b[0] == 0 {
@@ -108,92 +108,92 @@ func hooksHandler(conn net.Conn) {
 			args = append(args, arg.String())
 		}
 
-		git_env := make(map[string]string)
+		gitEnv := make(map[string]string)
 		for {
-			var env_line bytes.Buffer
+			var envLine bytes.Buffer
 			for {
 				b := make([]byte, 1)
 				n, err := conn.Read(b)
 				if err != nil || n != 1 {
-					wf_error(ssh_stderr, "Failed to read environment variable: %v", err)
+					writeRedError(sshStderr, "Failed to read environment variable: %v", err)
 					return 1
 				}
 				if b[0] == 0 {
 					break
 				}
-				env_line.WriteByte(b[0])
+				envLine.WriteByte(b[0])
 			}
-			if env_line.Len() == 0 {
+			if envLine.Len() == 0 {
 				break
 			}
-			kv := env_line.String()
+			kv := envLine.String()
 			parts := strings.SplitN(kv, "=", 2)
 			if len(parts) < 2 {
-				wf_error(ssh_stderr, "Invalid environment variable line: %v", kv)
+				writeRedError(sshStderr, "Invalid environment variable line: %v", kv)
 				return 1
 			}
-			git_env[parts[0]] = parts[1]
+			gitEnv[parts[0]] = parts[1]
 		}
 
 		var stdin bytes.Buffer
 		if _, err = io.Copy(&stdin, conn); err != nil {
-			wf_error(conn, "Failed to read to the stdin buffer: %v", err)
+			writeRedError(conn, "Failed to read to the stdin buffer: %v", err)
 		}
 
 		switch filepath.Base(args[0]) {
 		case "pre-receive":
-			if pack_to_hook.direct_access {
+			if packPass.directAccess {
 				return 0
 			} else {
-				all_ok := true
+				allOK := true
 				for {
-					var line, old_oid, rest, new_oid, ref_name string
+					var line, oldOID, rest, newIOID, refName string
 					var found bool
-					var old_hash, new_hash plumbing.Hash
-					var old_commit, new_commit *object.Commit
-					var git_push_option_count int
+					var oldHash, newHash plumbing.Hash
+					var oldCommit, newCommit *object.Commit
+					var pushOptCount int
 
-					git_push_option_count, err = strconv.Atoi(git_env["GIT_PUSH_OPTION_COUNT"])
+					pushOptCount, err = strconv.Atoi(gitEnv["GIT_PUSH_OPTION_COUNT"])
 					if err != nil {
-						wf_error(ssh_stderr, "Failed to parse GIT_PUSH_OPTION_COUNT: %v", err)
+						writeRedError(sshStderr, "Failed to parse GIT_PUSH_OPTION_COUNT: %v", err)
 						return 1
 					}
 
 					// TODO: Allow existing users (even if they are already federated or registered) to add a federated user ID... though perhaps this should be in the normal SSH interface instead of the git push interface?
 					// Also it'd be nice to be able to combine users or whatever
-					if pack_to_hook.contrib_requirements == "federated" && pack_to_hook.user_type != "federated" && pack_to_hook.user_type != "registered" {
-						if git_push_option_count == 0 {
-							wf_error(ssh_stderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
+					if packPass.contribReq == "federated" && packPass.userType != "federated" && packPass.userType != "registered" {
+						if pushOptCount == 0 {
+							writeRedError(sshStderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
 							return 1
 						}
-						for i := 0; i < git_push_option_count; i++ {
-							push_option, ok := git_env[fmt.Sprintf("GIT_PUSH_OPTION_%d", i)]
+						for i := 0; i < pushOptCount; i++ {
+							pushOpt, ok := gitEnv[fmt.Sprintf("GIT_PUSH_OPTION_%d", i)]
 							if !ok {
-								wf_error(ssh_stderr, "Failed to get push option %d", i)
+								writeRedError(sshStderr, "Failed to get push option %d", i)
 								return 1
 							}
-							if strings.HasPrefix(push_option, "fedid=") {
-								federated_user_identifier := strings.TrimPrefix(push_option, "fedid=")
-								service, username, found := strings.Cut(federated_user_identifier, ":")
+							if strings.HasPrefix(pushOpt, "fedid=") {
+								fedUserID := strings.TrimPrefix(pushOpt, "fedid=")
+								service, username, found := strings.Cut(fedUserID, ":")
 								if !found {
-									wf_error(ssh_stderr, "Invalid federated user identifier %#v does not contain a colon", federated_user_identifier)
+									writeRedError(sshStderr, "Invalid federated user identifier %#v does not contain a colon", fedUserID)
 									return 1
 								}
 
-								ok, err := fedauth(ctx, pack_to_hook.user_id, service, username, pack_to_hook.pubkey)
+								ok, err := fedauth(ctx, packPass.userID, service, username, packPass.pubkey)
 								if err != nil {
-									wf_error(ssh_stderr, "Failed to verify federated user identifier %#v: %v", federated_user_identifier, err)
+									writeRedError(sshStderr, "Failed to verify federated user identifier %#v: %v", fedUserID, err)
 									return 1
 								}
 								if !ok {
-									wf_error(ssh_stderr, "Failed to verify federated user identifier %#v: you don't seem to be on the list", federated_user_identifier)
+									writeRedError(sshStderr, "Failed to verify federated user identifier %#v: you don't seem to be on the list", fedUserID)
 									return 1
 								}
 
 								break
 							}
-							if i == git_push_option_count-1 {
-								wf_error(ssh_stderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
+							if i == pushOptCount-1 {
+								writeRedError(sshStderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
 								return 1
 							}
 						}
@@ -203,69 +203,69 @@ func hooksHandler(conn net.Conn) {
 					if errors.Is(err, io.EOF) {
 						break
 					} else if err != nil {
-						wf_error(ssh_stderr, "Failed to read pre-receive line: %v", err)
+						writeRedError(sshStderr, "Failed to read pre-receive line: %v", err)
 						return 1
 					}
 					line = line[:len(line)-1]
 
-					old_oid, rest, found = strings.Cut(line, " ")
+					oldOID, rest, found = strings.Cut(line, " ")
 					if !found {
-						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
+						writeRedError(sshStderr, "Invalid pre-receive line: %v", line)
 						return 1
 					}
 
-					new_oid, ref_name, found = strings.Cut(rest, " ")
+					newIOID, refName, found = strings.Cut(rest, " ")
 					if !found {
-						wf_error(ssh_stderr, "Invalid pre-receive line: %v", line)
+						writeRedError(sshStderr, "Invalid pre-receive line: %v", line)
 						return 1
 					}
 
-					if strings.HasPrefix(ref_name, "refs/heads/contrib/") {
-						if all_zero_num_string(old_oid) { // New branch
-							fmt.Fprintln(ssh_stderr, ansiec.Blue+"POK"+ansiec.Reset, ref_name)
-							var new_mr_id int
+					if strings.HasPrefix(refName, "refs/heads/contrib/") {
+						if allZero(oldOID) { // New branch
+							fmt.Fprintln(sshStderr, ansiec.Blue+"POK"+ansiec.Reset, refName)
+							var newMRID int
 
 							err = database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
-								pack_to_hook.repo_id, pack_to_hook.user_id, strings.TrimPrefix(ref_name, "refs/heads/"),
-							).Scan(&new_mr_id)
+								packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
+							).Scan(&newMRID)
 							if err != nil {
-								wf_error(ssh_stderr, "Error creating merge request: %v", err)
+								writeRedError(sshStderr, "Error creating merge request: %v", err)
 								return 1
 							}
-							fmt.Fprintln(ssh_stderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(pack_to_hook.group_path, pack_to_hook.repo_name)+"/contrib/"+strconv.FormatUint(uint64(new_mr_id), 10)+"/"+ansiec.Reset)
+							fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", generate_http_remote_url(packPass.group_path, packPass.repo_name)+"/contrib/"+strconv.FormatUint(uint64(newMRID), 10)+"/"+ansiec.Reset)
 						} else { // Existing contrib branch
-							var existing_merge_request_user_id int
-							var is_ancestor bool
+							var existingMRUser int
+							var isAncestor bool
 
 							err = database.QueryRow(ctx,
 								"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
-								strings.TrimPrefix(ref_name, "refs/heads/"), pack_to_hook.repo_id,
-							).Scan(&existing_merge_request_user_id)
+								strings.TrimPrefix(refName, "refs/heads/"), packPass.repoID,
+							).Scan(&existingMRUser)
 							if err != nil {
 								if errors.Is(err, pgx.ErrNoRows) {
-									wf_error(ssh_stderr, "No existing merge request for existing contrib branch: %v", err)
+									writeRedError(sshStderr, "No existing merge request for existing contrib branch: %v", err)
 								} else {
-									wf_error(ssh_stderr, "Error querying for existing merge request: %v", err)
+									writeRedError(sshStderr, "Error querying for existing merge request: %v", err)
 								}
 								return 1
 							}
-							if existing_merge_request_user_id == 0 {
-								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(branch belongs to unowned MR)")
+							if existingMRUser == 0 {
+								allOK = false
+								fmt.Fprintln(sshStderr, ansiec.Red+"NAK"+ansiec.Reset, refName, "(branch belongs to unowned MR)")
 								continue
 							}
 
-							if existing_merge_request_user_id != pack_to_hook.user_id {
-								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(branch belongs another user's MR)")
+							if existingMRUser != packPass.userID {
+								allOK = false
+								fmt.Fprintln(sshStderr, ansiec.Red+"NAK"+ansiec.Reset, refName, "(branch belongs another user's MR)")
 								continue
 							}
 
-							old_hash = plumbing.NewHash(old_oid)
+							oldHash = plumbing.NewHash(oldOID)
 
-							if old_commit, err = pack_to_hook.repo.CommitObject(old_hash); err != nil {
-								wf_error(ssh_stderr, "Daemon failed to get old commit: %v", err)
+							if oldCommit, err = packPass.repo.CommitObject(oldHash); err != nil {
+								writeRedError(sshStderr, "Daemon failed to get old commit: %v", err)
 								return 1
 							}
 
@@ -273,50 +273,50 @@ func hooksHandler(conn net.Conn) {
 							// detectable as they haven't been merged into the main repo's
 							// objects yet. But it seems to work, and I don't think there's
 							// any reason for this to only work intermitently.
-							new_hash = plumbing.NewHash(new_oid)
-							if new_commit, err = pack_to_hook.repo.CommitObject(new_hash); err != nil {
-								wf_error(ssh_stderr, "Daemon failed to get new commit: %v", err)
+							newHash = plumbing.NewHash(newIOID)
+							if newCommit, err = packPass.repo.CommitObject(newHash); err != nil {
+								writeRedError(sshStderr, "Daemon failed to get new commit: %v", err)
 								return 1
 							}
 
-							if is_ancestor, err = old_commit.IsAncestor(new_commit); err != nil {
-								wf_error(ssh_stderr, "Daemon failed to check if old commit is ancestor: %v", err)
+							if isAncestor, err = oldCommit.IsAncestor(newCommit); err != nil {
+								writeRedError(sshStderr, "Daemon failed to check if old commit is ancestor: %v", err)
 								return 1
 							}
 
-							if !is_ancestor {
+							if !isAncestor {
 								// TODO: Create MR snapshot ref instead
-								all_ok = false
-								fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(force pushes are not supported yet)")
+								allOK = false
+								fmt.Fprintln(sshStderr, ansiec.Red+"NAK"+ansiec.Reset, refName, "(force pushes are not supported yet)")
 								continue
 							}
 
-							fmt.Fprintln(ssh_stderr, ansiec.Blue+"POK"+ansiec.Reset, ref_name)
+							fmt.Fprintln(sshStderr, ansiec.Blue+"POK"+ansiec.Reset, refName)
 						}
 					} else { // Non-contrib branch
-						all_ok = false
-						fmt.Fprintln(ssh_stderr, ansiec.Red+"NAK"+ansiec.Reset, ref_name, "(you cannot push to branches outside of contrib/*)")
+						allOK = false
+						fmt.Fprintln(sshStderr, ansiec.Red+"NAK"+ansiec.Reset, refName, "(you cannot push to branches outside of contrib/*)")
 					}
 				}
 
-				fmt.Fprintln(ssh_stderr)
-				if all_ok {
-					fmt.Fprintln(ssh_stderr, "Overall "+ansiec.Green+"ACK"+ansiec.Reset+" (all checks passed)")
+				fmt.Fprintln(sshStderr)
+				if allOK {
+					fmt.Fprintln(sshStderr, "Overall "+ansiec.Green+"ACK"+ansiec.Reset+" (all checks passed)")
 					return 0
 				} else {
-					fmt.Fprintln(ssh_stderr, "Overall "+ansiec.Red+"NAK"+ansiec.Reset+" (one or more branches failed checks)")
+					fmt.Fprintln(sshStderr, "Overall "+ansiec.Red+"NAK"+ansiec.Reset+" (one or more branches failed checks)")
 					return 1
 				}
 			}
 		default:
-			fmt.Fprintln(ssh_stderr, ansiec.Red+"Invalid hook:", args[0]+ansiec.Reset)
+			fmt.Fprintln(sshStderr, ansiec.Red+"Invalid hook:", args[0]+ansiec.Reset)
 			return 1
 		}
 	}()
 
-	fmt.Fprintln(ssh_stderr)
+	fmt.Fprintln(sshStderr)
 
-	_, _ = conn.Write([]byte{hook_return_value})
+	_, _ = conn.Write([]byte{hookRet})
 }
 
 func serveGitHooks(listener net.Listener) error {
@@ -330,10 +330,10 @@ func serveGitHooks(listener net.Listener) error {
 }
 
 func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
-	var unix_conn *net.UnixConn = conn.(*net.UnixConn)
+	var unixConn *net.UnixConn = conn.(*net.UnixConn)
 	var fd *os.File
 
-	if fd, err = unix_conn.File(); err != nil {
+	if fd, err = unixConn.File(); err != nil {
 		return nil, errGetFD
 	}
 	defer fd.Close()
@@ -344,7 +344,7 @@ func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
 	return ucred, nil
 }
 
-func all_zero_num_string(s string) bool {
+func allZero(s string) bool {
 	for _, r := range s {
 		if r != '0' {
 			return false

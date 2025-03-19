@@ -20,12 +20,12 @@ func handle_repo_log(w http.ResponseWriter, r *http.Request, params map[string]a
 
 	repo = params["repo"].(*git.Repository)
 
-	if ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
+	if ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if commits, err = get_recent_commits(repo, ref_hash, -1); err != nil {
+	if commits, err = getRecentCommits(repo, ref_hash, -1); err != nil {
 		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -5,28 +5,28 @@ package main
 
 import (
 	"github.com/go-git/go-git/v5"
-	git_config "github.com/go-git/go-git/v5/config"
-	git_format_config "github.com/go-git/go-git/v5/plumbing/format/config"
+	gitConfig "github.com/go-git/go-git/v5/config"
+	gitFmtConfig "github.com/go-git/go-git/v5/plumbing/format/config"
 )
 
-// git_bare_init_with_default_hooks initializes a bare git repository with the
+// gitInit initializes a bare git repository with the
 // forge-deployed hooks directory as the hooksPath.
-func git_bare_init_with_default_hooks(repo_path string) (err error) {
+func gitInit(repoPath string) (err error) {
 	var repo *git.Repository
-	var git_config *git_config.Config
+	var gitConf *gitConfig.Config
 
-	if repo, err = git.PlainInit(repo_path, true); err != nil {
+	if repo, err = git.PlainInit(repoPath, true); err != nil {
 		return err
 	}
 
-	if git_config, err = repo.Config(); err != nil {
+	if gitConf, err = repo.Config(); err != nil {
 		return err
 	}
 
-	git_config.Raw.SetOption("core", git_format_config.NoSubsection, "hooksPath", config.Hooks.Execs)
-	git_config.Raw.SetOption("receive", git_format_config.NoSubsection, "advertisePushOptions", "true")
+	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", config.Hooks.Execs)
+	gitConf.Raw.SetOption("receive", gitFmtConfig.NoSubsection, "advertisePushOptions", "true")
 
-	if err = repo.SetConfig(git_config); err != nil {
+	if err = repo.SetConfig(gitConf); err != nil {
 		return err
 	}
 

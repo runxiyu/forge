@@ -16,9 +16,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-// open_git_repo opens a git repository by group and repo name.
-func open_git_repo(ctx context.Context, group_path []string, repo_name string) (repo *git.Repository, description string, repo_id int, err error) {
-	var fs_path string
+// openRepo opens a git repository by group and repo name.
+func openRepo(ctx context.Context, groupPath []string, repoName string) (repo *git.Repository, description string, repoID int, err error) {
+	var fsPath string
 
 	err = database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (
@@ -53,100 +53,100 @@ FROM group_path_cte g
 JOIN repos r ON r.group_id = g.id
 WHERE g.depth = cardinality($1::text[])
 	AND r.name = $2
-	`, pgtype.FlatArray[string](group_path), repo_name).Scan(&fs_path, &description, &repo_id)
+	`, pgtype.FlatArray[string](groupPath), repoName).Scan(&fsPath, &description, &repoID)
 	if err != nil {
 		return
 	}
 
-	repo, err = git.PlainOpen(fs_path)
+	repo, err = git.PlainOpen(fsPath)
 	return
 }
 
 // go-git's tree entries are not friendly for use in HTML templates.
-type display_git_tree_entry_t struct {
+type displayTreeEntry struct {
 	Name       string
 	Mode       string
 	Size       int64
-	Is_file    bool
-	Is_subtree bool
+	IsFile    bool
+	IsSubtree bool
 }
 
-func build_display_git_tree(tree *object.Tree) (display_git_tree []display_git_tree_entry_t) {
+func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 	for _, entry := range tree.Entries {
-		display_git_tree_entry := display_git_tree_entry_t{}
+		displayEntry := displayTreeEntry{}
 		var err error
-		var os_mode os.FileMode
+		var osMode os.FileMode
 
-		if os_mode, err = entry.Mode.ToOSFileMode(); err != nil {
-			display_git_tree_entry.Mode = "x---------"
+		if osMode, err = entry.Mode.ToOSFileMode(); err != nil {
+			displayEntry.Mode = "x---------"
 		} else {
-			display_git_tree_entry.Mode = os_mode.String()
+			displayEntry.Mode = osMode.String()
 		}
 
-		display_git_tree_entry.Is_file = entry.Mode.IsFile()
+		displayEntry.IsFile = entry.Mode.IsFile()
 
-		if display_git_tree_entry.Size, err = tree.Size(entry.Name); err != nil {
-			display_git_tree_entry.Size = 0
+		if displayEntry.Size, err = tree.Size(entry.Name); err != nil {
+			displayEntry.Size = 0
 		}
 
-		display_git_tree_entry.Name = strings.TrimPrefix(entry.Name, "/")
+		displayEntry.Name = strings.TrimPrefix(entry.Name, "/")
 
-		display_git_tree = append(display_git_tree, display_git_tree_entry)
+		displayTree = append(displayTree, displayEntry)
 	}
-	return display_git_tree
+	return displayTree
 }
 
-func get_recent_commits(repo *git.Repository, head_hash plumbing.Hash, number_of_commits int) (recent_commits []*object.Commit, err error) {
-	var commit_iter object.CommitIter
-	var this_recent_commit *object.Commit
+func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []*object.Commit, err error) {
+	var commitIter object.CommitIter
+	var thisCommit *object.Commit
 
-	commit_iter, err = repo.Log(&git.LogOptions{From: head_hash})
+	commitIter, err = repo.Log(&git.LogOptions{From: headHash})
 	if err != nil {
 		return nil, err
 	}
-	recent_commits = make([]*object.Commit, 0)
-	defer commit_iter.Close()
-	if number_of_commits < 0 {
+	recentCommits = make([]*object.Commit, 0)
+	defer commitIter.Close()
+	if numCommits < 0 {
 		for {
-			this_recent_commit, err = commit_iter.Next()
+			thisCommit, err = commitIter.Next()
 			if errors.Is(err, io.EOF) {
-				return recent_commits, nil
+				return recentCommits, nil
 			} else if err != nil {
 				return nil, err
 			}
-			recent_commits = append(recent_commits, this_recent_commit)
+			recentCommits = append(recentCommits, thisCommit)
 		}
 	} else {
-		for range number_of_commits {
-			this_recent_commit, err = commit_iter.Next()
+		for range numCommits {
+			thisCommit, err = commitIter.Next()
 			if errors.Is(err, io.EOF) {
-				return recent_commits, nil
+				return recentCommits, nil
 			} else if err != nil {
 				return nil, err
 			}
-			recent_commits = append(recent_commits, this_recent_commit)
+			recentCommits = append(recentCommits, thisCommit)
 		}
 	}
-	return recent_commits, err
+	return recentCommits, err
 }
 
-func get_patch_from_commit(commit_object *object.Commit) (parent_commit_hash plumbing.Hash, patch *object.Patch, err error) {
-	var parent_commit_object *object.Commit
-	var commit_tree *object.Tree
+func fmtCommitAsPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch *object.Patch, err error) {
+	var parentCommit *object.Commit
+	var commitTree *object.Tree
 
-	parent_commit_object, err = commit_object.Parent(0)
+	parentCommit, err = commit.Parent(0)
 	if errors.Is(err, object.ErrParentNotFound) {
-		if commit_tree, err = commit_object.Tree(); err != nil {
+		if commitTree, err = commit.Tree(); err != nil {
 			return
 		}
-		if patch, err = (&object.Tree{}).Patch(commit_tree); err != nil {
+		if patch, err = (&object.Tree{}).Patch(commitTree); err != nil {
 			return
 		}
 	} else if err != nil {
 		return
 	} else {
-		parent_commit_hash = parent_commit_object.Hash
-		if patch, err = parent_commit_object.Patch(commit_object); err != nil {
+		parentCommitHash = parentCommit.Hash
+		if patch, err = parentCommit.Patch(commit); err != nil {
 			return
 		}
 	}

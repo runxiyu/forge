@@ -15,7 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func fedauth(ctx context.Context, user_id int, service, remote_username, pubkey string) (bool, error) {
+func fedauth(ctx context.Context, userID int, service, remote_username, pubkey string) (bool, error) {
 	var err error
 	var resp *http.Response
 	matched := false
@@ -74,10 +74,10 @@ func fedauth(ctx context.Context, user_id int, service, remote_username, pubkey 
 	defer func() {
 		_ = tx.Rollback(ctx)
 	}()
-	if _, err = tx.Exec(ctx, `UPDATE users SET type = 'federated' WHERE id = $1 AND type = 'pubkey_only'`, user_id); err != nil {
+	if _, err = tx.Exec(ctx, `UPDATE users SET type = 'federated' WHERE id = $1 AND type = 'pubkey_only'`, userID); err != nil {
 		return false, err
 	}
-	if _, err = tx.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, user_id, service, remote_username); err != nil {
+	if _, err = tx.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, userID, service, remote_username); err != nil {
 		return false, err
 	}
 	if err = tx.Commit(ctx); err != nil {

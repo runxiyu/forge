@@ -32,7 +32,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 
-	ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string))
+	ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string))
 	if err != nil {
 		goto no_ref
 	}
@@ -48,7 +48,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 	}
 	params["branches"] = branches
 
-	if recent_commits, err = get_recent_commits(repo, ref_hash, 3); err != nil {
+	if recent_commits, err = getRecentCommits(repo, ref_hash, 3); err != nil {
 		goto no_ref
 	}
 	params["commits"] = recent_commits
@@ -61,7 +61,7 @@ func handle_repo_index(w http.ResponseWriter, r *http.Request, params map[string
 		goto no_ref
 	}
 
-	params["files"] = build_display_git_tree(tree)
+	params["files"] = makeDisplayTree(tree)
 	params["readme_filename"], params["readme"] = render_readme_at_tree(tree)
 
 no_ref:

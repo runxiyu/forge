@@ -21,7 +21,7 @@ func fmtCommitPatch(commit *object.Commit) (final string, err error) {
 	var date string
 	var commitTitle, commitDetails string
 
-	if _, patch, err = get_patch_from_commit(commit); err != nil {
+	if _, patch, err = fmtCommitAsPatch(commit); err != nil {
 		return "", err
 	}
 

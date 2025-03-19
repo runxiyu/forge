@@ -26,7 +26,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 	repo, path_spec = params["repo"].(*git.Repository), strings.TrimSuffix(raw_path_spec, "/")
 	params["path_spec"] = path_spec
 
-	if ref_hash, err = get_ref_hash_from_type_and_name(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
+	if ref_hash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
 		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -69,7 +69,7 @@ func handle_repo_raw(w http.ResponseWriter, r *http.Request, params map[string]a
 		return
 	}
 
-	params["files"] = build_display_git_tree(target)
+	params["files"] = makeDisplayTree(target)
 
 	render_template(w, "repo_raw_dir", params)
 }

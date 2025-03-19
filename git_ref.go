@@ -8,9 +8,9 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// get_ref_hash_from_type_and_name returns the hash of a reference given its
+// getRefHash returns the hash of a reference given its
 // type and name as supplied in URL queries.
-func get_ref_hash_from_type_and_name(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, err error) {
+func getRefHash(repo *git.Repository, ref_type, ref_name string) (ref_hash plumbing.Hash, err error) {
 	var ref *plumbing.Reference
 	switch ref_type {
 	case "":

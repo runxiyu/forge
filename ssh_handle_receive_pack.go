@@ -14,21 +14,21 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
-type pack_to_hook_t struct {
+type packPass struct {
 	session              glider_ssh.Session
 	repo                 *git.Repository
 	pubkey               string
-	direct_access        bool
+	directAccess        bool
 	repo_path            string
-	user_id              int
-	user_type            string
-	repo_id              int
+	userID              int
+	userType            string
+	repoID              int
 	group_path           []string
 	repo_name            string
-	contrib_requirements string
+	contribReq string
 }
 
-var pack_to_hook_by_cookie = cmap.Map[string, pack_to_hook_t]{}
+var packPasses = cmap.Map[string, packPass]{}
 
 // ssh_handle_receive_pack handles attempts to push to repos.
 func ssh_handle_receive_pack(session glider_ssh.Session, pubkey, repo_identifier string) (err error) {
@@ -92,20 +92,20 @@ func ssh_handle_receive_pack(session glider_ssh.Session, pubkey, repo_identifier
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	pack_to_hook_by_cookie.Store(cookie, pack_to_hook_t{
+	packPasses.Store(cookie, packPass{
 		session:              session,
 		pubkey:               pubkey,
-		direct_access:        direct_access,
+		directAccess:        direct_access,
 		repo_path:            repo_path,
-		user_id:              user_id,
-		repo_id:              repo_id,
+		userID:              user_id,
+		repoID:              repo_id,
 		group_path:           group_path,
 		repo_name:            repo_name,
 		repo:                 repo,
-		contrib_requirements: contrib_requirements,
-		user_type:            user_type,
+		contribReq: contrib_requirements,
+		userType:            user_type,
 	})
-	defer pack_to_hook_by_cookie.Delete(cookie)
+	defer packPasses.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
 	// horribly wrong such as a panic occurs.
 

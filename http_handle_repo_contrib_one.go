@@ -40,7 +40,7 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 
 	repo = params["repo"].(*git.Repository)
 
-	if source_ref_hash, err = get_ref_hash_from_type_and_name(repo, "branch", source_ref); err != nil {
+	if source_ref_hash, err = getRefHash(repo, "branch", source_ref); err != nil {
 		http.Error(w, "Error getting source ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -53,9 +53,9 @@ func handle_repo_contrib_one(w http.ResponseWriter, r *http.Request, params map[
 	var destination_branch_hash plumbing.Hash
 	if destination_branch == "" {
 		destination_branch = "HEAD"
-		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "", "")
+		destination_branch_hash, err = getRefHash(repo, "", "")
 	} else {
-		destination_branch_hash, err = get_ref_hash_from_type_and_name(repo, "branch", destination_branch)
+		destination_branch_hash, err = getRefHash(repo, "branch", destination_branch)
 	}
 	if err != nil {
 		http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)

@@ -121,7 +121,7 @@ func handle_group_index(w http.ResponseWriter, r *http.Request, params map[strin
 			return
 		}
 
-		if err = git_bare_init_with_default_hooks(file_path); err != nil {
+		if err = gitInit(file_path); err != nil {
 			http.Error(w, "Error initializing repo: "+err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -66,7 +66,7 @@ func handle_repo_commit(w http.ResponseWriter, r *http.Request, params map[strin
 	params["commit_object"] = commit_object
 	params["commit_id"] = commit_id_string
 
-	parent_commit_hash, patch, err = get_patch_from_commit(commit_object)
+	parent_commit_hash, patch, err = fmtCommitAsPatch(commit_object)
 	if err != nil {
 		http.Error(w, "Error getting patch from commit: "+err.Error(), http.StatusInternalServerError)
 		return
