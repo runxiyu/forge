@@ -328,7 +328,7 @@ func serveGitHooks(listener net.Listener) error {
 }
 
 func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
-	var unixConn = conn.(*net.UnixConn)
+	unixConn := conn.(*net.UnixConn)
 	var fd *os.File
 
 	if fd, err = unixConn.File(); err != nil {
