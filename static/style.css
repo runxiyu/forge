@@ -408,3 +408,14 @@ td > ul {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+
+
+.complete-error-page {
+	font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+}
+
+.complete-error-page hr {
+	border: 0;
+	border-bottom: 1px dashed;
+}

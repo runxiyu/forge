@@ -5,7 +5,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -58,7 +57,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	if segments[0] == ":" {
 		if len(segments) < 2 {
-			http.Error(w, "Blank system endpoint", http.StatusNotFound)
+			errorPage404(w, params)
 			return
 		} else if len(segments) == 2 && redirectDir(w, r) {
 			return
@@ -86,7 +85,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 			httpHandleGC(w, r, params)
 			return
 		default:
-			http.Error(w, fmt.Sprintf("Unknown system module type: %s", segments[1]), http.StatusNotFound)
+			errorPage404(w, params)
 			return
 		}
 	}
@@ -119,10 +118,10 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		}
 		httpHandleGroupIndex(w, r, params)
 	case len(segments) == sepIndex+1:
-		http.Error(w, "Illegal path 1", http.StatusNotImplemented)
+		errorPage404(w, params)
 		return
 	case len(segments) == sepIndex+2:
-		http.Error(w, "Illegal path 2", http.StatusNotImplemented)
+		errorPage404(w, params)
 		return
 	default:
 		moduleType = segments[sepIndex+1]
@@ -213,10 +212,12 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 				}
 			default:
-				http.Error(w, fmt.Sprintf("Unknown repo feature: %s", repoFeature), http.StatusNotFound)
+				errorPage404(w, params)
+				return
 			}
 		default:
-			http.Error(w, fmt.Sprintf("Unknown module type: %s", moduleType), http.StatusNotFound)
+			errorPage404(w, params)
+			return
 		}
 	}
 }
