@@ -55,7 +55,7 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	).Scan(&groupID, &groupDesc)
 
 	if err == pgx.ErrNoRows {
-		http.Error(w, "Group not found", http.StatusNotFound)
+		errorPage404(w, params)
 		return
 	} else if err != nil {
 		http.Error(w, "Error getting group: "+err.Error(), http.StatusInternalServerError)
