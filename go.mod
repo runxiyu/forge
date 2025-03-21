@@ -13,7 +13,7 @@ require (
 	github.com/niklasfasching/go-org v1.7.0
 	github.com/tdewolff/minify/v2 v2.22.3
 	github.com/yuin/goldmark v1.7.8
-	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321065842-f1247b104a0d
+	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321131425-dda3538a9cd4
 	golang.org/x/crypto v0.36.0
 )
 
