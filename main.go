@@ -36,9 +36,9 @@ func main() {
 	var err error
 	hooksListener, err = net.Listen("unix", config.Hooks.Socket)
 	if errors.Is(err, syscall.EADDRINUSE) {
-		clog.Warn("Removing stale socket " + config.Hooks.Socket)
+		clog.Warn("Removing existing socket " + config.Hooks.Socket)
 		if err = syscall.Unlink(config.Hooks.Socket); err != nil {
-			clog.Fatal(1, "Removing stale socket: "+err.Error())
+			clog.Fatal(1, "Removing existing socket: "+err.Error())
 		}
 		if hooksListener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
 			clog.Fatal(1, "Listening hooks: "+err.Error())
@@ -56,9 +56,9 @@ func main() {
 	// SSH listener
 	sshListener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.SSH.Net == "unix" {
-		clog.Warn("Removing stale socket " + config.SSH.Addr)
+		clog.Warn("Removing existing socket " + config.SSH.Addr)
 		if err = syscall.Unlink(config.SSH.Addr); err != nil {
-			clog.Fatal(1, "Removing stale socket: "+err.Error())
+			clog.Fatal(1, "Removing existing socket: "+err.Error())
 		}
 		if sshListener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
 			clog.Fatal(1, "Listening SSH: "+err.Error())
@@ -76,9 +76,9 @@ func main() {
 	// HTTP listener
 	httpListener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 	if errors.Is(err, syscall.EADDRINUSE) && config.HTTP.Net == "unix" {
-		clog.Warn("Removing stale socket " + config.HTTP.Addr)
+		clog.Warn("Removing existing socket " + config.HTTP.Addr)
 		if err = syscall.Unlink(config.HTTP.Addr); err != nil {
-			clog.Fatal(1, "Removing stale socket: "+err.Error())
+			clog.Fatal(1, "Removing existing socket: "+err.Error())
 		}
 		if httpListener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
 			clog.Fatal(1, "Listening HTTP: "+err.Error())
