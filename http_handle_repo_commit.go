@@ -99,7 +99,7 @@ func (f fakeDiffFile) Path() string {
 
 var nullFakeDiffFile = fakeDiffFile{
 	hash: plumbing.NewHash("0000000000000000000000000000000000000000"),
-	mode: misc.First_or_panic(filemode.New("100644")),
+	mode: misc.FirstOrPanic(filemode.New("100644")),
 	path: "",
 }
 
