@@ -11,7 +11,6 @@ import (
 	"syscall"
 
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
-	_ "net/http/pprof"
 )
 
 func main() {
@@ -91,18 +90,6 @@ func main() {
 	go func() {
 		if err = http.Serve(httpListener, &forgeHTTPRouter{}); err != nil {
 			clog.Fatal(1, "Serving HTTP: "+err.Error())
-		}
-	}()
-
-	// Pprof listener
-	pprofListener, err := net.Listen("tcp", "localhost:6060")
-	if err != nil {
-		clog.Fatal(1, "Listening pprof: "+err.Error())
-	}
-	clog.Info("Listening pprof on tcp localhost:6060")
-	go func() {
-		if err = http.Serve(pprofListener, nil); err != nil {
-			clog.Fatal(1, "Serving pprof: "+err.Error())
 		}
 	}()
 
