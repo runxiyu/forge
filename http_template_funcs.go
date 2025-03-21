@@ -25,3 +25,7 @@ func pathEscape(s string) string {
 func queryEscape(s string) string {
 	return url.QueryEscape(s)
 }
+
+func dereference[T any](p *T) T {
+	return *p
+}

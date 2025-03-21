@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"iter"
 	"os"
 	"strings"
 
@@ -94,6 +95,40 @@ func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 		displayTree = append(displayTree, displayEntry)
 	}
 	return displayTree
+}
+
+func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *error) {
+	var err error
+	return func(yield func(*object.Commit) bool) {
+		for {
+			commit, err2 := commitIter.Next()
+			if err2 != nil {
+				if errors.Is(err2, io.EOF) {
+					return
+				}
+				err = err2
+				return
+			}
+			if !yield(commit) {
+				return
+			}
+		}
+	}, &err
+}
+
+func iterSeqLimit[T any](s iter.Seq[T], n uint) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		var i uint
+		for v := range s {
+			if i > n-1 {
+				return
+			}
+			if !yield(v) {
+				return
+			}
+			i++
+		}
+	}
 }
 
 func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []*object.Commit, err error) {

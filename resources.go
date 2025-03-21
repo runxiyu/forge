@@ -40,10 +40,11 @@ func loadTemplates() (err error) {
 	m.Add("text/html", &html.Minifier{TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true})
 
 	templates = template.New("templates").Funcs(template.FuncMap{
-		"first_line":   firstLine,
-		"base_name":    baseName,
-		"path_escape":  pathEscape,
-		"query_escape": queryEscape,
+		"first_line":        firstLine,
+		"base_name":         baseName,
+		"path_escape":       pathEscape,
+		"query_escape":      queryEscape,
+		"dereference_error": dereference[error],
 	})
 
 	err = fs.WalkDir(resourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"iter"
 	"net/http"
 	"strings"
 
@@ -19,7 +20,8 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	var groupPath []string
 	var refHash plumbing.Hash
 	var err error
-	var recentCommits []*object.Commit
+	var commitIter object.CommitIter
+	var commitIterSeq iter.Seq[*object.Commit]
 	var commitObj *object.Commit
 	var tree *object.Tree
 	var notes []string
@@ -46,10 +48,11 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	}
 	params["branches"] = branches
 
-	if recentCommits, err = getRecentCommits(repo, refHash, 3); err != nil {
+	if commitIter, err = repo.Log(&git.LogOptions{From: refHash}); err != nil {
 		goto no_ref
 	}
-	params["commits"] = recentCommits
+	commitIterSeq, params["commits_err"] = commitIterSeqErr(commitIter)
+	params["commits"] = iterSeqLimit(commitIterSeq, 3)
 
 	if commitObj, err = repo.CommitObject(refHash); err != nil {
 		goto no_ref

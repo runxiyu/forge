@@ -90,6 +90,9 @@
 								</td>
 							</tr>
 						{{- end -}}
+						{{- if dereference_error .commits_err -}}
+							Error while obtaining commit log: {{ .commits_err }}
+						{{- end -}}
 					</tbody>
 				</table>
 			</div>
