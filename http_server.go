@@ -21,7 +21,6 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	var segments []string
 	var err error
-	var contentfulSegmentsLen int
 	var sepIndex int
 	params := make(map[string]any)
 
@@ -29,27 +28,9 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	contentfulSegmentsLen = len(segments)
 	if segments[len(segments)-1] == "" {
-		contentfulSegmentsLen--
-	}
-
-	if segments[0] == ":" {
-		if len(segments) < 2 {
-			http.Error(w, "Blank system endpoint", http.StatusNotFound)
-			return
-		} else if len(segments) == 2 && redirectDir(w, r) {
-			return
-		}
-
-		switch segments[1] {
-		case "static":
-			staticHandler.ServeHTTP(w, r)
-			return
-		case "source":
-			sourceHandler.ServeHTTP(w, r)
-			return
-		}
+		// Might assign a trailing bool here
+		segments = segments[:len(segments)-1]
 	}
 
 	params["url_segments"] = segments
@@ -68,6 +49,29 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		params["user_id_string"] = ""
 	} else {
 		params["user_id_string"] = strconv.Itoa(userID)
+	}
+
+	if len(segments) == 0 {
+		httpHandleIndex(w, r, params)
+		return
+	}
+
+	if segments[0] == ":" {
+		if len(segments) < 2 {
+			http.Error(w, "Blank system endpoint", http.StatusNotFound)
+			return
+		} else if len(segments) == 2 && redirectDir(w, r) {
+			return
+		}
+
+		switch segments[1] {
+		case "static":
+			staticHandler.ServeHTTP(w, r)
+			return
+		case "source":
+			sourceHandler.ServeHTTP(w, r)
+			return
+		}
 	}
 
 	if segments[0] == ":" {
@@ -104,22 +108,20 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	if sepIndex > 0 {
 		groupPath = segments[:sepIndex]
 	} else {
-		groupPath = segments[:len(segments)-1]
+		groupPath = segments
 	}
 	params["group_path"] = groupPath
 
 	switch {
-	case contentfulSegmentsLen == 0:
-		httpHandleIndex(w, r, params)
 	case sepIndex == -1:
 		if redirectDir(w, r) {
 			return
 		}
 		httpHandleGroupIndex(w, r, params)
-	case contentfulSegmentsLen == sepIndex+1:
+	case len(segments) == sepIndex+1:
 		http.Error(w, "Illegal path 1", http.StatusNotImplemented)
 		return
-	case contentfulSegmentsLen == sepIndex+2:
+	case len(segments) == sepIndex+2:
 		http.Error(w, "Illegal path 2", http.StatusNotImplemented)
 		return
 	default:
@@ -129,7 +131,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		case "repos":
 			params["repo_name"] = moduleName
 
-			if contentfulSegmentsLen > sepIndex+3 {
+			if len(segments) > sepIndex+3 {
 				switch segments[sepIndex+3] {
 				case "info":
 					if err = httpHandleRepoInfo(w, r, params); err != nil {
@@ -160,7 +162,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 				return
 			}
 
-			if contentfulSegmentsLen == sepIndex+3 {
+			if len(segments) == sepIndex+3 {
 				if redirectDir(w, r) {
 					return
 				}
@@ -183,7 +185,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 				}
 				httpHandleRepoRaw(w, r, params)
 			case "log":
-				if contentfulSegmentsLen > sepIndex+4 {
+				if len(segments) > sepIndex+4 {
 					http.Error(w, "Too many parameters", http.StatusBadRequest)
 					return
 				}
@@ -201,7 +203,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 				if redirectDir(w, r) {
 					return
 				}
-				switch contentfulSegmentsLen {
+				switch len(segments) {
 				case sepIndex + 4:
 					httpHandleRepoContribIndex(w, r, params)
 				case sepIndex + 5:
