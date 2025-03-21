@@ -35,6 +35,11 @@ var config struct {
 		Key  string `scfg:"key"`
 		Root string `scfg:"root"`
 	} `scfg:"ssh"`
+	IRC struct {
+		Net  string `scfg:"net"`
+		Addr string `scfg:"addr"`
+		TLS  bool   `scfg:"tls"`
+	} `scfg:"irc"`
 	General struct {
 		Title string `scfg:"title"`
 	} `scfg:"general"`

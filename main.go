@@ -93,5 +93,8 @@ func main() {
 		}
 	}()
 
+	// IRC bot
+	go ircBotLoop()
+
 	select {}
 }
