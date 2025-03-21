@@ -89,7 +89,7 @@ func main() {
 	}
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 	go func() {
-		if err = http.Serve(httpListener, &httpRouter{}); err != nil {
+		if err = http.Serve(httpListener, &forgeHTTPRouter{}); err != nil {
 			clog.Fatal(1, "Serving HTTP: "+err.Error())
 		}
 	}()
