@@ -1,6 +1,6 @@
 module go.lindenii.runxiyu.org/forge
 
-go 1.23.5
+go 1.24.1
 
 require (
 	github.com/alecthomas/chroma/v2 v2.15.0
