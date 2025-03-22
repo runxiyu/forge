@@ -14,7 +14,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.22.3
 	github.com/yuin/goldmark v1.7.8
 	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321131425-dda3538a9cd4
-	go.lindenii.runxiyu.org/lindenii-irc v0.0.0-20250322024138-aabae52169ec
+	go.lindenii.runxiyu.org/lindenii-irc v0.0.0-20250322030600-1e47f911f1fa
 	golang.org/x/crypto v0.36.0
 )
 

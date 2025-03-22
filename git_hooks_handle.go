@@ -237,7 +237,7 @@ func hooksHandler(conn net.Conn) {
 						merge_request_url := genHTTPRemoteURL(packPass.groupPath, packPass.repoName)+"/contrib/"+strconv.FormatUint(uint64(newMRID), 10)+"/"
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", merge_request_url+ansiec.Reset)
 						select {
-						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + merge_request_url + "\r\n":
+						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + merge_request_url:
 						default:
 							clog.Error("IRC SendQ exceeded")
 						}

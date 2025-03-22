@@ -32,10 +32,17 @@ func ircBotSession() error {
 	defer underlyingConn.Close()
 
 	conn := irc.NewConn(underlyingConn)
-	_, err = conn.WriteString(
-		"NICK " + config.IRC.Nick + "\r\n" +
-			"USER " + config.IRC.User + " 0 * :" + config.IRC.Gecos + "\r\n",
-	)
+
+	logAndWriteLn := func(s string) (n int, err error) {
+		clog.Debug("IRC tx: " + s)
+		return conn.WriteString(s + "\r\n")
+	}
+
+	_, err = logAndWriteLn("NICK " + config.IRC.Nick)
+	if err != nil {
+		return err
+	}
+	_, err = logAndWriteLn("USER " + config.IRC.User + " 0 * :" + config.IRC.Gecos)
 	if err != nil {
 		return err
 	}
@@ -49,20 +56,24 @@ func ircBotSession() error {
 				return
 			default:
 			}
-			msg, err := conn.ReadMessage()
+
+			msg, line, err := conn.ReadMessage()
 			if err != nil {
 				readLoopError <- err
 				return
 			}
+
+			clog.Debug("IRC rx: " + line)
+
 			switch msg.Command {
 			case "001":
-				_, err = conn.WriteString("JOIN #chat\r\n")
+				_, err = logAndWriteLn("JOIN #chat")
 				if err != nil {
 					readLoopError <- err
 					return
 				}
 			case "PING":
-				_, err = conn.WriteString("PONG :" + msg.Args[0] + "\r\n")
+				_, err = logAndWriteLn("PONG :" + msg.Args[0])
 				if err != nil {
 					readLoopError <- err
 					return
@@ -75,7 +86,7 @@ func ircBotSession() error {
 				if c.Nick != config.IRC.Nick {
 					continue
 				}
-				_, err = conn.WriteString("PRIVMSG #chat :test\r\n")
+				_, err = logAndWriteLn("PRIVMSG #chat :test")
 				if err != nil {
 					readLoopError <- err
 					return
@@ -90,7 +101,7 @@ func ircBotSession() error {
 		case err = <-readLoopError:
 			return err
 		case s := <-ircSendBuffered:
-			_, err = conn.WriteString(s)
+			_, err = logAndWriteLn(s)
 			if err != nil {
 				select {
 				case ircSendBuffered <- s:
@@ -101,7 +112,7 @@ func ircBotSession() error {
 				return err
 			}
 		case se := <-ircSendDirectChan:
-			_, err = conn.WriteString(se.content)
+			_, err = logAndWriteLn(se.content)
 			se.errorBack <- err
 			if err != nil {
 				writeLoopAbort <- struct{}{}
