@@ -1,0 +1,30 @@
+linters:
+  enable-all: true
+  disable:
+    - tenv
+    - depguard
+    - err113           # dynamically defined errors are fine for our purposes
+    - forcetypeassert  # type assertion failures are usually programming errors
+    - gochecknoglobals # doesn't matter since this isn't a library
+    - gochecknoinits   # we use inits sparingly for good reasons
+    - godox            # they're just used as markers for where needs improvements
+    - ireturn          # doesn't work well with how we use generics
+    - lll              # long lines are acceptable
+    - mnd              # it's a bit ridiculous to replace all of them
+    - nakedret         # patterns should be consistent
+    - nonamedreturns   # i like named returns
+    - maintidx   # e
+    - nestif     # e
+    - gocognit   # e
+    - gocyclo    # e
+    - cyclop     # e
+    - goconst    # e
+    - funlen     # e
+    - wsl        # e
+    - nlreturn   # e
+    - wrapcheck  # e
+    - varnamelen # e
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

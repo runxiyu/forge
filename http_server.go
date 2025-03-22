@@ -36,9 +36,7 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	var userID int // 0 for none
 	userID, params["username"], err = getUserFromRequest(r)
 	params["user_id"] = userID
-	if errors.Is(err, http.ErrNoCookie) {
-	} else if errors.Is(err, pgx.ErrNoRows) {
-	} else if err != nil {
+	if err != nil && !errors.Is(err, http.ErrNoCookie) && !errors.Is(err, pgx.ErrNoRows) {
 		http.Error(w, "Error getting user info from request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

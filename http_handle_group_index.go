@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -54,7 +55,7 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 		pgtype.FlatArray[string](groupPath),
 	).Scan(&groupID, &groupDesc)
 
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgx.ErrNoRows) {
 		errorPage404(w, params)
 		return
 	} else if err != nil {
@@ -76,7 +77,7 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	}
 	directAccess := (count > 0)
 
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		if !directAccess {
 			http.Error(w, "You do not have direct access to this group", http.StatusForbidden)
 			return

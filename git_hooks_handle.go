@@ -55,7 +55,8 @@ func hooksHandler(conn net.Conn) {
 		writeRedError(conn, "\nUnable to get peer credentials: %v", err)
 		return
 	}
-	if ucred.Uid != uint32(os.Getuid()) {
+	uint32uid := uint32(os.Getuid()) //#nosec G115
+	if ucred.Uid != uint32uid {
 		if _, err = conn.Write([]byte{1}); err != nil {
 			return
 		}
@@ -92,7 +93,7 @@ func hooksHandler(conn net.Conn) {
 			return 1
 		}
 		var args []string
-		for i := uint64(0); i < argc64; i++ {
+		for range argc64 {
 			var arg bytes.Buffer
 			for {
 				b := make([]byte, 1)
@@ -167,7 +168,7 @@ func hooksHandler(conn net.Conn) {
 						writeRedError(sshStderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
 						return 1
 					}
-					for i := 0; i < pushOptCount; i++ {
+					for i := range pushOptCount {
 						pushOpt, ok := gitEnv[fmt.Sprintf("GIT_PUSH_OPTION_%d", i)]
 						if !ok {
 							writeRedError(sshStderr, "Failed to get push option %d", i)
@@ -241,10 +242,10 @@ func hooksHandler(conn net.Conn) {
 							writeRedError(sshStderr, "Error creating merge request: %v", err)
 							return 1
 						}
-						merge_request_url := genHTTPRemoteURL(packPass.groupPath, packPass.repoName)+"/contrib/"+strconv.FormatUint(uint64(newMRID), 10)+"/"
-						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", merge_request_url+ansiec.Reset)
+						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRID)
+						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
 						select {
-						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + merge_request_url:
+						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
 							clog.Error("IRC SendQ exceeded")
 						}

@@ -14,7 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
-func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoIndex(w http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string
 	var groupPath []string
@@ -27,6 +27,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	var notes []string
 	var branches []string
 	var branchesIter storer.ReferenceIter
+	var logOptions git.LogOptions
 
 	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
@@ -48,7 +49,8 @@ func httpHandleRepoIndex(w http.ResponseWriter, r *http.Request, params map[stri
 	}
 	params["branches"] = branches
 
-	if commitIter, err = repo.Log(&git.LogOptions{From: refHash}); err != nil {
+	logOptions = git.LogOptions{From: refHash} //exhaustruct:ignore
+	if commitIter, err = repo.Log(&logOptions); err != nil {
 		goto no_ref
 	}
 	commitIterSeq, params["commits_err"] = commitIterSeqErr(commitIter)

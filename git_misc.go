@@ -74,7 +74,7 @@ type displayTreeEntry struct {
 
 func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 	for _, entry := range tree.Entries {
-		displayEntry := displayTreeEntry{}
+		displayEntry := displayTreeEntry{} //exhaustruct:ignore
 		var err error
 		var osMode os.FileMode
 
@@ -135,7 +135,7 @@ func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits i
 	var commitIter object.CommitIter
 	var thisCommit *object.Commit
 
-	commitIter, err = repo.Log(&git.LogOptions{From: headHash})
+	commitIter, err = repo.Log(&git.LogOptions{From: headHash}) //exhaustruct:ignore
 	if err != nil {
 		return nil, err
 	}
@@ -170,16 +170,17 @@ func fmtCommitAsPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, pa
 	var commitTree *object.Tree
 
 	parentCommit, err = commit.Parent(0)
-	if errors.Is(err, object.ErrParentNotFound) {
+	switch {
+	case errors.Is(err, object.ErrParentNotFound):
 		if commitTree, err = commit.Tree(); err != nil {
 			return
 		}
-		if patch, err = (&object.Tree{}).Patch(commitTree); err != nil {
+		if patch, err = nullTree.Patch(commitTree); err != nil {
 			return
 		}
-	} else if err != nil {
+	case err != nil:
 		return
-	} else {
+	default:
 		parentCommitHash = parentCommit.Hash
 		if patch, err = parentCommit.Patch(commit); err != nil {
 			return
@@ -187,3 +188,5 @@ func fmtCommitAsPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, pa
 	}
 	return
 }
+
+var nullTree object.Tree

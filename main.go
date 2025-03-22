@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"syscall"
+	"time"
 
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
@@ -86,9 +87,15 @@ func main() {
 	} else if err != nil {
 		clog.Fatal(1, "Listening HTTP: "+err.Error())
 	}
+	server := http.Server{
+		Handler:      &forgeHTTPRouter{},
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	} //exhaustruct:ignore
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 	go func() {
-		if err = http.Serve(httpListener, &forgeHTTPRouter{}); err != nil {
+		if err = server.Serve(httpListener); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			clog.Fatal(1, "Serving HTTP: "+err.Error())
 		}
 	}()

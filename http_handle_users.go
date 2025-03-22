@@ -7,6 +7,6 @@ import (
 	"net/http"
 )
 
-func httpHandleUsers(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleUsers(w http.ResponseWriter, _ *http.Request, _ map[string]any) {
 	http.Error(w, "Not implemented", http.StatusNotImplemented)
 }

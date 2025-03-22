@@ -12,7 +12,7 @@ import (
 )
 
 // TODO: I probably shouldn't include *all* commits here...
-func httpHandleRepoLog(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoLog(w http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var refHash plumbing.Hash
 	var err error

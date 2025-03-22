@@ -30,7 +30,7 @@ func dereference[T any](p *T) T {
 	return *p
 }
 
-func dereference_or_zero[T any](p *T) T {
+func dereferenceOrZero[T any](p *T) T {
 	if p != nil {
 		return *p
 	}

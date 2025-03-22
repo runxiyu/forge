@@ -90,13 +90,13 @@ func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[strin
 	return nil
 }
 
-// Taken from https://github.com/icyphox/legit, MIT license
+// Taken from https://github.com/icyphox/legit, MIT license.
 func packLine(w io.Writer, s string) error {
 	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
 	return err
 }
 
-// Taken from https://github.com/icyphox/legit, MIT license
+// Taken from https://github.com/icyphox/legit, MIT license.
 func packFlush(w io.Writer) error {
 	_, err := fmt.Fprint(w, "0000")
 	return err

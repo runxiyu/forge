@@ -79,13 +79,13 @@ func serveSSH(listener net.Listener) error {
 				return
 			}
 		},
-		PublicKeyHandler:           func(ctx gliderSSH.Context, key gliderSSH.PublicKey) bool { return true },
-		KeyboardInteractiveHandler: func(ctx gliderSSH.Context, challenge goSSH.KeyboardInteractiveChallenge) bool { return true },
+		PublicKeyHandler:           func(_ gliderSSH.Context, _ gliderSSH.PublicKey) bool { return true },
+		KeyboardInteractiveHandler: func(_ gliderSSH.Context, _ goSSH.KeyboardInteractiveChallenge) bool { return true },
 		// It is intentional that we do not check any credentials and accept all connections.
 		// This allows all users to connect and clone repositories. However, the public key
 		// is passed to handlers, so e.g. the push handler could check the key and reject the
 		// push if it needs to.
-	}
+	} //exhaustruct:ignore
 
 	server.AddHostKey(hostKey)
 

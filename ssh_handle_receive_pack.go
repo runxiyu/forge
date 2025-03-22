@@ -124,9 +124,7 @@ func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string)
 	}
 
 	err = proc.Wait()
-	if exitError, ok := err.(*exec.ExitError); ok {
-		fmt.Fprintln(session.Stderr(), "Process exited with error", exitError.ExitCode())
-	} else if err != nil {
+	if err != nil {
 		fmt.Fprintln(session.Stderr(), "Error while waiting for process:", err)
 	}
 

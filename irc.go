@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
-	"go.lindenii.runxiyu.org/lindenii-irc"
+	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
 var (

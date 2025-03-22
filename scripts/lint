@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# SPDX-License-Identifier: AGPL-3.0-only
-# SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
-
-golangci-lint run . --enable-all --disable wsl,wrapcheck,nlreturn,nonamedreturns,mnd,lll,intrange,godox,gochecknoglobals,gochecknoinits,forcetypeassert,gofmt,gofumpt,revive,stylecheck,exhaustruct,godot,unparam,err113,depguard

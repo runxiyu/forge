@@ -26,7 +26,7 @@ func httpHandleLogin(w http.ResponseWriter, r *http.Request, params map[string]a
 	var expiry time.Time
 	var cookie http.Cookie
 
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		renderTemplate(w, "login", params)
 		return
 	}
@@ -80,8 +80,7 @@ func httpHandleLogin(w http.ResponseWriter, r *http.Request, params map[string]a
 		Secure:   false, // TODO
 		Expires:  expiry,
 		Path:     "/",
-		// TODO: Expire
-	}
+	} //exhaustruct:ignore
 
 	http.SetCookie(w, &cookie)
 

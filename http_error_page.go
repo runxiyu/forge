@@ -8,18 +8,18 @@ import (
 )
 
 func errorPage404(w http.ResponseWriter, params map[string]any) {
-	w.WriteHeader(404)
+	w.WriteHeader(http.StatusNotFound)
 	_ = templates.ExecuteTemplate(w, "404", params)
 }
 
 func errorPage400(w http.ResponseWriter, params map[string]any, msg string) {
-	w.WriteHeader(400)
+	w.WriteHeader(http.StatusBadRequest)
 	params["complete_error_msg"] = msg
 	_ = templates.ExecuteTemplate(w, "400", params)
 }
 
 func errorPage451(w http.ResponseWriter, params map[string]any, msg string) {
-	w.WriteHeader(451)
+	w.WriteHeader(http.StatusUnavailableForLegalReasons)
 	params["complete_error_msg"] = msg
 	_ = templates.ExecuteTemplate(w, "451", params)
 }

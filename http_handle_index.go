@@ -22,7 +22,7 @@ func httpHandleIndex(w http.ResponseWriter, r *http.Request, params map[string]a
 	params["groups"] = groups
 
 	// Memory currently allocated
-	memstats := runtime.MemStats{}
+	memstats := runtime.MemStats{} //exhaustruct:ignore
 	runtime.ReadMemStats(&memstats)
 	params["mem"] = humanize.IBytes(memstats.Alloc)
 	renderTemplate(w, "index", params)
