@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 // TODO: I probably shouldn't include *all* commits here...
@@ -16,7 +15,6 @@ func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[s
 	var repo *git.Repository
 	var refHash plumbing.Hash
 	var err error
-	var commits []*object.Commit
 
 	repo = params["repo"].(*git.Repository)
 
@@ -25,11 +23,13 @@ func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[s
 		return
 	}
 
-	if commits, err = getRecentCommits(repo, refHash, -1); err != nil {
+	logOptions := git.LogOptions{From: refHash} //exhaustruct:ignore
+	commitIter, err := repo.Log(&logOptions)
+	if err != nil {
 		errorPage500(writer, params, "Error getting recent commits: "+err.Error())
 		return
 	}
-	params["commits"] = commits
+	params["commits"], params["commits_err"] = commitIterSeqErr(commitIter)
 
 	renderTemplate(writer, "repo_log", params)
 }
