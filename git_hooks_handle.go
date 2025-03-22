@@ -21,6 +21,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/jackc/pgx/v5"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
+	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 var (
@@ -233,7 +234,13 @@ func hooksHandler(conn net.Conn) {
 							writeRedError(sshStderr, "Error creating merge request: %v", err)
 							return 1
 						}
-						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", genHTTPRemoteURL(packPass.groupPath, packPass.repoName)+"/contrib/"+strconv.FormatUint(uint64(newMRID), 10)+"/"+ansiec.Reset)
+						merge_request_url := genHTTPRemoteURL(packPass.groupPath, packPass.repoName)+"/contrib/"+strconv.FormatUint(uint64(newMRID), 10)+"/"
+						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", merge_request_url+ansiec.Reset)
+						select {
+						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + merge_request_url + "\r\n":
+						default:
+							clog.Error("IRC SendQ exceeded")
+						}
 					} else { // Existing contrib branch
 						var existingMRUser int
 						var isAncestor bool
