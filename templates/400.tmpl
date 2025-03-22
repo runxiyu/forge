@@ -1,0 +1,25 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "400" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{- template "head_common" . -}}
+		<title>400 Bad Request &ndash; {{ .global.forge_title }}</title>
+	</head>
+	<body class="400">
+		{{- template "header" . -}}
+		<div class="padding-wrapper complete-error-page">
+			<h1>400 Bad Request</h1>
+			<p>{{- .bad_request_msg -}}</p>
+			<hr />
+			<address>Lindenii Forge</address>
+		</div>
+		<footer>
+			{{- template "footer" . -}}
+		</footer>
+	</body>
+</html>
+{{- end -}}

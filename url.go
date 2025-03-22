@@ -119,3 +119,12 @@ func segmentsToURL(segments []string) string {
 	}
 	return strings.Join(segments, "/")
 }
+
+func anyContain(ss []string, c string) bool {
+	for _, s := range ss {
+		if strings.Contains(s, c) {
+			return true
+		}
+	}
+	return false
+}

@@ -61,8 +61,7 @@ func httpHandleRepoTree(w http.ResponseWriter, r *http.Request, params map[strin
 				http.Error(w, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] == '/' {
-				http.Redirect(w, r, "../"+pathSpec, http.StatusSeeOther)
+			if redirectNoDir(w, r) {
 				return
 			}
 			if fileContent, err = file.Contents(); err != nil {

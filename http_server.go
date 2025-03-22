@@ -28,7 +28,6 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if segments[len(segments)-1] == "" {
-		// Might assign a trailing bool here
 		segments = segments[:len(segments)-1]
 	}
 
@@ -172,12 +171,20 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 			repoFeature := segments[sepIndex+3]
 			switch repoFeature {
 			case "tree":
+				if anyContain(segments[sepIndex+4:], "/") {
+					errorPage400(w, params, "Repo tree paths may not contain slashes in any segments")
+					return
+				}
 				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
 				if len(segments) < sepIndex+5 && redirectDir(w, r) {
 					return
 				}
 				httpHandleRepoTree(w, r, params)
 			case "raw":
+				if anyContain(segments[sepIndex+4:], "/") {
+					errorPage400(w, params, "Repo tree paths may not contain slashes in any segments")
+					return
+				}
 				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
 				if len(segments) < sepIndex+5 && redirectDir(w, r) {
 					return

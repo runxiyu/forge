@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -51,8 +50,7 @@ func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string
 				http.Error(w, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] == '/' {
-				http.Redirect(w, r, "../"+pathSpec, http.StatusSeeOther)
+			if redirectNoDir(w, r) {
 				return
 			}
 			if fileContent, err = file.Contents(); err != nil {
@@ -64,8 +62,7 @@ func httpHandleRepoRaw(w http.ResponseWriter, r *http.Request, params map[string
 		}
 	}
 
-	if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] != '/' {
-		http.Redirect(w, r, path.Base(pathSpec)+"/", http.StatusSeeOther)
+	if redirectDir(w, r) {
 		return
 	}
 
