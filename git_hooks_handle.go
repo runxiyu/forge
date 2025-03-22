@@ -226,10 +226,17 @@ func hooksHandler(conn net.Conn) {
 						fmt.Fprintln(sshStderr, ansiec.Blue+"POK"+ansiec.Reset, refName)
 						var newMRID int
 
-						err = database.QueryRow(ctx,
-							"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
-							packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
-						).Scan(&newMRID)
+						if packPass.userID != 0 {
+							err = database.QueryRow(ctx,
+								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
+								packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
+							).Scan(&newMRID)
+						} else {
+							err = database.QueryRow(ctx,
+								"INSERT INTO merge_requests (repo_id, source_ref, status) VALUES ($1, $2, 'open') RETURNING id",
+								packPass.repoID, strings.TrimPrefix(refName, "refs/heads/"),
+							).Scan(&newMRID)
+						}
 						if err != nil {
 							writeRedError(sshStderr, "Error creating merge request: %v", err)
 							return 1
