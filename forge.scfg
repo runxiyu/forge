@@ -15,6 +15,16 @@ http {
 	root https://forge.example.org
 }
 
+irc {
+	tls true
+	net tcp
+	addr irc.runxiyu.org:6697
+	sendq 6000
+	nick forge-test
+	user forge
+	gecos "Lindenii Forge Test"
+}
+
 git {
 	repo_dir /var/lib/lindenii/forge/repos
 }
