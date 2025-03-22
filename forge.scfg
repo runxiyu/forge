@@ -13,6 +13,10 @@ http {
 
 	# What is the canonical URL of the web root?
 	root https://forge.example.org
+
+	read_timeout 120
+	write_timeout 120
+	idle_timeout 120
 }
 
 irc {

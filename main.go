@@ -89,9 +89,9 @@ func main() {
 	}
 	server := http.Server{
 		Handler:      &forgeHTTPRouter{},
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  time.Duration(config.HTTP.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(config.HTTP.ReadTimeout) * time.Second,
+		IdleTimeout:  time.Duration(config.HTTP.ReadTimeout) * time.Second,
 	} //exhaustruct:ignore
 	clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
 	go func() {

@@ -21,6 +21,9 @@ var config struct {
 		Addr         string `scfg:"addr"`
 		CookieExpiry int    `scfg:"cookie_expiry"`
 		Root         string `scfg:"root"`
+		ReadTimeout  uint   `scfg:"read_timeout"`
+		WriteTimeout uint   `scfg:"write_timeout"`
+		IdleTimeout  uint   `scfg:"idle_timeout"`
 	} `scfg:"http"`
 	Hooks struct {
 		Socket string `scfg:"socket"`
