@@ -8,13 +8,13 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.14.0
-	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jackc/pgx/v5 v5.7.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
 	github.com/tdewolff/minify/v2 v2.22.3
 	github.com/yuin/goldmark v1.7.8
 	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321131425-dda3538a9cd4
-	go.lindenii.runxiyu.org/lindenii-irc v0.0.0-20250321180239-62045c958b0d
+	go.lindenii.runxiyu.org/lindenii-irc v0.0.0-20250322024138-aabae52169ec
 	golang.org/x/crypto v0.36.0
 )
 
