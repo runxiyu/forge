@@ -14,6 +14,12 @@ func errorPage404(w http.ResponseWriter, params map[string]any) {
 
 func errorPage400(w http.ResponseWriter, params map[string]any, msg string) {
 	w.WriteHeader(400)
-	params["bad_request_msg"] = msg
+	params["complete_error_msg"] = msg
 	_ = templates.ExecuteTemplate(w, "400", params)
+}
+
+func errorPage451(w http.ResponseWriter, params map[string]any, msg string) {
+	w.WriteHeader(451)
+	params["complete_error_msg"] = msg
+	_ = templates.ExecuteTemplate(w, "451", params)
 }
