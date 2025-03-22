@@ -16,7 +16,7 @@ func httpHandleIndex(writer http.ResponseWriter, request *http.Request, params m
 
 	groups, err = queryNameDesc(request.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
 	if err != nil {
-		http.Error(writer, "Error querying groups: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error querying groups: "+err.Error())
 		return
 	}
 	params["groups"] = groups

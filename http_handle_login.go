@@ -44,7 +44,7 @@ func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params m
 			renderTemplate(writer, "login", params)
 			return
 		}
-		http.Error(writer, "Error querying user information: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error querying user information: "+err.Error())
 		return
 	}
 	if passwordHash == "" {
@@ -54,7 +54,7 @@ func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params m
 	}
 
 	if passwordMatches, err = argon2id.ComparePasswordAndHash(password, passwordHash); err != nil {
-		http.Error(writer, "Error comparing password and hash: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error comparing password and hash: "+err.Error())
 		return
 	}
 
@@ -65,7 +65,7 @@ func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params m
 	}
 
 	if cookieValue, err = randomUrlsafeStr(16); err != nil {
-		http.Error(writer, "Error getting random string: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting random string: "+err.Error())
 		return
 	}
 
@@ -86,7 +86,7 @@ func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params m
 
 	_, err = database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
-		http.Error(writer, "Error inserting session: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error inserting session: "+err.Error())
 		return
 	}
 

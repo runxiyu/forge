@@ -59,7 +59,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 		errorPage404(writer, params)
 		return
 	} else if err != nil {
-		http.Error(writer, "Error getting group: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting group: "+err.Error())
 		return
 	}
 
@@ -72,7 +72,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			AND group_id = $2
 	`, params["user_id"].(int), groupID).Scan(&count)
 	if err != nil {
-		http.Error(writer, "Error checking access: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error checking access: "+err.Error())
 		return
 	}
 	directAccess := (count > 0)
@@ -103,7 +103,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			contribReq,
 		).Scan(&newRepoID)
 		if err != nil {
-			http.Error(writer, "Error creating repo: "+err.Error(), http.StatusInternalServerError)
+			errorPage500(writer, params, "Error creating repo: "+err.Error())
 			return
 		}
 
@@ -118,12 +118,12 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			newRepoID,
 		)
 		if err != nil {
-			http.Error(writer, "Error updating repo path: "+err.Error(), http.StatusInternalServerError)
+			errorPage500(writer, params, "Error updating repo path: "+err.Error())
 			return
 		}
 
 		if err = gitInit(filePath); err != nil {
-			http.Error(writer, "Error initializing repo: "+err.Error(), http.StatusInternalServerError)
+			errorPage500(writer, params, "Error initializing repo: "+err.Error())
 			return
 		}
 
@@ -139,7 +139,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 		WHERE group_id = $1
 	`, groupID)
 	if err != nil {
-		http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting repos: "+err.Error())
 		return
 	}
 	defer rows.Close()
@@ -147,13 +147,13 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+			errorPage500(writer, params, "Error getting repos: "+err.Error())
 			return
 		}
 		repos = append(repos, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting repos: "+err.Error())
 		return
 	}
 
@@ -164,7 +164,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 		WHERE parent_group = $1
 	`, groupID)
 	if err != nil {
-		http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting subgroups: "+err.Error())
 		return
 	}
 	defer rows.Close()
@@ -172,13 +172,13 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+			errorPage500(writer, params, "Error getting subgroups: "+err.Error())
 			return
 		}
 		subgroups = append(subgroups, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting subgroups: "+err.Error())
 		return
 	}
 

@@ -23,3 +23,9 @@ func errorPage451(w http.ResponseWriter, params map[string]any, msg string) {
 	params["complete_error_msg"] = msg
 	_ = templates.ExecuteTemplate(w, "451", params)
 }
+
+func errorPage500(w http.ResponseWriter, params map[string]any, msg string) {
+	w.WriteHeader(http.StatusInternalServerError)
+	params["complete_error_msg"] = msg
+	_ = templates.ExecuteTemplate(w, "500", params)
+}

@@ -35,18 +35,18 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE id = $1",
 		mrIDInt,
 	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {
-		http.Error(writer, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error querying merge request: "+err.Error())
 		return
 	}
 
 	repo = params["repo"].(*git.Repository)
 
 	if srcRefHash, err = getRefHash(repo, "branch", srcRefStr); err != nil {
-		http.Error(writer, "Error getting source ref hash: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting source ref hash: "+err.Error())
 		return
 	}
 	if srcCommit, err = repo.CommitObject(srcRefHash); err != nil {
-		http.Error(writer, "Error getting source commit: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting source commit: "+err.Error())
 		return
 	}
 	params["source_commit"] = srcCommit
@@ -58,18 +58,18 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 		dstBranchHash, err = getRefHash(repo, "branch", dstBranchStr)
 	}
 	if err != nil {
-		http.Error(writer, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting destination branch hash: "+err.Error())
 		return
 	}
 
 	if dstCommit, err = repo.CommitObject(dstBranchHash); err != nil {
-		http.Error(writer, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting destination commit: "+err.Error())
 		return
 	}
 	params["destination_commit"] = dstCommit
 
 	if mergeBases, err = srcCommit.MergeBase(dstCommit); err != nil {
-		http.Error(writer, "Error getting merge base: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting merge base: "+err.Error())
 		return
 	}
 	mergeBaseCommit = mergeBases[0]
@@ -77,7 +77,7 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 
 	patch, err := mergeBaseCommit.Patch(srcCommit)
 	if err != nil {
-		http.Error(writer, "Error getting patch: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting patch: "+err.Error())
 		return
 	}
 	params["file_patches"] = makeUsableFilePatches(patch)

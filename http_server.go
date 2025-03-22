@@ -37,7 +37,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	userID, params["username"], err = getUserFromRequest(request)
 	params["user_id"] = userID
 	if err != nil && !errors.Is(err, http.ErrNoCookie) && !errors.Is(err, pgx.ErrNoRows) {
-		http.Error(writer, "Error getting user info from request: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting user info from request: "+err.Error())
 		return
 	}
 
@@ -131,12 +131,12 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				switch segments[sepIndex+3] {
 				case "info":
 					if err = httpHandleRepoInfo(writer, request, params); err != nil {
-						http.Error(writer, err.Error(), http.StatusInternalServerError)
+						errorPage500(writer, params, err.Error())
 					}
 					return
 				case "git-upload-pack":
 					if err = httpHandleUploadPack(writer, request, params); err != nil {
-						http.Error(writer, err.Error(), http.StatusInternalServerError)
+						errorPage500(writer, params, err.Error())
 					}
 					return
 				}
@@ -146,7 +146,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				if errors.Is(err, errNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
-					http.Error(writer, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
+					errorPage500(writer, params, "Error querying ref type: "+err.Error())
 					return
 				}
 			}
@@ -154,7 +154,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 			// TODO: subgroups
 
 			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(request.Context(), groupPath, moduleName); err != nil {
-				http.Error(writer, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
+				errorPage500(writer, params, "Error opening repo: "+err.Error())
 				return
 			}
 

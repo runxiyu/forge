@@ -32,15 +32,15 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 	params["path_spec"] = pathSpec
 
 	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
-		http.Error(writer, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting ref hash: "+err.Error())
 		return
 	}
 	if commitObject, err = repo.CommitObject(refHash); err != nil {
-		http.Error(writer, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting commit object: "+err.Error())
 		return
 	}
 	if tree, err = commitObject.Tree(); err != nil {
-		http.Error(writer, "Error getting file tree: "+err.Error(), http.StatusInternalServerError)
+		errorPage500(writer, params, "Error getting file tree: "+err.Error())
 		return
 	}
 
@@ -58,14 +58,14 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 			var formattedHTML template.HTML
 
 			if file, err = tree.File(pathSpec); err != nil {
-				http.Error(writer, "Error retrieving path: "+err.Error(), http.StatusInternalServerError)
+				errorPage500(writer, params, "Error retrieving path: "+err.Error())
 				return
 			}
 			if redirectNoDir(writer, request) {
 				return
 			}
 			if fileContent, err = file.Contents(); err != nil {
-				http.Error(writer, "Error reading file: "+err.Error(), http.StatusInternalServerError)
+				errorPage500(writer, params, "Error reading file: "+err.Error())
 				return
 			}
 			lexer = chromaLexers.Match(pathSpec)
@@ -73,14 +73,14 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 				lexer = chromaLexers.Fallback
 			}
 			if iterator, err = lexer.Tokenise(nil, fileContent); err != nil {
-				http.Error(writer, "Error tokenizing code: "+err.Error(), http.StatusInternalServerError)
+				errorPage500(writer, params, "Error tokenizing code: "+err.Error())
 				return
 			}
 			var formattedHTMLStr bytes.Buffer
 			style = chromaStyles.Get("autumn")
 			formatter = chromaHTML.New(chromaHTML.WithClasses(true), chromaHTML.TabWidth(8))
 			if err = formatter.Format(&formattedHTMLStr, style, iterator); err != nil {
-				http.Error(writer, "Error formatting code: "+err.Error(), http.StatusInternalServerError)
+				errorPage500(writer, params, "Error formatting code: "+err.Error())
 				return
 			}
 			formattedHTML = template.HTML(formattedHTMLStr.Bytes()) //#nosec G203
