@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/chroma/v2"
 	chromaHTML "github.com/alecthomas/chroma/v2/formatters/html"
@@ -23,6 +24,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 	var rawPathSpec, pathSpec string
 	var repo *git.Repository
 	var refHash plumbing.Hash
+	var refHashSlice []byte
 	var commitObject *object.Commit
 	var tree *object.Tree
 	var err error
@@ -35,6 +37,45 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		errorPage500(writer, params, "Error getting ref hash: "+err.Error())
 		return
 	}
+	refHashSlice = refHash[:]
+
+	var target *object.Tree
+	if pathSpec == "" {
+		if value, found := treeReadmeCache.Get(refHashSlice); found {
+			params["files"] = value.DisplayTree
+			params["readme_filename"] = value.ReadmeFilename
+			params["readme"] = value.ReadmeRendered
+		} else {
+			if commitObject, err = repo.CommitObject(refHash); err != nil {
+				errorPage500(writer, params, "Error getting commit object: "+err.Error())
+				return
+			}
+			if tree, err = commitObject.Tree(); err != nil {
+				errorPage500(writer, params, "Error getting file tree: "+err.Error())
+				return
+			}
+
+			start := time.Now()
+			displayTree := makeDisplayTree(tree)
+			readmeFilename, readmeRendered := renderReadmeAtTree(tree)
+			cost := time.Since(start).Nanoseconds()
+
+			params["files"] = displayTree
+			params["readme_filename"] = readmeFilename
+			params["readme"] = readmeRendered
+
+			entry := treeReadmeCacheEntry{
+				DisplayTree:    displayTree,
+				ReadmeFilename: readmeFilename,
+				ReadmeRendered: readmeRendered,
+			}
+			treeReadmeCache.Set(refHashSlice, entry, cost)
+		}
+
+		renderTemplate(writer, "repo_tree_dir", params)
+		return
+	}
+
 	if commitObject, err = repo.CommitObject(refHash); err != nil {
 		errorPage500(writer, params, "Error getting commit object: "+err.Error())
 		return
@@ -43,52 +84,46 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		errorPage500(writer, params, "Error getting file tree: "+err.Error())
 		return
 	}
+	if target, err = tree.Tree(pathSpec); err != nil {
+		var file *object.File
+		var fileContent string
+		var lexer chroma.Lexer
+		var iterator chroma.Iterator
+		var style *chroma.Style
+		var formatter *chromaHTML.Formatter
+		var formattedHTML template.HTML
 
-	var target *object.Tree
-	if pathSpec == "" {
-		target = tree
-	} else {
-		if target, err = tree.Tree(pathSpec); err != nil {
-			var file *object.File
-			var fileContent string
-			var lexer chroma.Lexer
-			var iterator chroma.Iterator
-			var style *chroma.Style
-			var formatter *chromaHTML.Formatter
-			var formattedHTML template.HTML
-
-			if file, err = tree.File(pathSpec); err != nil {
-				errorPage500(writer, params, "Error retrieving path: "+err.Error())
-				return
-			}
-			if redirectNoDir(writer, request) {
-				return
-			}
-			if fileContent, err = file.Contents(); err != nil {
-				errorPage500(writer, params, "Error reading file: "+err.Error())
-				return
-			}
-			lexer = chromaLexers.Match(pathSpec)
-			if lexer == nil {
-				lexer = chromaLexers.Fallback
-			}
-			if iterator, err = lexer.Tokenise(nil, fileContent); err != nil {
-				errorPage500(writer, params, "Error tokenizing code: "+err.Error())
-				return
-			}
-			var formattedHTMLStr bytes.Buffer
-			style = chromaStyles.Get("autumn")
-			formatter = chromaHTML.New(chromaHTML.WithClasses(true), chromaHTML.TabWidth(8))
-			if err = formatter.Format(&formattedHTMLStr, style, iterator); err != nil {
-				errorPage500(writer, params, "Error formatting code: "+err.Error())
-				return
-			}
-			formattedHTML = template.HTML(formattedHTMLStr.Bytes()) //#nosec G203
-			params["file_contents"] = formattedHTML
-
-			renderTemplate(writer, "repo_tree_file", params)
+		if file, err = tree.File(pathSpec); err != nil {
+			errorPage500(writer, params, "Error retrieving path: "+err.Error())
 			return
 		}
+		if redirectNoDir(writer, request) {
+			return
+		}
+		if fileContent, err = file.Contents(); err != nil {
+			errorPage500(writer, params, "Error reading file: "+err.Error())
+			return
+		}
+		lexer = chromaLexers.Match(pathSpec)
+		if lexer == nil {
+			lexer = chromaLexers.Fallback
+		}
+		if iterator, err = lexer.Tokenise(nil, fileContent); err != nil {
+			errorPage500(writer, params, "Error tokenizing code: "+err.Error())
+			return
+		}
+		var formattedHTMLStr bytes.Buffer
+		style = chromaStyles.Get("autumn")
+		formatter = chromaHTML.New(chromaHTML.WithClasses(true), chromaHTML.TabWidth(8))
+		if err = formatter.Format(&formattedHTMLStr, style, iterator); err != nil {
+			errorPage500(writer, params, "Error formatting code: "+err.Error())
+			return
+		}
+		formattedHTML = template.HTML(formattedHTMLStr.Bytes()) //#nosec G203
+		params["file_contents"] = formattedHTML
+
+		renderTemplate(writer, "repo_tree_file", params)
+		return
 	}
 
 	if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] != '/' {

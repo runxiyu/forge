@@ -4,39 +4,16 @@
 package main
 
 import (
-	"html/template"
 	"iter"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/dgraph-io/ristretto/v2"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/storer"
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
-
-type indexPageCacheEntry struct {
-	DisplayTree    []displayTreeEntry
-	ReadmeFilename string
-	ReadmeRendered template.HTML
-}
-
-var indexPageCache *ristretto.Cache[[]byte, indexPageCacheEntry]
-
-func init() {
-	var err error
-	indexPageCache, err = ristretto.NewCache(&ristretto.Config[[]byte, indexPageCacheEntry]{
-		NumCounters: 1e4,
-		MaxCost:     1 << 30,
-		BufferItems: 64,
-	})
-	if err != nil {
-		clog.Fatal(1, "Error initializing indexPageCache: "+err.Error())
-	}
-}
 
 func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
@@ -83,7 +60,7 @@ func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map
 	commitIterSeq, params["commits_err"] = commitIterSeqErr(commitIter)
 	params["commits"] = iterSeqLimit(commitIterSeq, 3)
 
-	if value, found := indexPageCache.Get(refHashSlice); found {
+	if value, found := treeReadmeCache.Get(refHashSlice); found {
 		params["files"] = value.DisplayTree
 		params["readme_filename"] = value.ReadmeFilename
 		params["readme"] = value.ReadmeRendered
@@ -104,12 +81,12 @@ func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map
 		params["readme_filename"] = readmeFilename
 		params["readme"] = readmeRendered
 
-		entry := indexPageCacheEntry{
+		entry := treeReadmeCacheEntry{
 			DisplayTree:    displayTree,
 			ReadmeFilename: readmeFilename,
 			ReadmeRendered: readmeRendered,
 		}
-		indexPageCache.Set(refHashSlice, entry, cost)
+		treeReadmeCache.Set(refHashSlice, entry, cost)
 	}
 
 no_ref:
