@@ -24,6 +24,7 @@ var config struct {
 		ReadTimeout  uint   `scfg:"read_timeout"`
 		WriteTimeout uint   `scfg:"write_timeout"`
 		IdleTimeout  uint   `scfg:"idle_timeout"`
+		ReverseProxy bool   `scfg:"reverse_proxy"`
 	} `scfg:"http"`
 	Hooks struct {
 		Socket string `scfg:"socket"`

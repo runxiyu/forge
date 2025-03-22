@@ -16,7 +16,18 @@ import (
 type forgeHTTPRouter struct{}
 
 func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	clog.Info("Incoming HTTP: " + request.RemoteAddr + " " + request.Method + " " + request.RequestURI)
+	var remoteAddr string
+	if config.HTTP.ReverseProxy {
+		remoteAddrs, ok := request.Header["X-Forwarded-For"]
+		if ok && len(remoteAddrs) == 1 {
+			remoteAddr = remoteAddrs[0]
+		} else {
+			remoteAddr = request.RemoteAddr
+		}
+	} else {
+		remoteAddr = request.RemoteAddr
+	}
+	clog.Info("Incoming HTTP: " + remoteAddr + " " + request.Method + " " + request.RequestURI)
 
 	var segments []string
 	var err error

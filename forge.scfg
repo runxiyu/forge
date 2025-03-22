@@ -14,9 +14,16 @@ http {
 	# What is the canonical URL of the web root?
 	root https://forge.example.org
 
+	# General HTTP server context timeout settings. It's recommended to
+	# set them slightly higher than usual as Git operations over large
+	# repos may take a long time.
 	read_timeout 120
-	write_timeout 120
+	write_timeout 1800
 	idle_timeout 120
+
+	# Are we running behind a reverse proxy? If so, we will trust
+	# X-Forwarded-For headers.
+	reverse_proxy true
 }
 
 irc {
