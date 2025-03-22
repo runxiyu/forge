@@ -32,10 +32,13 @@ func ircBotSession() error {
 	defer underlyingConn.Close()
 
 	conn := irc.NewConn(underlyingConn)
-	conn.WriteString(
+	_, err = conn.WriteString(
 		"NICK " + config.IRC.Nick + "\r\n" +
 			"USER " + config.IRC.User + " 0 * :" + config.IRC.Gecos + "\r\n",
 	)
+	if err != nil {
+		return err
+	}
 
 	readLoopError := make(chan error)
 	writeLoopAbort := make(chan struct{})
