@@ -12,7 +12,7 @@ import (
 )
 
 // TODO: I probably shouldn't include *all* commits here...
-func httpHandleRepoLog(w http.ResponseWriter, _ *http.Request, params map[string]any) {
+func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var refHash plumbing.Hash
 	var err error
@@ -21,15 +21,15 @@ func httpHandleRepoLog(w http.ResponseWriter, _ *http.Request, params map[string
 	repo = params["repo"].(*git.Repository)
 
 	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
-		http.Error(w, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if commits, err = getRecentCommits(repo, refHash, -1); err != nil {
-		http.Error(w, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting recent commits: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["commits"] = commits
 
-	renderTemplate(w, "repo_log", params)
+	renderTemplate(writer, "repo_log", params)
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
-func httpHandleRepoIndex(w http.ResponseWriter, _ *http.Request, params map[string]any) {
+func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string
 	var groupPath []string
@@ -73,5 +73,5 @@ no_ref:
 	params["ssh_clone_url"] = genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
-	renderTemplate(w, "repo_index", params)
+	renderTemplate(writer, "repo_index", params)
 }

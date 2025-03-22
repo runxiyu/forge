@@ -12,12 +12,12 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
+func httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	groupPath := params["group_path"].([]string)
 	repoName := params["repo_name"].(string)
 	var repoPath string
 
-	if err := database.QueryRow(r.Context(), `
+	if err := database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT
@@ -54,8 +54,8 @@ func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[strin
 		return err
 	}
 
-	w.Header().Set("Content-Type", "application/x-git-upload-pack-advertisement")
-	w.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/x-git-upload-pack-advertisement")
+	writer.WriteHeader(http.StatusOK)
 
 	cmd := exec.Command("git", "upload-pack", "--stateless-rpc", "--advertise-refs", repoPath)
 	stdout, err := cmd.StdoutPipe()
@@ -71,15 +71,15 @@ func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[strin
 		return err
 	}
 
-	if err = packLine(w, "# service=git-upload-pack\n"); err != nil {
+	if err = packLine(writer, "# service=git-upload-pack\n"); err != nil {
 		return err
 	}
 
-	if err = packFlush(w); err != nil {
+	if err = packFlush(writer); err != nil {
 		return
 	}
 
-	if _, err = io.Copy(w, stdout); err != nil {
+	if _, err = io.Copy(writer, stdout); err != nil {
 		return err
 	}
 

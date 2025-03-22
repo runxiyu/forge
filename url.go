@@ -15,15 +15,15 @@ var (
 	errNoRefSpec  = errors.New("no ref spec")
 )
 
-func getParamRefTypeName(r *http.Request) (retRefType, retRefName string, err error) {
-	qr := r.URL.RawQuery
-	q, err := url.ParseQuery(qr)
+func getParamRefTypeName(request *http.Request) (retRefType, retRefName string, err error) {
+	rawQuery := request.URL.RawQuery
+	queryValues, err := url.ParseQuery(rawQuery)
 	if err != nil {
 		return
 	}
 	done := false
 	for _, refType := range []string{"commit", "branch", "tag"} {
-		refName, ok := q[refType]
+		refName, ok := queryValues[refType]
 		if ok {
 			if done {
 				err = errDupRefSpec
@@ -60,8 +60,8 @@ func parseReqURI(requestURI string) (segments []string, params url.Values, err e
 	return
 }
 
-func redirectDir(w http.ResponseWriter, r *http.Request) bool {
-	requestURI := r.RequestURI
+func redirectDir(writer http.ResponseWriter, request *http.Request) bool {
+	requestURI := request.RequestURI
 
 	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
@@ -73,14 +73,14 @@ func redirectDir(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if !strings.HasSuffix(path, "/") {
-		http.Redirect(w, r, path+"/"+rest, http.StatusSeeOther)
+		http.Redirect(writer, request, path+"/"+rest, http.StatusSeeOther)
 		return true
 	}
 	return false
 }
 
-func redirectNoDir(w http.ResponseWriter, r *http.Request) bool {
-	requestURI := r.RequestURI
+func redirectNoDir(writer http.ResponseWriter, request *http.Request) bool {
+	requestURI := request.RequestURI
 
 	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
@@ -92,14 +92,14 @@ func redirectNoDir(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if strings.HasSuffix(path, "/") {
-		http.Redirect(w, r, strings.TrimSuffix(path, "/")+rest, http.StatusSeeOther)
+		http.Redirect(writer, request, strings.TrimSuffix(path, "/")+rest, http.StatusSeeOther)
 		return true
 	}
 	return false
 }
 
-func redirectUnconditionally(w http.ResponseWriter, r *http.Request) {
-	requestURI := r.RequestURI
+func redirectUnconditionally(writer http.ResponseWriter, request *http.Request) {
+	requestURI := request.RequestURI
 
 	pathEnd := strings.IndexAny(requestURI, "?#")
 	var path, rest string
@@ -110,7 +110,7 @@ func redirectUnconditionally(w http.ResponseWriter, r *http.Request) {
 		rest = requestURI[pathEnd:]
 	}
 
-	http.Redirect(w, r, path+rest, http.StatusSeeOther)
+	http.Redirect(writer, request, path+rest, http.StatusSeeOther)
 }
 
 func segmentsToURL(segments []string) string {

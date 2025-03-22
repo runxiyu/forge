@@ -72,20 +72,20 @@ func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey st
 		return false, nil
 	}
 
-	var tx pgx.Tx
-	if tx, err = database.Begin(ctx); err != nil {
+	var txn pgx.Tx
+	if txn, err = database.Begin(ctx); err != nil {
 		return false, err
 	}
 	defer func() {
-		_ = tx.Rollback(ctx)
+		_ = txn.Rollback(ctx)
 	}()
-	if _, err = tx.Exec(ctx, `UPDATE users SET type = 'federated' WHERE id = $1 AND type = 'pubkey_only'`, userID); err != nil {
+	if _, err = txn.Exec(ctx, `UPDATE users SET type = 'federated' WHERE id = $1 AND type = 'pubkey_only'`, userID); err != nil {
 		return false, err
 	}
-	if _, err = tx.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, userID, service, remoteUsername); err != nil {
+	if _, err = txn.Exec(ctx, `INSERT INTO federated_identities (user_id, service, remote_username) VALUES ($1, $2, $3)`, userID, service, remoteUsername); err != nil {
 		return false, err
 	}
-	if err = tx.Commit(ctx); err != nil {
+	if err = txn.Commit(ctx); err != nil {
 		return false, err
 	}
 

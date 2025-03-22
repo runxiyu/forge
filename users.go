@@ -10,23 +10,23 @@ import (
 )
 
 func addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
-	var tx pgx.Tx
+	var txn pgx.Tx
 
-	if tx, err = database.Begin(ctx); err != nil {
+	if txn, err = database.Begin(ctx); err != nil {
 		return
 	}
 	defer func() {
-		_ = tx.Rollback(ctx)
+		_ = txn.Rollback(ctx)
 	}()
 
-	if err = tx.QueryRow(ctx, `INSERT INTO users (type) VALUES ('pubkey_only') RETURNING id`).Scan(&userID); err != nil {
+	if err = txn.QueryRow(ctx, `INSERT INTO users (type) VALUES ('pubkey_only') RETURNING id`).Scan(&userID); err != nil {
 		return
 	}
 
-	if _, err = tx.Exec(ctx, `INSERT INTO ssh_public_keys (key_string, user_id) VALUES ($1, $2)`, pubkey, userID); err != nil {
+	if _, err = txn.Exec(ctx, `INSERT INTO ssh_public_keys (key_string, user_id) VALUES ($1, $2)`, pubkey, userID); err != nil {
 		return
 	}
 
-	err = tx.Commit(ctx)
+	err = txn.Commit(ctx)
 	return
 }

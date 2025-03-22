@@ -10,13 +10,13 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-func httpHandleIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var err error
 	var groups []nameDesc
 
-	groups, err = queryNameDesc(r.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
+	groups, err = queryNameDesc(request.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
 	if err != nil {
-		http.Error(w, "Error querying groups: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error querying groups: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["groups"] = groups
@@ -25,5 +25,5 @@ func httpHandleIndex(w http.ResponseWriter, r *http.Request, params map[string]a
 	memstats := runtime.MemStats{} //exhaustruct:ignore
 	runtime.ReadMemStats(&memstats)
 	params["mem"] = humanize.IBytes(memstats.Alloc)
-	renderTemplate(w, "index", params)
+	renderTemplate(writer, "index", params)
 }

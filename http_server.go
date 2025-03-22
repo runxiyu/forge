@@ -15,16 +15,16 @@ import (
 
 type forgeHTTPRouter struct{}
 
-func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	clog.Info("Incoming HTTP: " + r.RemoteAddr + " " + r.Method + " " + r.RequestURI)
+func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	clog.Info("Incoming HTTP: " + request.RemoteAddr + " " + request.Method + " " + request.RequestURI)
 
 	var segments []string
 	var err error
 	var sepIndex int
 	params := make(map[string]any)
 
-	if segments, _, err = parseReqURI(r.RequestURI); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if segments, _, err = parseReqURI(request.RequestURI); err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if segments[len(segments)-1] == "" {
@@ -34,10 +34,10 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	params["url_segments"] = segments
 	params["global"] = globalData
 	var userID int // 0 for none
-	userID, params["username"], err = getUserFromRequest(r)
+	userID, params["username"], err = getUserFromRequest(request)
 	params["user_id"] = userID
 	if err != nil && !errors.Is(err, http.ErrNoCookie) && !errors.Is(err, pgx.ErrNoRows) {
-		http.Error(w, "Error getting user info from request: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting user info from request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -48,24 +48,24 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(segments) == 0 {
-		httpHandleIndex(w, r, params)
+		httpHandleIndex(writer, request, params)
 		return
 	}
 
 	if segments[0] == ":" {
 		if len(segments) < 2 {
-			errorPage404(w, params)
+			errorPage404(writer, params)
 			return
-		} else if len(segments) == 2 && redirectDir(w, r) {
+		} else if len(segments) == 2 && redirectDir(writer, request) {
 			return
 		}
 
 		switch segments[1] {
 		case "static":
-			staticHandler.ServeHTTP(w, r)
+			staticHandler.ServeHTTP(writer, request)
 			return
 		case "source":
-			sourceHandler.ServeHTTP(w, r)
+			sourceHandler.ServeHTTP(writer, request)
 			return
 		}
 	}
@@ -73,16 +73,16 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	if segments[0] == ":" {
 		switch segments[1] {
 		case "login":
-			httpHandleLogin(w, r, params)
+			httpHandleLogin(writer, request, params)
 			return
 		case "users":
-			httpHandleUsers(w, r, params)
+			httpHandleUsers(writer, request, params)
 			return
 		case "gc":
-			httpHandleGC(w, r, params)
+			httpHandleGC(writer, request, params)
 			return
 		default:
-			errorPage404(w, params)
+			errorPage404(writer, params)
 			return
 		}
 	}
@@ -110,15 +110,15 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	switch {
 	case sepIndex == -1:
-		if redirectDir(w, r) {
+		if redirectDir(writer, request) {
 			return
 		}
-		httpHandleGroupIndex(w, r, params)
+		httpHandleGroupIndex(writer, request, params)
 	case len(segments) == sepIndex+1:
-		errorPage404(w, params)
+		errorPage404(writer, params)
 		return
 	case len(segments) == sepIndex+2:
-		errorPage404(w, params)
+		errorPage404(writer, params)
 		return
 	default:
 		moduleType = segments[sepIndex+1]
@@ -130,39 +130,39 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 			if len(segments) > sepIndex+3 {
 				switch segments[sepIndex+3] {
 				case "info":
-					if err = httpHandleRepoInfo(w, r, params); err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
+					if err = httpHandleRepoInfo(writer, request, params); err != nil {
+						http.Error(writer, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				case "git-upload-pack":
-					if err = httpHandleUploadPack(w, r, params); err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
+					if err = httpHandleUploadPack(writer, request, params); err != nil {
+						http.Error(writer, err.Error(), http.StatusInternalServerError)
 					}
 					return
 				}
 			}
 
-			if params["ref_type"], params["ref_name"], err = getParamRefTypeName(r); err != nil {
+			if params["ref_type"], params["ref_name"], err = getParamRefTypeName(request); err != nil {
 				if errors.Is(err, errNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
-					http.Error(w, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
+					http.Error(writer, "Error querying ref type: "+err.Error(), http.StatusInternalServerError)
 					return
 				}
 			}
 
 			// TODO: subgroups
 
-			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(r.Context(), groupPath, moduleName); err != nil {
-				http.Error(w, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
+			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(request.Context(), groupPath, moduleName); err != nil {
+				http.Error(writer, "Error opening repo: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
 			if len(segments) == sepIndex+3 {
-				if redirectDir(w, r) {
+				if redirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoIndex(w, r, params)
+				httpHandleRepoIndex(writer, request, params)
 				return
 			}
 
@@ -170,58 +170,58 @@ func (router *forgeHTTPRouter) ServeHTTP(w http.ResponseWriter, r *http.Request)
 			switch repoFeature {
 			case "tree":
 				if anyContain(segments[sepIndex+4:], "/") {
-					errorPage400(w, params, "Repo tree paths may not contain slashes in any segments")
+					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
 				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
-				if len(segments) < sepIndex+5 && redirectDir(w, r) {
+				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoTree(w, r, params)
+				httpHandleRepoTree(writer, request, params)
 			case "raw":
 				if anyContain(segments[sepIndex+4:], "/") {
-					errorPage400(w, params, "Repo tree paths may not contain slashes in any segments")
+					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
 				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
-				if len(segments) < sepIndex+5 && redirectDir(w, r) {
+				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoRaw(w, r, params)
+				httpHandleRepoRaw(writer, request, params)
 			case "log":
 				if len(segments) > sepIndex+4 {
-					http.Error(w, "Too many parameters", http.StatusBadRequest)
+					http.Error(writer, "Too many parameters", http.StatusBadRequest)
 					return
 				}
-				if redirectDir(w, r) {
+				if redirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoLog(w, r, params)
+				httpHandleRepoLog(writer, request, params)
 			case "commit":
-				if redirectNoDir(w, r) {
+				if redirectNoDir(writer, request) {
 					return
 				}
 				params["commit_id"] = segments[sepIndex+4]
-				httpHandleRepoCommit(w, r, params)
+				httpHandleRepoCommit(writer, request, params)
 			case "contrib":
-				if redirectDir(w, r) {
+				if redirectDir(writer, request) {
 					return
 				}
 				switch len(segments) {
 				case sepIndex + 4:
-					httpHandleRepoContribIndex(w, r, params)
+					httpHandleRepoContribIndex(writer, request, params)
 				case sepIndex + 5:
 					params["mr_id"] = segments[sepIndex+4]
-					httpHandleRepoContribOne(w, r, params)
+					httpHandleRepoContribOne(writer, request, params)
 				default:
-					http.Error(w, "Too many parameters", http.StatusBadRequest)
+					http.Error(writer, "Too many parameters", http.StatusBadRequest)
 				}
 			default:
-				errorPage404(w, params)
+				errorPage404(writer, params)
 				return
 			}
 		default:
-			errorPage404(w, params)
+			errorPage404(writer, params)
 			return
 		}
 	}

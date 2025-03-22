@@ -100,20 +100,20 @@ func ircBotSession() error {
 		select {
 		case err = <-readLoopError:
 			return err
-		case s := <-ircSendBuffered:
-			_, err = logAndWriteLn(s)
+		case line := <-ircSendBuffered:
+			_, err = logAndWriteLn(line)
 			if err != nil {
 				select {
-				case ircSendBuffered <- s:
+				case ircSendBuffered <- line:
 				default:
-					clog.Error("unable to requeue IRC message: " + s)
+					clog.Error("unable to requeue IRC message: " + line)
 				}
 				writeLoopAbort <- struct{}{}
 				return err
 			}
-		case se := <-ircSendDirectChan:
-			_, err = logAndWriteLn(se.content)
-			se.errorBack <- err
+		case lineErrorBack := <-ircSendDirectChan:
+			_, err = logAndWriteLn(lineErrorBack.content)
+			lineErrorBack.errorBack <- err
 			if err != nil {
 				writeLoopAbort <- struct{}{}
 				return err

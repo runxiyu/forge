@@ -29,7 +29,7 @@ type usableChunk struct {
 	Content   string
 }
 
-func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var commitIDStrSpec, commitIDStrSpecNoSuffix string
 	var commitID plumbing.Hash
@@ -44,22 +44,22 @@ func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[str
 	commitIDStrSpecNoSuffix = strings.TrimSuffix(commitIDStrSpec, ".patch")
 	commitID = plumbing.NewHash(commitIDStrSpecNoSuffix)
 	if commitObj, err = repo.CommitObject(commitID); err != nil {
-		http.Error(w, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting commit object: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if commitIDStrSpecNoSuffix != commitIDStrSpec {
 		var patchStr string
 		if patchStr, err = fmtCommitPatch(commitObj); err != nil {
-			http.Error(w, "Error formatting patch: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error formatting patch: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, patchStr)
+		fmt.Fprintln(writer, patchStr)
 		return
 	}
 	commitIDStr = commitObj.Hash.String()
 
 	if commitIDStr != commitIDStrSpec {
-		http.Redirect(w, r, commitIDStr, http.StatusSeeOther)
+		http.Redirect(writer, request, commitIDStr, http.StatusSeeOther)
 		return
 	}
 
@@ -68,7 +68,7 @@ func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[str
 
 	parentCommitHash, patch, err = fmtCommitAsPatch(commitObj)
 	if err != nil {
-		http.Error(w, "Error getting patch from commit: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting patch from commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["parent_commitHash"] = parentCommitHash.String()
@@ -76,7 +76,7 @@ func httpHandleRepoCommit(w http.ResponseWriter, r *http.Request, params map[str
 
 	params["file_patches"] = makeUsableFilePatches(patch)
 
-	renderTemplate(w, "repo_commit", params)
+	renderTemplate(writer, "repo_commit", params)
 }
 
 type fakeDiffFile struct {
@@ -108,16 +108,16 @@ func makeUsableFilePatches(patch diff.Patch) (usableFilePatches []usableFilePatc
 	// TODO: Prepend "+"/"-"/" " instead of solely distinguishing based on color
 
 	for _, filePatch := range patch.FilePatches() {
-		var from, to diff.File
+		var fromFile, toFile diff.File
 		var ufp usableFilePatch
 		chunks := []usableChunk{}
 
-		from, to = filePatch.Files()
-		if from == nil {
-			from = nullFakeDiffFile
+		fromFile, toFile = filePatch.Files()
+		if fromFile == nil {
+			fromFile = nullFakeDiffFile
 		}
-		if to == nil {
-			to = nullFakeDiffFile
+		if toFile == nil {
+			toFile = nullFakeDiffFile
 		}
 		for _, chunk := range filePatch.Chunks() {
 			var content string
@@ -133,8 +133,8 @@ func makeUsableFilePatches(patch diff.Patch) (usableFilePatches []usableFilePatc
 		}
 		ufp = usableFilePatch{
 			Chunks: chunks,
-			From:   from,
-			To:     to,
+			From:   fromFile,
+			To:     toFile,
 		}
 		usableFilePatches = append(usableFilePatches, ufp)
 	}

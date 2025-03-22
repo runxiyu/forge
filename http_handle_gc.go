@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-func httpHandleGC(w http.ResponseWriter, r *http.Request, _ map[string]any) {
+func httpHandleGC(writer http.ResponseWriter, request *http.Request, _ map[string]any) {
 	runtime.GC()
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(writer, request, "/", http.StatusSeeOther)
 }

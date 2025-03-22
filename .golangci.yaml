@@ -13,6 +13,7 @@ linters:
     - mnd              # it's a bit ridiculous to replace all of them
     - nakedret         # patterns should be consistent
     - nonamedreturns   # i like named returns
+    - wrapcheck        # wrapping all errors is just not necessary
     - maintidx   # e
     - nestif     # e
     - gocognit   # e
@@ -22,8 +23,6 @@ linters:
     - funlen     # e
     - wsl        # e
     - nlreturn   # e
-    - wrapcheck  # e
-    - varnamelen # e
 
 issues:
   max-issues-per-linter: 0

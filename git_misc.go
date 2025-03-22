@@ -118,15 +118,15 @@ func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *
 
 func iterSeqLimit[T any](s iter.Seq[T], n uint) iter.Seq[T] {
 	return func(yield func(T) bool) {
-		var i uint
+		var iterations uint
 		for v := range s {
-			if i > n-1 {
+			if iterations > n-1 {
 				return
 			}
 			if !yield(v) {
 				return
 			}
-			i++
+			iterations++
 		}
 	}
 }

@@ -39,7 +39,6 @@ func hooksHandler(conn net.Conn) {
 	var cookie []byte
 	var packPass packPass
 	var sshStderr io.Writer
-	var ok bool
 	var hookRet byte
 
 	defer conn.Close()
@@ -73,13 +72,16 @@ func hooksHandler(conn net.Conn) {
 		return
 	}
 
-	packPass, ok = packPasses.Load(string(cookie))
-	if !ok {
-		if _, err = conn.Write([]byte{1}); err != nil {
+	{
+		var ok bool
+		packPass, ok = packPasses.Load(string(cookie))
+		if !ok {
+			if _, err = conn.Write([]byte{1}); err != nil {
+				return
+			}
+			writeRedError(conn, "\nInvalid handler cookie")
 			return
 		}
-		writeRedError(conn, "\nInvalid handler cookie")
-		return
 	}
 
 	sshStderr = packPass.session.Stderr()
@@ -96,16 +98,16 @@ func hooksHandler(conn net.Conn) {
 		for range argc64 {
 			var arg bytes.Buffer
 			for {
-				b := make([]byte, 1)
-				n, err := conn.Read(b)
+				nextByte := make([]byte, 1)
+				n, err := conn.Read(nextByte)
 				if err != nil || n != 1 {
 					writeRedError(sshStderr, "Failed to read arg: %v", err)
 					return 1
 				}
-				if b[0] == 0 {
+				if nextByte[0] == 0 {
 					break
 				}
-				arg.WriteByte(b[0])
+				arg.WriteByte(nextByte[0])
 			}
 			args = append(args, arg.String())
 		}
@@ -114,16 +116,16 @@ func hooksHandler(conn net.Conn) {
 		for {
 			var envLine bytes.Buffer
 			for {
-				b := make([]byte, 1)
-				n, err := conn.Read(b)
+				nextByte := make([]byte, 1)
+				n, err := conn.Read(nextByte)
 				if err != nil || n != 1 {
 					writeRedError(sshStderr, "Failed to read environment variable: %v", err)
 					return 1
 				}
-				if b[0] == 0 {
+				if nextByte[0] == 0 {
 					break
 				}
-				envLine.WriteByte(b[0])
+				envLine.WriteByte(nextByte[0])
 			}
 			if envLine.Len() == 0 {
 				break
@@ -168,10 +170,10 @@ func hooksHandler(conn net.Conn) {
 						writeRedError(sshStderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
 						return 1
 					}
-					for i := range pushOptCount {
-						pushOpt, ok := gitEnv[fmt.Sprintf("GIT_PUSH_OPTION_%d", i)]
+					for pushOptIndex := range pushOptCount {
+						pushOpt, ok := gitEnv[fmt.Sprintf("GIT_PUSH_OPTION_%d", pushOptIndex)]
 						if !ok {
-							writeRedError(sshStderr, "Failed to get push option %d", i)
+							writeRedError(sshStderr, "Failed to get push option %d", pushOptIndex)
 							return 1
 						}
 						if strings.HasPrefix(pushOpt, "fedid=") {
@@ -194,7 +196,7 @@ func hooksHandler(conn net.Conn) {
 
 							break
 						}
-						if i == pushOptCount-1 {
+						if pushOptIndex == pushOptCount-1 {
 							writeRedError(sshStderr, "This repo requires contributors to be either federated or registered users. You must supply your federated user ID as a push option. For example, git push -o fedid=sr.ht:runxiyu")
 							return 1
 						}
@@ -344,14 +346,14 @@ func serveGitHooks(listener net.Listener) error {
 
 func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
 	unixConn := conn.(*net.UnixConn)
-	var fd *os.File
+	var unixConnFD *os.File
 
-	if fd, err = unixConn.File(); err != nil {
+	if unixConnFD, err = unixConn.File(); err != nil {
 		return nil, errGetFD
 	}
-	defer fd.Close()
+	defer unixConnFD.Close()
 
-	if ucred, err = syscall.GetsockoptUcred(int(fd.Fd()), syscall.SOL_SOCKET, syscall.SO_PEERCRED); err != nil {
+	if ucred, err = syscall.GetsockoptUcred(int(unixConnFD.Fd()), syscall.SOL_SOCKET, syscall.SO_PEERCRED); err != nil {
 		return nil, errGetUcred
 	}
 	return ucred, nil

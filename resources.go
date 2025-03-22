@@ -36,9 +36,12 @@ var resourcesFS embed.FS
 var templates *template.Template
 
 func loadTemplates() (err error) {
-	m := minify.New()
-	minifier := html.Minifier{TemplateDelims: [2]string{"{{", "}}"}, KeepDefaultAttrVals: true} //exhaustruct:ignore
-	m.Add("text/html", &minifier)
+	minifier := minify.New()
+	minifierOptions := html.Minifier{
+		TemplateDelims:      [2]string{"{{", "}}"},
+		KeepDefaultAttrVals: true,
+	} //exhaustruct:ignore
+	minifier.Add("text/html", &minifierOptions)
 
 	templates = template.New("templates").Funcs(template.FuncMap{
 		"first_line":        firstLine,
@@ -58,7 +61,7 @@ func loadTemplates() (err error) {
 				return err
 			}
 
-			minified, err := m.Bytes("text/html", content)
+			minified, err := minifier.Bytes("text/html", content)
 			if err != nil {
 				return err
 			}

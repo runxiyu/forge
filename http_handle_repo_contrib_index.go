@@ -15,34 +15,34 @@ type idTitleStatus struct {
 	Status string
 }
 
-func httpHandleRepoContribIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoContribIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var rows pgx.Rows
 	var result []idTitleStatus
 	var err error
 
-	if rows, err = database.Query(r.Context(),
+	if rows, err = database.Query(request.Context(),
 		"SELECT id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
 		params["repo_id"],
 	); err != nil {
-		http.Error(w, "Error querying merge requests: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error querying merge requests: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var id int
-		var title, status string
-		if err = rows.Scan(&id, &title, &status); err != nil {
-			http.Error(w, "Error scanning merge request: "+err.Error(), http.StatusInternalServerError)
+		var mrID int
+		var mrTitle, mrStatus string
+		if err = rows.Scan(&mrID, &mrTitle, &mrStatus); err != nil {
+			http.Error(writer, "Error scanning merge request: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		result = append(result, idTitleStatus{id, title, status})
+		result = append(result, idTitleStatus{mrID, mrTitle, mrStatus})
 	}
 	if err = rows.Err(); err != nil {
-		http.Error(w, "Error ranging over merge requests: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error ranging over merge requests: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["merge_requests"] = result
 
-	renderTemplate(w, "repo_contrib_index", params)
+	renderTemplate(writer, "repo_contrib_index", params)
 }

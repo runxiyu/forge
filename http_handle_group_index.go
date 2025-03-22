@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var groupPath []string
 	var repos []nameDesc
 	var subgroups []nameDesc
@@ -24,7 +24,7 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	groupPath = params["group_path"].([]string)
 
 	// The group itself
-	err = database.QueryRow(r.Context(), `
+	err = database.QueryRow(request.Context(), `
 		WITH RECURSIVE group_path_cte AS (
 			SELECT
 				id,
@@ -56,44 +56,44 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	).Scan(&groupID, &groupDesc)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		errorPage404(w, params)
+		errorPage404(writer, params)
 		return
 	} else if err != nil {
-		http.Error(w, "Error getting group: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting group: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// ACL
 	var count int
-	err = database.QueryRow(r.Context(), `
+	err = database.QueryRow(request.Context(), `
 		SELECT COUNT(*)
 		FROM user_group_roles
 		WHERE user_id = $1
 			AND group_id = $2
 	`, params["user_id"].(int), groupID).Scan(&count)
 	if err != nil {
-		http.Error(w, "Error checking access: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error checking access: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	directAccess := (count > 0)
 
-	if r.Method == http.MethodPost {
+	if request.Method == http.MethodPost {
 		if !directAccess {
-			http.Error(w, "You do not have direct access to this group", http.StatusForbidden)
+			http.Error(writer, "You do not have direct access to this group", http.StatusForbidden)
 			return
 		}
 
-		repoName := r.FormValue("repo_name")
-		repoDesc := r.FormValue("repo_desc")
-		contribReq := r.FormValue("repo_contrib")
+		repoName := request.FormValue("repo_name")
+		repoDesc := request.FormValue("repo_desc")
+		contribReq := request.FormValue("repo_contrib")
 		if repoName == "" {
-			http.Error(w, "Repo name is required", http.StatusBadRequest)
+			http.Error(writer, "Repo name is required", http.StatusBadRequest)
 			return
 		}
 
 		var newRepoID int
 		err := database.QueryRow(
-			r.Context(),
+			request.Context(),
 			`INSERT INTO repos (name, description, group_id, contrib_requirements)
 	 VALUES ($1, $2, $3, $4)
 	 RETURNING id`,
@@ -103,14 +103,14 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 			contribReq,
 		).Scan(&newRepoID)
 		if err != nil {
-			http.Error(w, "Error creating repo: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error creating repo: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		filePath := filepath.Join(config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
 
 		_, err = database.Exec(
-			r.Context(),
+			request.Context(),
 			`UPDATE repos
 	 SET filesystem_path = $1
 	 WHERE id = $2`,
@@ -118,28 +118,28 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 			newRepoID,
 		)
 		if err != nil {
-			http.Error(w, "Error updating repo path: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error updating repo path: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		if err = gitInit(filePath); err != nil {
-			http.Error(w, "Error initializing repo: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error initializing repo: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		redirectUnconditionally(w, r)
+		redirectUnconditionally(writer, request)
 		return
 	}
 
 	// Repos
 	var rows pgx.Rows
-	rows, err = database.Query(r.Context(), `
+	rows, err = database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM repos
 		WHERE group_id = $1
 	`, groupID)
 	if err != nil {
-		http.Error(w, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -147,24 +147,24 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			http.Error(w, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		repos = append(repos, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		http.Error(w, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting repos: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Subgroups
-	rows, err = database.Query(r.Context(), `
+	rows, err = database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM groups
 		WHERE parent_group = $1
 	`, groupID)
 	if err != nil {
-		http.Error(w, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -172,13 +172,13 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			http.Error(w, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+			http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		subgroups = append(subgroups, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		http.Error(w, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting subgroups: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -187,5 +187,5 @@ func httpHandleGroupIndex(w http.ResponseWriter, r *http.Request, params map[str
 	params["description"] = groupDesc
 	params["direct_access"] = directAccess
 
-	renderTemplate(w, "group", params)
+	renderTemplate(writer, "group", params)
 }

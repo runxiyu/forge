@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
+func httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	var groupPath []string
 	var repoName string
 	var repoPath string
@@ -22,7 +22,7 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 
 	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
 
-	if err := database.QueryRow(r.Context(), `
+	if err := database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT
@@ -59,10 +59,10 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 		return err
 	}
 
-	w.Header().Set("Content-Type", "application/x-git-upload-pack-result")
-	w.Header().Set("Connection", "Keep-Alive")
-	w.Header().Set("Transfer-Encoding", "chunked")
-	w.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/x-git-upload-pack-result")
+	writer.Header().Set("Connection", "Keep-Alive")
+	writer.Header().Set("Transfer-Encoding", "chunked")
+	writer.WriteHeader(http.StatusOK)
 
 	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
 	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
@@ -85,7 +85,7 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 		return err
 	}
 
-	if _, err = io.Copy(stdin, r.Body); err != nil {
+	if _, err = io.Copy(stdin, request.Body); err != nil {
 		return err
 	}
 
@@ -93,7 +93,7 @@ func httpHandleUploadPack(w http.ResponseWriter, r *http.Request, params map[str
 		return err
 	}
 
-	if _, err = io.Copy(w, stdout); err != nil {
+	if _, err = io.Copy(writer, stdout); err != nil {
 		return err
 	}
 

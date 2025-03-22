@@ -12,7 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func httpHandleRepoContribOne(w http.ResponseWriter, r *http.Request, params map[string]any) {
+func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var mrIDStr string
 	var mrIDInt int
 	var err error
@@ -26,27 +26,27 @@ func httpHandleRepoContribOne(w http.ResponseWriter, r *http.Request, params map
 	mrIDStr = params["mr_id"].(string)
 	mrIDInt64, err := strconv.ParseInt(mrIDStr, 10, strconv.IntSize)
 	if err != nil {
-		http.Error(w, "Merge request ID not an integer: "+err.Error(), http.StatusBadRequest)
+		http.Error(writer, "Merge request ID not an integer: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	mrIDInt = int(mrIDInt64)
 
-	if err = database.QueryRow(r.Context(),
+	if err = database.QueryRow(request.Context(),
 		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE id = $1",
 		mrIDInt,
 	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {
-		http.Error(w, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error querying merge request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	repo = params["repo"].(*git.Repository)
 
 	if srcRefHash, err = getRefHash(repo, "branch", srcRefStr); err != nil {
-		http.Error(w, "Error getting source ref hash: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting source ref hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if srcCommit, err = repo.CommitObject(srcRefHash); err != nil {
-		http.Error(w, "Error getting source commit: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting source commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["source_commit"] = srcCommit
@@ -58,18 +58,18 @@ func httpHandleRepoContribOne(w http.ResponseWriter, r *http.Request, params map
 		dstBranchHash, err = getRefHash(repo, "branch", dstBranchStr)
 	}
 	if err != nil {
-		http.Error(w, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting destination branch hash: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if dstCommit, err = repo.CommitObject(dstBranchHash); err != nil {
-		http.Error(w, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting destination commit: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["destination_commit"] = dstCommit
 
 	if mergeBases, err = srcCommit.MergeBase(dstCommit); err != nil {
-		http.Error(w, "Error getting merge base: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting merge base: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	mergeBaseCommit = mergeBases[0]
@@ -77,12 +77,12 @@ func httpHandleRepoContribOne(w http.ResponseWriter, r *http.Request, params map
 
 	patch, err := mergeBaseCommit.Patch(srcCommit)
 	if err != nil {
-		http.Error(w, "Error getting patch: "+err.Error(), http.StatusInternalServerError)
+		http.Error(writer, "Error getting patch: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	params["file_patches"] = makeUsableFilePatches(patch)
 
 	params["mr_title"], params["mr_status"], params["mr_source_ref"], params["mr_destination_branch"] = title, status, srcRefStr, dstBranchStr
 
-	renderTemplate(w, "repo_contrib_one", params)
+	renderTemplate(writer, "repo_contrib_one", params)
 }
