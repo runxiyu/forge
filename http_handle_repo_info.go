@@ -13,8 +13,9 @@ import (
 )
 
 func httpHandleRepoInfo(w http.ResponseWriter, r *http.Request, params map[string]any) (err error) {
-	var groupPath []string
-	var repoName, repoPath string
+	groupPath := params["group_path"].([]string)
+	repoName := params["repo_name"].(string)
+	var repoPath string
 
 	if err := database.QueryRow(r.Context(), `
 	WITH RECURSIVE group_path_cte AS (
