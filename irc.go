@@ -65,6 +65,13 @@ func ircBotSession() error {
 					return
 				}
 			case "JOIN":
+				c, ok := msg.Source.(irc.Client)
+				if !ok {
+					clog.Error("IRC server told us a non-client is joining a channel...")
+				}
+				if c.Nick != config.IRC.Nick {
+					continue
+				}
 				_, err = conn.WriteString("PRIVMSG #chat :test\r\n")
 				if err != nil {
 					readLoopError <- err
