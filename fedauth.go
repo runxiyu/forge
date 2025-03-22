@@ -17,27 +17,29 @@ import (
 
 func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
 	var err error
-	var resp *http.Response
+
 	matched := false
 	usernameEscaped := url.PathEscape(remoteUsername)
+
+	var req *http.Request
 	switch service {
 	case "sr.ht":
-		resp, err = http.Get("https://meta.sr.ht/~" + usernameEscaped + ".keys")
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "https://meta.sr.ht/~" + usernameEscaped + ".keys", nil)
 	case "github":
-		resp, err = http.Get("https://github.com/" + usernameEscaped + ".keys")
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "https://github.com/" + usernameEscaped + ".keys", nil)
 	case "codeberg":
-		resp, err = http.Get("https://codeberg.org/" + usernameEscaped + ".keys")
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "https://codeberg.org/" + usernameEscaped + ".keys", nil)
 	case "tangled":
-		resp, err = http.Get("https://tangled.sh/keys/" + usernameEscaped)
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "https://tangled.sh/keys/" + usernameEscaped, nil)
 		// TODO: Don't rely on one webview
 	default:
 		return false, errors.New("unknown federated service")
 	}
-
 	if err != nil {
 		return false, err
 	}
 
+	resp, err := http.DefaultClient.Do(req)
 	defer func() {
 		_ = resp.Body.Close()
 	}()
