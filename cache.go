@@ -29,3 +29,17 @@ func init() {
 		clog.Fatal(1, "Error initializing indexPageCache: "+err.Error())
 	}
 }
+
+var indexCommitsDisplayCache *ristretto.Cache[[]byte, []commitDisplay]
+
+func init() {
+	var err error
+	indexCommitsDisplayCache, err = ristretto.NewCache(&ristretto.Config[[]byte, []commitDisplay]{
+		NumCounters: 1e4,
+		MaxCost:     1 << 30,
+		BufferItems: 64,
+	})
+	if err != nil {
+		clog.Fatal(1, "Error initializing indexCommitsCache: "+err.Error())
+	}
+}

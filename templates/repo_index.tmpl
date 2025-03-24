@@ -81,7 +81,7 @@
 					<tbody>
 						{{- range .commits -}}
 							<tr>
-								<td class="commit-title"><a href="commit/{{- .ID -}}">{{- .Message | first_line -}}</a></td>
+								<td class="commit-title"><a href="commit/{{- .Hash -}}">{{- .Message | first_line -}}</a></td>
 								<td class="commit-author">
 									<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
 								</td>

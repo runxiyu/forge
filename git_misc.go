@@ -165,6 +165,60 @@ func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits i
 	return recentCommits, err
 }
 
+func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []commitDisplay, err error) {
+	var commitIter object.CommitIter
+	var thisCommit *object.Commit
+
+	commitIter, err = repo.Log(&git.LogOptions{From: headHash}) //exhaustruct:ignore
+	if err != nil {
+		return nil, err
+	}
+	recentCommits = make([]commitDisplay, 0)
+	defer commitIter.Close()
+	if numCommits < 0 {
+		for {
+			thisCommit, err = commitIter.Next()
+			if errors.Is(err, io.EOF) {
+				return recentCommits, nil
+			} else if err != nil {
+				return nil, err
+			}
+			recentCommits = append(recentCommits, commitDisplay{
+				thisCommit.Hash,
+				thisCommit.Author,
+				thisCommit.Committer,
+				thisCommit.Message,
+				thisCommit.TreeHash,
+			})
+		}
+	} else {
+		for range numCommits {
+			thisCommit, err = commitIter.Next()
+			if errors.Is(err, io.EOF) {
+				return recentCommits, nil
+			} else if err != nil {
+				return nil, err
+			}
+			recentCommits = append(recentCommits, commitDisplay{
+				thisCommit.Hash,
+				thisCommit.Author,
+				thisCommit.Committer,
+				thisCommit.Message,
+				thisCommit.TreeHash,
+			})
+		}
+	}
+	return recentCommits, err
+}
+
+type commitDisplay struct {
+	Hash      plumbing.Hash
+	Author    object.Signature
+	Committer object.Signature
+	Message   string
+	TreeHash  plumbing.Hash
+}
+
 func fmtCommitAsPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch *object.Patch, err error) {
 	var parentCommit *object.Commit
 	var commitTree *object.Tree

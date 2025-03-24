@@ -4,7 +4,6 @@
 package main
 
 import (
-	"iter"
 	"net/http"
 	"strings"
 	"time"
@@ -22,14 +21,12 @@ func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map
 	var refHash plumbing.Hash
 	var refHashSlice []byte
 	var err error
-	var logOptions git.LogOptions
-	var commitIter object.CommitIter
-	var commitIterSeq iter.Seq[*object.Commit]
 	var commitObj *object.Commit
 	var tree *object.Tree
 	var notes []string
 	var branches []string
 	var branchesIter storer.ReferenceIter
+	var commits []commitDisplay
 
 	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
@@ -52,13 +49,28 @@ func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map
 	}
 	params["branches"] = branches
 
-	// TODO: Cache
-	logOptions = git.LogOptions{From: refHash} //exhaustruct:ignore
-	if commitIter, err = repo.Log(&logOptions); err != nil {
-		goto no_ref
+	if value, found := indexCommitsDisplayCache.Get(refHashSlice); found {
+		if value != nil {
+			commits = value
+		} else {
+			goto readme
+		}
+	} else {
+		start := time.Now()
+		commits, err = getRecentCommitsDisplay(repo, refHash, 5)
+		if err != nil {
+			commits = nil
+		}
+		cost := time.Since(start).Nanoseconds()
+		indexCommitsDisplayCache.Set(refHashSlice, commits, cost)
+		if err != nil {
+			goto readme
+		}
 	}
-	commitIterSeq, params["commits_err"] = commitIterSeqErr(commitIter)
-	params["commits"] = iterSeqLimit(commitIterSeq, 3)
+
+	params["commits"] = commits
+
+readme:
 
 	if value, found := treeReadmeCache.Get(refHashSlice); found {
 		params["files"] = value.DisplayTree
