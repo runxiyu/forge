@@ -11,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
@@ -103,10 +102,6 @@ func main() {
 
 	// IRC bot
 	go ircBotLoop()
-
-	// Prometheus
-	http.Handle("/metrics", promhttp.Handler())
-	go http.ListenAndServe(":9112", nil)
 
 	select {}
 }
