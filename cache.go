@@ -16,6 +16,7 @@ type treeReadmeCacheEntry struct {
 	ReadmeRendered template.HTML
 }
 
+// key = commit hash + path
 var treeReadmeCache *ristretto.Cache[[]byte, treeReadmeCacheEntry]
 
 func init() {

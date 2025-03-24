@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -39,38 +40,44 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 	}
 	refHashSlice = refHash[:]
 
+	cacheHandle := append(refHashSlice, []byte(pathSpec)...)
+
+	fmt.Printf("%#v", string(cacheHandle))
+
+	if value, found := treeReadmeCache.Get(cacheHandle); found {
+		params["files"] = value.DisplayTree
+		params["readme_filename"] = value.ReadmeFilename
+		params["readme"] = value.ReadmeRendered
+		renderTemplate(writer, "repo_tree_dir", params)
+		return
+	}
+
 	var target *object.Tree
 	if pathSpec == "" {
-		if value, found := treeReadmeCache.Get(refHashSlice); found {
-			params["files"] = value.DisplayTree
-			params["readme_filename"] = value.ReadmeFilename
-			params["readme"] = value.ReadmeRendered
-		} else {
-			if commitObject, err = repo.CommitObject(refHash); err != nil {
-				errorPage500(writer, params, "Error getting commit object: "+err.Error())
-				return
-			}
-			if tree, err = commitObject.Tree(); err != nil {
-				errorPage500(writer, params, "Error getting file tree: "+err.Error())
-				return
-			}
-
-			start := time.Now()
-			displayTree := makeDisplayTree(tree)
-			readmeFilename, readmeRendered := renderReadmeAtTree(tree)
-			cost := time.Since(start).Nanoseconds()
-
-			params["files"] = displayTree
-			params["readme_filename"] = readmeFilename
-			params["readme"] = readmeRendered
-
-			entry := treeReadmeCacheEntry{
-				DisplayTree:    displayTree,
-				ReadmeFilename: readmeFilename,
-				ReadmeRendered: readmeRendered,
-			}
-			treeReadmeCache.Set(refHashSlice, entry, cost)
+		if commitObject, err = repo.CommitObject(refHash); err != nil {
+			errorPage500(writer, params, "Error getting commit object: "+err.Error())
+			return
 		}
+		if tree, err = commitObject.Tree(); err != nil {
+			errorPage500(writer, params, "Error getting file tree: "+err.Error())
+			return
+		}
+
+		start := time.Now()
+		displayTree := makeDisplayTree(tree)
+		readmeFilename, readmeRendered := renderReadmeAtTree(tree)
+		cost := time.Since(start).Nanoseconds()
+
+		params["files"] = displayTree
+		params["readme_filename"] = readmeFilename
+		params["readme"] = readmeRendered
+
+		entry := treeReadmeCacheEntry{
+			DisplayTree:    displayTree,
+			ReadmeFilename: readmeFilename,
+			ReadmeRendered: readmeRendered,
+		}
+		treeReadmeCache.Set(cacheHandle, entry, cost)
 
 		renderTemplate(writer, "repo_tree_dir", params)
 		return
@@ -131,8 +138,20 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		return
 	}
 
-	params["readme_filename"], params["readme"] = renderReadmeAtTree(target)
-	params["files"] = makeDisplayTree(target)
+	start := time.Now()
+	displayTree := makeDisplayTree(target)
+	readmeFilename, readmeRendered := renderReadmeAtTree(target)
+	cost := time.Since(start).Nanoseconds()
+
+	entry := treeReadmeCacheEntry{
+		DisplayTree:    displayTree,
+		ReadmeFilename: readmeFilename,
+		ReadmeRendered: readmeRendered,
+	}
+	treeReadmeCache.Set(cacheHandle, entry, cost)
+
+	params["readme_filename"], params["readme"] = readmeFilename, readmeRendered
+	params["files"] = displayTree
 
 	renderTemplate(writer, "repo_tree_dir", params)
 }
