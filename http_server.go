@@ -38,7 +38,9 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
+	dirMode := false
 	if segments[len(segments)-1] == "" {
+		dirMode = true
 		segments = segments[:len(segments)-1]
 	}
 
@@ -184,7 +186,11 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
-				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				if dirMode {
+					params["rest"] = strings.Join(segments[sepIndex+4:], "/") + "/"
+				} else {
+					params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				}
 				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
 					return
 				}
@@ -194,7 +200,11 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
-				params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				if dirMode {
+					params["rest"] = strings.Join(segments[sepIndex+4:], "/") + "/"
+				} else {
+					params["rest"] = strings.Join(segments[sepIndex+4:], "/")
+				}
 				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
 					return
 				}
