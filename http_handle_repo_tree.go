@@ -42,7 +42,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 
 	cacheHandle := append(refHashSlice, []byte(pathSpec)...)
 
-	fmt.Printf("%#v", string(cacheHandle))
+	fmt.Printf("%#v\n", string(cacheHandle))
 
 	if value, found := treeReadmeCache.Get(cacheHandle); found {
 		params["files"] = value.DisplayTree
@@ -51,6 +51,15 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		renderTemplate(writer, "repo_tree_dir", params)
 		return
 	}
+
+	if value, found := commitPathFileHTMLCache.Get(cacheHandle); found {
+		params["file_contents"] = value
+		renderTemplate(writer, "repo_tree_file", params)
+		return
+	}
+	start := time.Now()
+
+	fmt.Println("miss")
 
 	var target *object.Tree
 	if pathSpec == "" {
@@ -63,7 +72,6 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 			return
 		}
 
-		start := time.Now()
 		displayTree := makeDisplayTree(tree)
 		readmeFilename, readmeRendered := renderReadmeAtTree(tree)
 		cost := time.Since(start).Nanoseconds()
@@ -127,6 +135,10 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 			return
 		}
 		formattedHTML = template.HTML(formattedHTMLStr.Bytes()) //#nosec G203
+		cost := time.Since(start).Nanoseconds()
+
+		commitPathFileHTMLCache.Set(cacheHandle, formattedHTML, cost)
+
 		params["file_contents"] = formattedHTML
 
 		renderTemplate(writer, "repo_tree_file", params)
@@ -138,7 +150,6 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		return
 	}
 
-	start := time.Now()
 	displayTree := makeDisplayTree(target)
 	readmeFilename, readmeRendered := renderReadmeAtTree(target)
 	cost := time.Since(start).Nanoseconds()
@@ -148,7 +159,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		ReadmeFilename: readmeFilename,
 		ReadmeRendered: readmeRendered,
 	}
-	treeReadmeCache.Set(cacheHandle, entry, cost)
+	fmt.Println(treeReadmeCache.Set(cacheHandle, entry, cost))
 
 	params["readme_filename"], params["readme"] = readmeFilename, readmeRendered
 	params["files"] = displayTree
