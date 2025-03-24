@@ -4,5 +4,5 @@
 */}}
 {{- define "group_path_plain" -}}
 {{- $p := . -}}
-{{- range $i, $s := . -}}{{- $s -}}{{- if ne $i (len $p) -}}/{{- end -}}{{- end -}}
+{{- range $i, $s := . -}}{{- $s -}}{{- if ne $i (minus (len $p) 1) -}}/{{- end -}}{{- end -}}
 {{- end -}}

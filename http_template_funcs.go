@@ -37,3 +37,7 @@ func dereferenceOrZero[T any](p *T) T {
 	var z T
 	return z
 }
+
+func minus(a, b int) int {
+	return a - b
+}

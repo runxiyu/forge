@@ -49,6 +49,7 @@ func loadTemplates() (err error) {
 		"path_escape":       pathEscape,
 		"query_escape":      queryEscape,
 		"dereference_error": dereferenceOrZero[error],
+		"minus":             minus,
 	})
 
 	err = fs.WalkDir(resourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
