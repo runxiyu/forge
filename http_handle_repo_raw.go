@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -17,6 +18,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 	var rawPathSpec, pathSpec string
 	var repo *git.Repository
 	var refHash plumbing.Hash
+	var refHashSlice []byte
 	var commitObj *object.Commit
 	var tree *object.Tree
 	var err error
@@ -29,6 +31,19 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		errorPage500(writer, params, "Error getting ref hash: "+err.Error())
 		return
 	}
+	refHashSlice = refHash[:]
+
+	cacheHandle := append(refHashSlice, []byte(pathSpec)...)
+
+	if value, found := treeReadmeCache.Get(cacheHandle); found {
+		params["files"] = value.DisplayTree
+		renderTemplate(writer, "repo_raw_dir", params)
+		return
+	}
+	if value, found := commitPathFileRawCache.Get(cacheHandle); found {
+		fmt.Fprint(writer, value)
+		return
+	}
 
 	if commitObj, err = repo.CommitObject(refHash); err != nil {
 		errorPage500(writer, params, "Error getting commit object: "+err.Error())
@@ -39,6 +54,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		return
 	}
 
+	start := time.Now()
 	var target *object.Tree
 	if pathSpec == "" {
 		target = tree
@@ -57,6 +73,8 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 				errorPage500(writer, params, "Error reading file: "+err.Error())
 				return
 			}
+			cost := time.Since(start).Nanoseconds()
+			commitPathFileRawCache.Set(cacheHandle, fileContent, cost)
 			fmt.Fprint(writer, fileContent)
 			return
 		}
@@ -66,7 +84,19 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		return
 	}
 
-	params["files"] = makeDisplayTree(target)
+	displayTree := makeDisplayTree(target)
+	readmeFilename, readmeRendered := renderReadmeAtTree(target)
+	cost := time.Since(start).Nanoseconds()
+
+	params["files"] = displayTree
+	params["readme_filename"] = readmeFilename
+	params["readme"] = readmeRendered
+
+	treeReadmeCache.Set(cacheHandle, treeReadmeCacheEntry{
+		DisplayTree:    displayTree,
+		ReadmeFilename: readmeFilename,
+		ReadmeRendered: readmeRendered,
+	}, cost)
 
 	renderTemplate(writer, "repo_raw_dir", params)
 }
