@@ -220,6 +220,10 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				}
 				httpHandleRepoLog(writer, request, params)
 			case "commit":
+				if len(segments) != sepIndex+5 {
+					errorPage400(writer, params, "Incorrect number of parameters")
+					return
+				}
 				if redirectNoDir(writer, request) {
 					return
 				}
