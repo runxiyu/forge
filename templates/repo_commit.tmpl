@@ -12,35 +12,29 @@
 	<body class="repo-commit">
 		{{- template "header" . -}}
 		<div class="padding-wrapper scroll">
-<div class="key-val-grid-wrapper">
-	<section id="commit-info" class="key-val-grid">
-		<div class="title-row">Commit info</div>
-
-		<div class="row-label">ID</div>
-		<div class="row-value">{{- .commit_id -}}</div>
-
-		<div class="row-label">Author</div>
-		<div class="row-value">
-			<span>{{- .commit_object.Author.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Author.Email -}}">{{- .commit_object.Author.Email -}}</a>&gt;</span>
-		</div>
-
-		<div class="row-label">Author date</div>
-		<div class="row-value">{{- .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
-
-		<div class="row-label">Committer</div>
-		<div class="row-value">
-			<span>{{- .commit_object.Committer.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Committer.Email -}}">{{- .commit_object.Committer.Email -}}</a>&gt;</span>
-		</div>
-
-		<div class="row-label">Committer date</div>
-		<div class="row-value">{{- .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
-
-		<div class="row-label">Actions</div>
-		<div class="row-value">
-			<a href="{{- .commit_object.Hash -}}.patch">Get patch</a>
-		</div>
-	</section>
-</div>
+			<div class="key-val-grid-wrapper">
+				<section id="commit-info" class="key-val-grid">
+					<div class="title-row">Commit info</div>
+					<div class="row-label">ID</div>
+					<div class="row-value">{{- .commit_id -}}</div>
+					<div class="row-label">Author</div>
+					<div class="row-value">
+						<span>{{- .commit_object.Author.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Author.Email -}}">{{- .commit_object.Author.Email -}}</a>&gt;</span>
+					</div>
+					<div class="row-label">Author date</div>
+					<div class="row-value">{{- .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
+					<div class="row-label">Committer</div>
+					<div class="row-value">
+						<span>{{- .commit_object.Committer.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Committer.Email -}}">{{- .commit_object.Committer.Email -}}</a>&gt;</span>
+					</div>
+					<div class="row-label">Committer date</div>
+					<div class="row-value">{{- .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
+					<div class="row-label">Actions</div>
+					<div class="row-value">
+						<a href="{{- .commit_object.Hash -}}.patch">Get patch</a>
+					</div>
+				</section>
+			</div>
 		</div>
 
 		<div class="padding-wrapper scroll" id="this-commit-message">
