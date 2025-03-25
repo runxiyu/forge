@@ -9,7 +9,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.14.0
-	github.com/jackc/pgx/v5 v5.7.3
+	github.com/jackc/pgx/v5 v5.7.4
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
 	github.com/tdewolff/minify/v2 v2.22.3
