@@ -12,35 +12,27 @@
 	<body class="repo-index">
 		{{- template "header" . -}}
 		<div class="padding-wrapper">
-			<table id="repo-info-table" class="rounded">
-				<thead>
-					<tr class="title-row">
-						<th colspan="2">Repo info</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">Name</th>
-						<td>{{- .repo_name -}}</td>
-					</tr>
+			<div class="key-val-grid-wrapper">
+				<section id="repo-info" class="key-val-grid">
+					<div class="title-row">Repo info</div>
+					<div class="row-label">Name</div>
+					<div class="row-value">{{- .repo_name -}}</div>
 					{{- if .repo_description -}}
-						<tr>
-							<th scope="row">Description</th>
-							<td>{{- .repo_description -}}</td>
-						</tr>
+						<div class="row-label">Description</div>
+						<div class="row-value">{{- .repo_description -}}</div>
 					{{- end -}}
-					<tr>
-						<th scope="row">SSH remote</th>
-						<td><code>{{- .ssh_clone_url -}}</code></td>
-					</tr>
+					<div class="row-label">SSH remote</div>
+					<div class="row-value"><code>{{- .ssh_clone_url -}}</code></div>
 					{{- if .notes -}}
-						<tr>
-							<th scope="row">Notes</th>
-							<td><ul>{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}</ul></td>
-						</tr>
+						<div class="row-label">Notes</div>
+						<div class="row-value">
+							<ul>
+								{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}
+							</ul>
+						</div>
 					{{- end -}}
-				</tbody>
-			</table>
+				</section>
+			</div>
 		</div>
 		<div class="padding-wrapper">
 			<table id="branches" class="rounded">
