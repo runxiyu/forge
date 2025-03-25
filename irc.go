@@ -86,11 +86,6 @@ func ircBotSession() error {
 				if c.Nick != config.IRC.Nick {
 					continue
 				}
-				_, err = logAndWriteLn("PRIVMSG #chat :test")
-				if err != nil {
-					readLoopError <- err
-					return
-				}
 			default:
 			}
 		}
