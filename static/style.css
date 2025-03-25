@@ -9,7 +9,6 @@ html {
 	font-family: sans-serif;
 	background-color: var(--background-color);
 	color: var(--text-color);
-	--radius-1: 0.32rem;
 	--background-color: hsl(0, 0%, 100%);
 	--text-color: hsl(0, 0%, 0%);
 	--link-color: hsl(320, 50%, 36%);
@@ -80,7 +79,6 @@ table.rounded, table.rounded-footed {
 	overflow: hidden;
 	border-spacing: 0;
 	border-collapse: separate;
-	border-radius: var(--radius-1);
 	border: var(--lighter-border-color) solid 1px;
 }
 
@@ -372,7 +370,6 @@ input[type=file]::file-selector-button {
 	display: inline-block;
 	width: auto;
 	min-width: fit-content;
-	border-radius: var(--radius-1);
 	padding: .1rem .75rem;
 	font-size: 0.9rem;
 	transition: background .1s linear;
@@ -459,7 +456,6 @@ td > ul {
 	grid-template-columns: auto 1fr;
 	gap: 0;
 	border: var(--lighter-border-color) 1px solid;
-	border-radius: var(--radius-1);
 	overflow: auto;
 	font-size: 0.96rem;
 }
