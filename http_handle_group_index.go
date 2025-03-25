@@ -79,7 +79,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 
 	if request.Method == http.MethodPost {
 		if !directAccess {
-			http.Error(writer, "You do not have direct access to this group", http.StatusForbidden)
+			errorPage403(writer, params, "You do not have direct access to this group")
 			return
 		}
 
@@ -87,7 +87,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 		repoDesc := request.FormValue("repo_desc")
 		contribReq := request.FormValue("repo_contrib")
 		if repoName == "" {
-			http.Error(writer, "Repo name is required", http.StatusBadRequest)
+			errorPage400(writer, params, "Repo name is required")
 			return
 		}
 

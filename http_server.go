@@ -35,7 +35,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	params := make(map[string]any)
 
 	if segments, _, err = parseReqURI(request.RequestURI); err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		errorPage400(writer, params, "Error parsing request URI: "+err.Error())
 		return
 	}
 	dirMode := false
@@ -212,7 +212,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				httpHandleRepoRaw(writer, request, params)
 			case "log":
 				if len(segments) > sepIndex+4 {
-					http.Error(writer, "Too many parameters", http.StatusBadRequest)
+					errorPage400(writer, params, "Too many parameters")
 					return
 				}
 				if redirectDir(writer, request) {
@@ -236,7 +236,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					params["mr_id"] = segments[sepIndex+4]
 					httpHandleRepoContribOne(writer, request, params)
 				default:
-					http.Error(writer, "Too many parameters", http.StatusBadRequest)
+					errorPage400(writer, params, "Too many parameters")
 				}
 			default:
 				errorPage404(writer, params)

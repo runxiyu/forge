@@ -26,7 +26,7 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 	mrIDStr = params["mr_id"].(string)
 	mrIDInt64, err := strconv.ParseInt(mrIDStr, 10, strconv.IntSize)
 	if err != nil {
-		http.Error(writer, "Merge request ID not an integer: "+err.Error(), http.StatusBadRequest)
+		errorPage400(writer, params, "Merge request ID not an integer")
 		return
 	}
 	mrIDInt = int(mrIDInt64)

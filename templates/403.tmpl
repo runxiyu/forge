@@ -1,0 +1,25 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "403" -}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{- template "head_common" . -}}
+		<title>403 Forbidden &ndash; {{ .global.forge_title }}</title>
+	</head>
+	<body class="403">
+		{{- template "header" . -}}
+		<div class="padding-wrapper complete-error-page">
+			<h1>403 Forbidden</h1>
+			<p>{{- .complete_error_msg -}}</p>
+			<hr />
+			<address>Lindenii Forge</address>
+		</div>
+		<footer>
+			{{- template "footer" . -}}
+		</footer>
+	</body>
+</html>
+{{- end -}}
