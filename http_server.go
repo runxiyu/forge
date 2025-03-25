@@ -45,6 +45,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	}
 
 	params["url_segments"] = segments
+	params["dir_mode"] = dirMode
 	params["global"] = globalData
 	var userID int // 0 for none
 	userID, params["username"], err = getUserFromRequest(request)

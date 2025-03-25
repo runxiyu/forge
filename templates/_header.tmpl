@@ -9,10 +9,14 @@
 	</div>
 	<nav id="breadcrumb-nav">
 		{{- $path := "" -}}
+		{{- $url_segments := .url_segments -}}
+		{{- $dir_mode := .dir_mode -}}
+		{{- $ref_type := .ref_type -}}
+		{{- $ref := .ref_name -}}
 		{{- range $i, $segment := .url_segments -}}
 			{{- $path = printf "%s/%s" $path $segment -}}
 			<span class="breadcrumb-separator">/</span>
-			<a href="{{ $path }}">{{ $segment }}</a>
+			<a href="{{ $path }}{{ if or (ne $i (minus (len $url_segments) 1)) $dir_mode }}/{{ end }}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{ $segment }}</a>
 		{{- end -}}
 	</nav>
 	<div id="main-header-user">
