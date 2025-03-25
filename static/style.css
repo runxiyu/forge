@@ -386,16 +386,45 @@ a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
 header#main-header {
 	background-color: var(--lighter-box-background-color);
 	display: flex;
-	justify-content: space-between;
+	flex-direction: row;
 	align-items: center;
-	padding: 10px;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	padding: 0.625rem 1rem;
+	gap: 0.5rem;
 }
-header#main-header > div#main-header-forge-title {
-	flex-grow: 1;
+#main-header-forge-title {
+	white-space: nowrap;
 }
-header#main-header > div#main-header-user {
+#breadcrumb-nav {
 	display: flex;
 	align-items: center;
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-x: auto;
+	font-size: 0.9rem;
+	gap: 0.25rem;
+	white-space: nowrap;
+}
+.breadcrumb-separator {
+	margin: 0 0.25rem;
+}
+#main-header-user {
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+	font-size: 0.95rem;
+}
+@media (max-width: 37.5rem) {
+	header#main-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	#breadcrumb-nav {
+		width: 100%;
+		overflow-x: auto;
+	}
 }
 
 /* Uncategorized */

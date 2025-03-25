@@ -7,6 +7,14 @@
 	<div id="main-header-forge-title">
 		<a href="/">{{- .global.forge_title -}}</a>
 	</div>
+	<nav id="breadcrumb-nav">
+		{{- $path := "" -}}
+		{{- range $i, $segment := .url_segments -}}
+			{{- $path = printf "%s/%s" $path $segment -}}
+			<span class="breadcrumb-separator">/</span>
+			<a href="{{ $path }}">{{ $segment }}</a>
+		{{- end -}}
+	</nav>
 	<div id="main-header-user">
 		{{- if ne .user_id_string "" -}}
 			<a href="/:/users/{{- .user_id_string -}}">{{- .username -}}</a>
