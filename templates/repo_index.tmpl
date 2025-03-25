@@ -42,13 +42,13 @@
 					</tr>
 				</thead>
 				<tbody>
-					{{ range .branches }}
+					{{- range .branches -}}
 					<tr>
 						<td>
 							<a href="./?branch={{ . }}">{{ . }}</a>
 						</td>
 					</tr>
-					{{ end }}
+					{{- end -}}
 				</tbody>
 			</table>
 		</div>
