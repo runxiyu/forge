@@ -12,30 +12,29 @@
 	<body class="index">
 		{{- template "header" . -}}
 		<div class="padding-wrapper">
-		<table class="wide">
-			<thead>
-				<tr>
-					<th colspan="2" class="title-row">Groups</th>
-				</tr>
-				<tr>
-					<th scope="col">Name</th>
-					<th scope="col">Description</th>
-				</tr>
-			</thead>
-			<tbody>
-				{{- range .groups -}}
+			<table class="wide">
+				<thead>
 					<tr>
-						<td>
-							<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
-						</td>
-						<td>
-							{{- .Description -}}
-						</td>
+						<th colspan="2" class="title-row">Groups</th>
 					</tr>
-				{{- end -}}
-			</tbody>
-		</table>
-		<div class="padding-wrapper">
+					<tr>
+						<th scope="col">Name</th>
+						<th scope="col">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{- range .groups -}}
+						<tr>
+							<td>
+								<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
+							</td>
+							<td>
+								{{- .Description -}}
+							</td>
+						</tr>
+					{{- end -}}
+				</tbody>
+			</table>
 			<table class="wide">
 				<thead>
 					<tr>
