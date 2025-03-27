@@ -12,7 +12,7 @@ forge: $(filter-out forge,$(wildcard *)) version.go hookc/*.c hookc/hookc
 hookc/hookc:
 
 version.go:
-	printf 'package main\nconst VERSION="%s"\n' $(shell git describe --tags --always --dirty) > $@
+	printf 'package main\nconst VERSION = "%s"\n' $(shell git describe --tags --always --dirty) > $@
 
 clean:
 	$(RM) forge version.go vendor
