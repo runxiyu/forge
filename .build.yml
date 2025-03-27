@@ -1,6 +1,9 @@
 image: alpine/edge
+secrets:
+  - 46f739e5-4538-45dd-a79f-bf173b7a2ed9
 packages:
   - go
+  - hut
   - golangci-lint
   - make
   - gcc
@@ -15,3 +18,12 @@ tasks:
   - lint: |
       cd forge
       golangci-lint run .
+  - upload: |
+      cd forge
+      x="$(git describe --exact || true)"
+      if [ -z "$x" ]; then
+      	printf 'Not a tag, not uploading artifacts\n' >&2
+      else
+      	mv forge forge-"$x"-linux-amd64
+      	hut git artifact -r forge upload forge-"$x"-linux-amd64
+      fi
