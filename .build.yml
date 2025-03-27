@@ -1,6 +1,6 @@
 image: alpine/edge
 secrets:
-  - 1e5bf996-a5ca-4d31-9225-778cf90e3fba
+  - cf31947b-6d5d-4229-8ed3-56183102ea81
 packages:
   - go
   - hut
