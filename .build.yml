@@ -5,15 +5,13 @@ packages:
   - make
   - gcc
   - musl-dev
-sources:
-  - ssh://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/
 tasks:
   - prepare: |
-      cd server
+      cd forge
       git checkout go
   - build: |
-      cd server
+      cd forge
       make
   - lint: |
-      cd server
+      cd forge
       golangci-lint run .
