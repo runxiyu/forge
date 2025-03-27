@@ -14,15 +14,17 @@ linters:
     - nakedret         # patterns should be consistent
     - nonamedreturns   # i like named returns
     - wrapcheck        # wrapping all errors is just not necessary
-    - maintidx   # e
-    - nestif     # e
-    - gocognit   # e
-    - gocyclo    # e
-    - cyclop     # e
-    - goconst    # e
-    - funlen     # e
-    - wsl        # e
-    - nlreturn   # e
+    - maintidx    # e
+    - nestif      # e
+    - gocognit    # e
+    - gocyclo     # e
+    - cyclop      # e
+    - goconst     # e
+    - funlen      # e
+    - wsl         # e
+    - nlreturn    # e
+    - unused      # e
+    - exhaustruct # e
 
 issues:
   max-issues-per-linter: 0

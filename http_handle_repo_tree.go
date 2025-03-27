@@ -5,7 +5,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -42,8 +41,6 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 
 	cacheHandle := append(refHashSlice, []byte(pathSpec)...)
 
-	fmt.Printf("%#v\n", string(cacheHandle))
-
 	if value, found := treeReadmeCache.Get(cacheHandle); found {
 		params["files"] = value.DisplayTree
 		params["readme_filename"] = value.ReadmeFilename
@@ -58,8 +55,6 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		return
 	}
 	start := time.Now()
-
-	fmt.Println("miss")
 
 	var target *object.Tree
 	if pathSpec == "" {
@@ -159,7 +154,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		ReadmeFilename: readmeFilename,
 		ReadmeRendered: readmeRendered,
 	}
-	fmt.Println(treeReadmeCache.Set(cacheHandle, entry, cost))
+	treeReadmeCache.Set(cacheHandle, entry, cost)
 
 	params["readme_filename"], params["readme"] = readmeFilename, readmeRendered
 	params["files"] = displayTree
