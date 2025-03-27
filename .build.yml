@@ -1,0 +1,19 @@
+image: alpine/edge
+packages:
+  - go
+  - golangci-lint
+  - make
+  - gcc
+  - musl-dev
+sources:
+  - ssh://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/
+tasks:
+  - prepare: |
+      cd server
+      git checkout go
+  - build: |
+      cd server
+      make
+  - lint: |
+      cd server
+      golangci-lint run .
