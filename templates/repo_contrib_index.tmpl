@@ -26,8 +26,8 @@
 				<tbody>
 					{{- range .merge_requests -}}
 						<tr>
-							<td class="merge_request-id">{{- .Hash -}}</td>
-							<td class="merge_request-title"><a href="{{- .Hash -}}/">{{- .Title -}}</a></td>
+							<td class="merge_request-id">{{- .ID -}}</td>
+							<td class="merge_request-title"><a href="{{- .ID -}}/">{{- .Title -}}</a></td>
 							<td class="merge_request-status">{{- .Status -}}</td>
 						</tr>
 					{{- end -}}
