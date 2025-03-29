@@ -51,3 +51,8 @@ We have several Git repo mirrors on a few places:
 * [Codeberg](https://codeberg.org/lindenii/forge/)
 * [GitHub](https://github.com/runxiyu/forge/)
 
+## Hare implementation
+
+There's a `hare` branch for an experimental implementation in the
+[Hare](https://harelang.org) programming language. It's currently unused
+because Hare isn't stable enough yet but we expect to pick it back up later.

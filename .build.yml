@@ -12,7 +12,6 @@ packages:
 tasks:
   - prepare: |
       cd forge
-      git checkout go
   - build: |
       cd forge
       make
