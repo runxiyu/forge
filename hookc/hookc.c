@@ -15,11 +15,13 @@
 #include <string.h>
 #include <fcntl.h>
 #include <signal.h>
-
-/*
- * FIXME: splice(2) is not portable and will only work on Linux. Alternative
- * implementations should be supplied for other environments.
- */
+#ifdef __linux__
+#include <linux/limits.h>
+#include <sys/sendfile.h>
+#define USE_SPLICE 1
+#else
+#define USE_SPLICE 0
+#endif
 
 int main(int argc, char *argv[]) {
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
@@ -56,7 +58,16 @@ int main(int argc, char *argv[]) {
 		dprintf(STDERR_FILENO, "stdin must be a pipe\n");
 		return EXIT_FAILURE;
 	}
+	#if USE_SPLICE
 	int stdin_pipe_size = fcntl(STDIN_FILENO, F_GETPIPE_SZ);
+	if (stdin_pipe_size == -1) {
+		perror("fcntl on stdin");
+		return EXIT_FAILURE;
+	}
+#else
+	int stdin_pipe_size = 65536;
+#endif
+
 	if (stdin_pipe_size == -1) {
 		perror("fcntl on stdin");
 		return EXIT_FAILURE;
@@ -74,7 +85,15 @@ int main(int argc, char *argv[]) {
 		dprintf(STDERR_FILENO, "stderr must be a pipe\n");
 		return EXIT_FAILURE;
 	}
+#if USE_SPLICE
 	int stderr_pipe_size = fcntl(STDERR_FILENO, F_GETPIPE_SZ);
+	if (stderr_pipe_size == -1) {
+		perror("fcntl on stderr");
+		return EXIT_FAILURE;
+	}
+#else
+	int stderr_pipe_size = 65536;
+#endif
 	if (stderr_pipe_size == -1) {
 		perror("fcntl on stderr");
 		return EXIT_FAILURE;
@@ -182,6 +201,7 @@ int main(int argc, char *argv[]) {
 	 * Splice stdin to the daemon. For pre-receive it's just old/new/ref.
 	 */
 	ssize_t stdin_bytes_spliced;
+#if USE_SPLICE
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 	if (stdin_bytes_spliced == -1) {
@@ -189,6 +209,22 @@ int main(int argc, char *argv[]) {
 		close(sock);
 		return EXIT_FAILURE;
 	}
+#else
+	char buf[65536];
+	ssize_t n;
+	while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+		if (write(sock, buf, n) != n) {
+			perror("write to internal socket");
+			close(sock);
+			return EXIT_FAILURE;
+		}
+	}
+	if (n < 0) {
+		perror("read from stdin");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+#endif
 
 	/*
 	 * The sending part of the UNIX socket should be shut down, to let
@@ -237,13 +273,28 @@ int main(int argc, char *argv[]) {
 	 * to the SSH connection's stderr directly anyway.
 	 */
 	ssize_t stderr_bytes_spliced;
+#if USE_SPLICE
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
-	if (stdin_bytes_spliced == -1 && errno != ECONNRESET) {
+	if (stderr_bytes_spliced == -1 && errno != ECONNRESET) {
 		perror("splice internal socket to stderr");
 		close(sock);
 		return EXIT_FAILURE;
 	}
+#else
+	while ((n = read(sock, buf, sizeof(buf))) > 0) {
+		if (write(STDERR_FILENO, buf, n) != n) {
+			perror("write to stderr");
+			close(sock);
+			return EXIT_FAILURE;
+		}
+	}
+	if (n < 0 && errno != ECONNRESET) {
+		perror("read from internal socket");
+		close(sock);
+		return EXIT_FAILURE;
+	}
+#endif
 
 	close(sock);
 	return *status_buf;
