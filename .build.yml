@@ -5,6 +5,7 @@ packages:
   - go
   - hut
   - golangci-lint
+  - linux-headers
   - make
   - gcc
   - musl-dev
