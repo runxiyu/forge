@@ -345,7 +345,7 @@ a.btn, a.btn-white, a.btn-danger, a.btn-normal, a.btn-primary {
 
 /* Header layout */
 header#main-header {
-	background-color: var(--lighter-box-background-color);
+	/* background-color: var(--lighter-box-background-color); */
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -353,6 +353,10 @@ header#main-header {
 	flex-wrap: wrap;
 	padding: 0.625rem 1rem;
 	gap: 0.5rem;
+}
+#main-header a, #main-header a:link, main-header a:visited {
+	text-decoration: none;
+	color: inherit;
 }
 #main-header-forge-title {
 	white-space: nowrap;
@@ -484,4 +488,30 @@ td > ul {
 .key-val-grid-wrapper {
 	max-width: 100%;
 	width: fit-content;
+}
+
+.nav-tabs-standalone {
+	border: none;
+	list-style: none;
+	margin: 0;
+	flex-grow: 1;
+	display: inline-flex;
+	flex-wrap: nowrap;
+	padding: 0;
+	border-bottom: 0.25rem var(--lighter-box-background-color) solid;
+}
+
+.nav-tabs-standalone li {
+	align-self: flex-end;
+	padding: 0 1rem;
+}
+
+.nav-item.active {
+	font-weigt: bold;
+	background-color: var(--lighter-box-background-color);
+}
+
+.nav-item a, .nav-item a:link, .nav-item a:visited {
+	text-decoration: none;
+	color: inherit;
 }
