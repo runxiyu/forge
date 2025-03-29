@@ -24,9 +24,7 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
-var (
-	errGetFD = errors.New("unable to get file descriptor")
-)
+var errGetFD = errors.New("unable to get file descriptor")
 
 // hooksHandler handles a connection from hookc via the
 // unix socket.
