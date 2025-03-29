@@ -72,6 +72,13 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 		errorPage500(writer, params, "Error getting merge base: "+err.Error())
 		return
 	}
+	
+	if len(mergeBases) < 1 {
+		errorPage500(writer, params, "No merge base found for this merge request; these two branches do not share any common history")
+		// TODO
+		return
+	}
+
 	mergeBaseCommit = mergeBases[0]
 	params["merge_base"] = mergeBaseCommit
 
