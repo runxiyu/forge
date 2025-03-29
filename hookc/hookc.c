@@ -200,8 +200,8 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Splice stdin to the daemon. For pre-receive it's just old/new/ref.
 	 */
-	ssize_t stdin_bytes_spliced;
 #if USE_SPLICE
+	ssize_t stdin_bytes_spliced;
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 	if (stdin_bytes_spliced == -1) {
@@ -272,8 +272,8 @@ int main(int argc, char *argv[]) {
 	 * We usually don't actually use this as the daemon could easily write
 	 * to the SSH connection's stderr directly anyway.
 	 */
-	ssize_t stderr_bytes_spliced;
 #if USE_SPLICE
+	ssize_t stderr_bytes_spliced;
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 	if (stderr_bytes_spliced == -1 && errno != ECONNRESET) {
