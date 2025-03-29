@@ -89,33 +89,6 @@
 				</table>
 			</div>
 		{{- end -}}
-		{{- if .files -}}
-			<div class="padding-wrapper scroll">
-				<table id="file-tree" class="wide">
-					<thead>
-						<tr class="title-row">
-							<th colspan="3">/{{- if .ref_name }} on {{ .ref_name -}}{{- end -}}</th>
-						</tr>
-						<tr>
-							<th scope="col">Mode</th>
-							<th scope="col">Filename</th>
-							<th scope="col">Size</th>
-						</tr>
-					</thead>
-					<tbody>
-						{{- $ref_type := .ref_type -}}
-						{{- $ref := .ref_name -}}
-						{{- range .files -}}
-							<tr>
-								<td class="file-mode">{{- .Mode -}}</td>
-								<td class="file-name"><a href="tree/{{- .Name -}}{{- if not .IsFile -}}/{{- end -}}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{- .Name -}}</a>{{- if not .IsFile -}}/{{- end -}}</td>
-								<td class="file-size">{{- .Size -}}</td>
-							</tr>
-						{{- end -}}
-					</tbody>
-				</table>
-			</div>
-		{{- end -}}
 		{{- if .readme -}}
 			<div class="padding-wrapper" id="readme">
 				{{- .readme -}}
