@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"io/fs"
 	"os"
@@ -48,7 +49,10 @@ func deployHooks() (err error) {
 		"pre-receive",
 	} {
 		if err = os.Symlink(filepath.Join(config.Hooks.Execs, "hookc"), filepath.Join(config.Hooks.Execs, hookName)); err != nil {
-			return err
+			if !errors.Is(err, fs.ErrExist) {
+				return err
+			}
+			// TODO: Maybe check if it points to the right place?
 		}
 	}
 
