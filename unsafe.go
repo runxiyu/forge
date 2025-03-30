@@ -16,5 +16,5 @@ func stringToBytes(s string) (bytes []byte) {
 // Memory is borrowed from the byte slice.
 // The source byte slice must not be modified.
 func bytesToString(b []byte) string {
-	return unsafe.String(&b[0], len(b))
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
