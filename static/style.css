@@ -490,6 +490,8 @@ td > ul {
 	width: fit-content;
 }
 
+/* Tab navigation */
+
 .nav-tabs-standalone {
 	border: none;
 	list-style: none;
