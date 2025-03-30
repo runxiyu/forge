@@ -1,0 +1,3 @@
+{{- define "ref_query" -}}
+{{- if .ref_type -}}?{{- .ref_type -}}={{- .ref_name -}}{{- end -}}
+{{- end -}}

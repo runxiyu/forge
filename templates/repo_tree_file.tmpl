@@ -3,6 +3,7 @@
 	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "repo_tree_file" -}}
+{{- $root := . -}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -14,7 +15,7 @@
 		{{- template "header" . -}}
 		<div class="padding">
 			<p>
-				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{ if .ref_type }}?{{ .ref_type }}={{ .ref_name }}{{ end }}">raw</a>)
+				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{- template "ref_query" $root -}}">raw</a>)
 			</p>
 			{{- .file_contents -}}
 		</div>

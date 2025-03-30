@@ -3,6 +3,7 @@
 	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "repo_index" -}}
+{{- $root := . -}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -14,13 +15,13 @@
 		<div class="padding-wrapper">
 			<ul class="nav-tabs-standalone">
 				<li class="nav-item active">
-					<a class="nav-link" href="./">Summary</a>
+					<a class="nav-link" href="./{{- template "ref_query" $root -}}">Summary</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="tree/">Tree</a>
+					<a class="nav-link" href="tree/{{- template "ref_query" $root -}}">Tree</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="log/">Log</a>
+					<a class="nav-link" href="log/{{- template "ref_query" $root -}}">Log</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="branches/">Branches</a>
@@ -84,7 +85,7 @@
 				<table id="recent-commits" class="wide">
 					<thead>
 						<tr class="title-row">
-							<th colspan="3">Recent commits (<a href="log/{{- if .ref_type -}}?{{- .ref_type -}}={{- .ref_name -}}{{- end -}}">see all</a>)</th>
+							<th colspan="3">Recent commits (<a href="log/{{- template "ref_query" $root -}}">see all</a>)</th>
 						</tr>
 						<tr>
 							<th scope="col">Title</th>

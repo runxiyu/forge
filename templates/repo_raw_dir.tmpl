@@ -3,6 +3,7 @@
 	SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "repo_raw_dir" -}}
+{{- $root := . -}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -27,12 +28,10 @@
 				</thead>
 				<tbody>
 					{{- $path_spec := .path_spec -}}
-					{{- $ref := .ref_name -}}
-					{{- $ref_type := .ref_type -}}
 					{{- range .files -}}
 						<tr>
 							<td class="file-mode">{{- .Mode -}}</td>
-							<td class="file-name"><a href="{{- .Name -}}{{- if not .IsFile -}}/{{- end -}}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{- .Name -}}</a>{{- if not .IsFile -}}/{{- end -}}</td>
+							<td class="file-name"><a href="{{- .Name -}}{{- if not .IsFile -}}/{{- end -}}{{- template "ref_query" $root -}}">{{- .Name -}}</a>{{- if not .IsFile -}}/{{- end -}}</td>
 							<td class="file-size">{{- .Size -}}</td>
 						</tr>
 					{{- end -}}
