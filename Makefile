@@ -10,10 +10,13 @@ forge: version.go hookc/*.c hookc/hookc man # TODO
 	go mod vendor
 	go build .
 
-man: $(MAN_PAGES:%=man/%.html)
+man: $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt)
 
 man/%.html: man/%
-	mandoc -Thtml -O style=static/mandoc.css $< > $@
+	mandoc -Thtml -O style=./mandoc.css $< > $@
+
+man/%.txt: man/%
+	mandoc $< | col -b > $@
 
 hookc/hookc:
 

@@ -75,6 +75,9 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		}
 
 		switch segments[1] {
+		case "man":
+			manHandler.ServeHTTP(writer, request)
+			return
 		case "static":
 			staticHandler.ServeHTTP(writer, request)
 			return

@@ -20,7 +20,7 @@ import (
 //go:embed *.go go.mod go.sum
 //go:embed *.scfg
 //go:embed Makefile
-//go:embed static/* templates/* scripts/* sql/*
+//go:embed static/* templates/* scripts/* sql/* man/*
 //go:embed hookc/*.c
 //go:embed vendor/*
 var sourceFS embed.FS
@@ -30,7 +30,7 @@ var sourceHandler = http.StripPrefix(
 	http.FileServer(http.FS(sourceFS)),
 )
 
-//go:embed templates/* static/* hookc/hookc
+//go:embed templates/* static/* hookc/hookc man/*.html man/*.txt man/*.css
 var resourcesFS embed.FS
 
 var templates *template.Template
@@ -78,6 +78,7 @@ func loadTemplates() (err error) {
 }
 
 var staticHandler http.Handler
+var manHandler http.Handler
 
 func init() {
 	staticFS, err := fs.Sub(resourcesFS, "static")
@@ -85,4 +86,9 @@ func init() {
 		panic(err)
 	}
 	staticHandler = http.StripPrefix("/:/static/", http.FileServer(http.FS(staticFS)))
+	manFS, err := fs.Sub(resourcesFS, "man")
+	if err != nil {
+		panic(err)
+	}
+	manHandler = http.StripPrefix("/:/man/", http.FileServer(http.FS(manFS)))
 }
