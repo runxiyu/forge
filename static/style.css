@@ -498,7 +498,7 @@ td > ul {
 	display: inline-flex;
 	flex-wrap: nowrap;
 	padding: 0;
-	border-bottom: 0.25rem var(--lighter-box-background-color) solid;
+	border-bottom: 0.25rem var(--darker-box-background-color) solid;
 }
 
 .nav-tabs-standalone li {
@@ -508,7 +508,7 @@ td > ul {
 
 .nav-item.active {
 	font-weigt: bold;
-	background-color: var(--lighter-box-background-color);
+	background-color: var(--darker-box-background-color);
 }
 
 .nav-item a, .nav-item a:link, .nav-item a:visited {
