@@ -3,6 +3,7 @@ secrets:
   - cf31947b-6d5d-4229-8ed3-56183102ea81
 packages:
   - go
+  - mandoc
   - hut
   - golangci-lint
   - linux-headers

@@ -1,0 +1,119 @@
+.\" SPDX-License-Identifier: AGPL-3.0-only
+.\" SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+.Dd March 30, 2025
+.Dt FORGE 5
+.Os Lindenii Forge
+.Sh NAME
+.Nm forge.scfg
+.Nd configuration file for Lindenii Forge
+.Sh DESCRIPTION
+.Nm
+describes the configuration for
+.Xr forge 1
+instance using the
+scfg
+format.
+.Pp
+Each directive consists of a name followed by zero or more parameters. Directives may also introduce blocks of subdirectives using braces.
+.Pp
+Comments begin with
+.Sq #
+and extend to the end of the line.
+.Sh DIRECTIVES
+.Bl -tag -width Ds
+.It Ic http
+Configures the ingress HTTP server.
+.Bl -tag -width Ds
+.It Ic net
+Network type to listen on (e.g., 
+.Dq tcp ,
+.Dq tcp4 ,
+.Dq unix ) .
+.It Ic addr
+Address to listen on (e.g., 
+.Dq :8080
+or
+.Dq /var/run/lindenii/forge/http.sock ) .
+.It Ic cookie_expiry
+How long (in seconds) to keep session cookies.
+.It Ic root
+Canonical root URL of the web interface (e.g.,
+.Dq https://forge.example.org ) .
+.It Ic read_timeout , write_timeout , idle_timeout
+Timeouts, in seconds, for the general HTTP server context.
+.It Ic reverse_proxy
+Boolean indicating whether to trust X-Forwarded-For headers.
+.El
+.It Ic ssh
+Configures the SSH server.
+.Bl -tag -width Ds
+.It Ic net
+Network type to listen on
+.Dq ( tcp
+is recommended).
+.It Ic addr
+Address to listen on (e.g.,
+.Dq :22 ) .
+.It Ic key
+Path to the SSH host key (must be passwordless).
+.It Ic root
+Canonical SSH URL prefix (e.g.,
+.Dq ssh://forge.example.org ) .
+.El
+.It Ic git
+Configures Git repository storage.
+.Bl -tag -width Ds
+.It Ic repo_dir
+Filesystem path under which new repositories are stored.
+.El
+.It Ic db
+Configures database connection.
+.Bl -tag -width Ds
+.It Ic type
+Database type (currently must be
+.Dq postgres ) .
+.It Ic conn
+Connection string, e.g.,
+.Dq postgresql:///lindenii-forge?host=/var/run/postgresql .
+.El
+.It Ic general
+Miscellaneous settings.
+.Bl -tag -width Ds
+.It Ic title
+A user-facing name for the instance.
+.El
+.It Ic hooks
+Configures Git hook communication with the forge daemon.
+.Bl -tag -width Ds
+.It Ic socket
+Path to a UNIX domain socket for receiving hook events.
+.It Ic execs
+Directory where Git hook executables are stored.
+.El
+.It Ic irc
+Optional configuration for IRC presence.
+.Bl -tag -width Ds
+.It Ic tls
+Boolean indicating whether to use TLS.
+.It Ic net , addr
+Network type and address (e.g.,
+.Dq tcp ,
+.Dq irc.example.org:6697 ) .
+.It Ic sendq
+Maximum send queue size.
+.It Ic nick , user , gecos
+Identity fields for the IRC connection.
+.El
+.El
+.Sh FILES
+.Bl -tag -width Ds
+.It Pa /etc/lindenii/forge.scfg
+Default path to the configuration file.
+.El
+.Sh SEE ALSO
+.Xr forge 1 ,
+.Xr hookc 1 ,
+.Lk https://git.sr.ht/~emersion/scfg scfg
+.Sh AUTHORS
+.An Runxi Yu Aq Mt https://runxiyu.org
+.An Test_User Aq Mt hax@runxiyu.org
