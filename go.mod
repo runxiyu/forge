@@ -8,11 +8,11 @@ require (
 	github.com/dgraph-io/ristretto/v2 v2.1.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-git/go-git/v5 v5.14.0
+	github.com/go-git/go-git/v5 v5.14.0 // has too many deps :(
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
-	github.com/tdewolff/minify/v2 v2.22.3
+	github.com/tdewolff/minify/v2 v2.22.4
 	github.com/yuin/goldmark v1.7.8
 	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321131425-dda3538a9cd4
 	go.lindenii.runxiyu.org/lindenii-irc v0.0.0-20250322030600-1e47f911f1fa
@@ -46,7 +46,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.7.21 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
