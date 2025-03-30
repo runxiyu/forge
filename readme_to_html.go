@@ -37,7 +37,7 @@ func renderReadmeAtTree(tree *object.Tree) (readmeFilename string, readmeRendere
 			return "Error fetching README", escapeHTML("Unable to fetch contents of README: " + err.Error())
 		}
 
-		if err = markdownConverter.Convert([]byte(readmeFileContents), &readmeRenderedUnsafe); err != nil {
+		if err = markdownConverter.Convert(stringToBytes(readmeFileContents), &readmeRenderedUnsafe); err != nil {
 			return "Error fetching README", escapeHTML("Unable to render README: " + err.Error())
 		}
 

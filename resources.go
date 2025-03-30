@@ -67,7 +67,7 @@ func loadTemplates() (err error) {
 				return err
 			}
 
-			_, err = templates.Parse(string(minified))
+			_, err = templates.Parse(bytesToString(minified))
 			if err != nil {
 				return err
 			}

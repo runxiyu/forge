@@ -39,7 +39,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 	}
 	refHashSlice = refHash[:]
 
-	cacheHandle := append(refHashSlice, []byte(pathSpec)...) //nolint:gocritic
+	cacheHandle := append(refHashSlice, stringToBytes(pathSpec)...) //nolint:gocritic
 
 	if value, found := treeReadmeCache.Get(cacheHandle); found {
 		params["files"] = value.DisplayTree

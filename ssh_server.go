@@ -36,7 +36,7 @@ func serveSSH(listener net.Listener) error {
 	}
 
 	serverPubkey = hostKey.PublicKey()
-	serverPubkeyString = string(goSSH.MarshalAuthorizedKey(serverPubkey))
+	serverPubkeyString = bytesToString(goSSH.MarshalAuthorizedKey(serverPubkey))
 	serverPubkeyFP = goSSH.FingerprintSHA256(serverPubkey)
 
 	server = &gliderSSH.Server{
@@ -44,7 +44,7 @@ func serveSSH(listener net.Listener) error {
 			clientPubkey := session.PublicKey()
 			var clientPubkeyStr string
 			if clientPubkey != nil {
-				clientPubkeyStr = strings.TrimSuffix(string(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
+				clientPubkeyStr = strings.TrimSuffix(bytesToString(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
 			}
 
 			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + clientPubkeyStr + " " + session.RawCommand())
