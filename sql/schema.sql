@@ -19,21 +19,6 @@ CREATE TABLE repos (
 	filesystem_path TEXT
 );
 
-CREATE TABLE ticket_trackers (
-	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE RESTRICT,
-	name TEXT NOT NULL,
-	UNIQUE(group_id, name),
-	description TEXT
-);
-
-CREATE TABLE tickets (
-	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	tracker_id INTEGER NOT NULL REFERENCES ticket_trackers(id) ON DELETE CASCADE,
-	title TEXT NOT NULL,
-	description TEXT
-);
-
 CREATE TABLE mailing_lists (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE RESTRICT,
@@ -96,3 +81,66 @@ CREATE TABLE federated_identities (
 	remote_username TEXT NOT NULL,
 	PRIMARY KEY(user_id, service)
 );
+
+
+CREATE TABLE ticket_trackers (
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE RESTRICT,
+	name TEXT NOT NULL,
+	description TEXT,
+	UNIQUE(group_id, name)
+);
+
+CREATE TABLE tickets (
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	tracker_id INTEGER NOT NULL REFERENCES ticket_trackers(id) ON DELETE CASCADE,
+	tracker_local_id INTEGER NOT NULL,
+	title TEXT NOT NULL,
+	description TEXT,
+	UNIQUE(tracker_id, tracker_local_id)
+);
+
+CREATE OR REPLACE FUNCTION create_tracker_ticket_sequence()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'tracker_ticket_seq_' || NEW.id;
+BEGIN
+	EXECUTE format('CREATE SEQUENCE %I', seq_name);
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER after_insert_ticket_tracker
+AFTER INSERT ON ticket_trackers
+FOR EACH ROW
+EXECUTE FUNCTION create_tracker_ticket_sequence();
+
+CREATE OR REPLACE FUNCTION drop_tracker_ticket_sequence()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'tracker_ticket_seq_' || OLD.id;
+BEGIN
+	EXECUTE format('DROP SEQUENCE IF EXISTS %I', seq_name);
+	RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER before_delete_ticket_tracker
+BEFORE DELETE ON ticket_trackers
+FOR EACH ROW
+EXECUTE FUNCTION drop_tracker_ticket_sequence();
+
+CREATE OR REPLACE FUNCTION assign_tracker_local_id()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'tracker_ticket_seq_' || NEW.tracker_id;
+BEGIN
+	IF NEW.tracker_local_id IS NULL THEN
+		EXECUTE format('SELECT nextval(%L)', seq_name)
+		INTO NEW.tracker_local_id;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER before_insert_ticket
+BEFORE INSERT ON tickets
+FOR EACH ROW
+EXECUTE FUNCTION assign_tracker_local_id();
