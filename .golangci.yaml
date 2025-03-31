@@ -1,31 +1,53 @@
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
-    - tenv
+    - cyclop
     - depguard
-    - err113           # dynamically defined errors are fine for our purposes
-    - forcetypeassert  # type assertion failures are usually programming errors
-    - gochecknoglobals # doesn't matter since this isn't a library
-    - gochecknoinits   # we use inits sparingly for good reasons
-    - godox            # they're just used as markers for where needs improvements
-    - ireturn          # doesn't work well with how we use generics
-    - lll              # long lines are acceptable
-    - mnd              # it's a bit ridiculous to replace all of them
-    - nakedret         # patterns should be consistent
-    - nonamedreturns   # i like named returns
-    - wrapcheck        # wrapping all errors is just not necessary
-    - maintidx    # e
-    - nestif      # e
-    - gocognit    # e
-    - gocyclo     # e
-    - cyclop      # e
-    - goconst     # e
-    - funlen      # e
-    - wsl         # e
-    - nlreturn    # e
-    - unused      # e
-    - exhaustruct # e
-
+    - err113
+    - exhaustruct
+    - forcetypeassert
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocyclo
+    - godox
+    - ireturn
+    - lll
+    - maintidx
+    - mnd
+    - nakedret
+    - nestif
+    - nlreturn
+    - nonamedreturns
+    - unused
+    - wrapcheck
+    - wsl
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
