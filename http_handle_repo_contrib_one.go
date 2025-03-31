@@ -32,8 +32,8 @@ func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request,
 	mrIDInt = int(mrIDInt64)
 
 	if err = database.QueryRow(request.Context(),
-		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE id = $1",
-		mrIDInt,
+		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE repo_id = $1 AND repo_local_id = $2",
+		params["repo_id"], mrIDInt,
 	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {
 		errorPage500(writer, params, "Error querying merge request: "+err.Error())
 		return

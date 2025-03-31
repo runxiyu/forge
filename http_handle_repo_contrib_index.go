@@ -21,7 +21,7 @@ func httpHandleRepoContribIndex(writer http.ResponseWriter, request *http.Reques
 	var err error
 
 	if rows, err = database.Query(request.Context(),
-		"SELECT id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
+		"SELECT repo_local_id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
 		params["repo_id"],
 	); err != nil {
 		errorPage500(writer, params, "Error querying merge requests: "+err.Error())

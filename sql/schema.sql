@@ -56,19 +56,6 @@ CREATE TABLE sessions (
 	UNIQUE(user_id, session_id)
 );
 
--- TODO:
-CREATE TABLE merge_requests (
-	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	title TEXT,
-	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,
-	creator INTEGER REFERENCES users(id) ON DELETE SET NULL,
-	source_ref TEXT NOT NULL,
-	destination_branch TEXT,
-	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
-	UNIQUE (repo_id, source_ref, destination_branch),
-	UNIQUE (repo_id, id)
-);
-
 CREATE TABLE user_group_roles (
 	group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
 	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -82,6 +69,7 @@ CREATE TABLE federated_identities (
 	PRIMARY KEY(user_id, service)
 );
 
+-- Ticket tracking
 
 CREATE TABLE ticket_trackers (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -144,3 +132,64 @@ CREATE TRIGGER before_insert_ticket
 BEFORE INSERT ON tickets
 FOR EACH ROW
 EXECUTE FUNCTION assign_tracker_local_id();
+
+-- Merge requests
+
+CREATE TABLE merge_requests (
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	repo_id INTEGER NOT NULL REFERENCES repos(id) ON DELETE CASCADE,
+	repo_local_id INTEGER NOT NULL,
+	title TEXT,
+	creator INTEGER REFERENCES users(id) ON DELETE SET NULL,
+	source_ref TEXT NOT NULL,
+	destination_branch TEXT,
+	status TEXT NOT NULL CHECK (status IN ('open', 'merged', 'closed')),
+	UNIQUE (repo_id, repo_local_id),
+	UNIQUE (repo_id, source_ref, destination_branch)
+);
+
+CREATE OR REPLACE FUNCTION create_repo_mr_sequence()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'repo_mr_seq_' || NEW.id;
+BEGIN
+	EXECUTE format('CREATE SEQUENCE %I', seq_name);
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER after_insert_repo
+AFTER INSERT ON repos
+FOR EACH ROW
+EXECUTE FUNCTION create_repo_mr_sequence();
+
+CREATE OR REPLACE FUNCTION drop_repo_mr_sequence()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'repo_mr_seq_' || OLD.id;
+BEGIN
+	EXECUTE format('DROP SEQUENCE IF EXISTS %I', seq_name);
+	RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER before_delete_repo
+BEFORE DELETE ON repos
+FOR EACH ROW
+EXECUTE FUNCTION drop_repo_mr_sequence();
+
+
+CREATE OR REPLACE FUNCTION assign_repo_local_id()
+RETURNS TRIGGER AS $$
+DECLARE
+	seq_name TEXT := 'repo_mr_seq_' || NEW.repo_id;
+BEGIN
+	IF NEW.repo_local_id IS NULL THEN
+		EXECUTE format('SELECT nextval(%L)', seq_name)
+		INTO NEW.repo_local_id;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER before_insert_merge_request
+BEFORE INSERT ON merge_requests
+FOR EACH ROW
+EXECUTE FUNCTION assign_repo_local_id();

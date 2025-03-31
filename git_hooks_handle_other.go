@@ -207,25 +207,26 @@ func hooksHandler(conn net.Conn) {
 				if strings.HasPrefix(refName, "refs/heads/contrib/") {
 					if allZero(oldOID) { // New branch
 						fmt.Fprintln(sshStderr, ansiec.Blue+"POK"+ansiec.Reset, refName)
-						var newMRID int
+						var newMRLocalID int
 
 						if packPass.userID != 0 {
 							err = database.QueryRow(ctx,
-								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING id",
+								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING repo_local_id",
 								packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
-							).Scan(&newMRID)
+							).Scan(&newMRLocalID)
 						} else {
 							err = database.QueryRow(ctx,
-								"INSERT INTO merge_requests (repo_id, source_ref, status) VALUES ($1, $2, 'open') RETURNING id",
+								"INSERT INTO merge_requests (repo_id, source_ref, status) VALUES ($1, $2, 'open') RETURNING repo_local_id",
 								packPass.repoID, strings.TrimPrefix(refName, "refs/heads/"),
-							).Scan(&newMRID)
+							).Scan(&newMRLocalID)
 						}
 						if err != nil {
 							writeRedError(sshStderr, "Error creating merge request: %v", err)
 							return 1
 						}
-						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRID)
+						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRLocalID)
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
+
 						select {
 						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
