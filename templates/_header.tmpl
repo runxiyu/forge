@@ -13,7 +13,8 @@
 		{{- $dir_mode := .dir_mode -}}
 		{{- $ref_type := .ref_type -}}
 		{{- $ref := .ref_name -}}
-		{{- range $i, $segment := .url_segments -}}
+		{{- range $i := .separator_index -}}
+			{{- $segment := index $url_segments $i -}}
 			{{- $path = printf "%s/%s" $path $segment -}}
 			<span class="breadcrumb-separator">/</span>
 			<a href="{{ $path }}{{ if or (ne $i (minus (len $url_segments) 1)) $dir_mode }}/{{ end }}{{- if $ref_type -}}?{{- $ref_type -}}={{- $ref -}}{{- end -}}">{{ $segment }}</a>

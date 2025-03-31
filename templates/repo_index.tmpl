@@ -12,10 +12,11 @@
 	</head>
 	<body class="repo-index">
 		{{- template "header" . -}}
-		<div class="padding-wrapper">
+		<div class="repo-header">
+			<h2>{{- .repo_name -}}</h2>
 			<ul class="nav-tabs-standalone">
-				<li class="nav-item active">
-					<a class="nav-link" href="./{{- template "ref_query" $root -}}">Summary</a>
+				<li class="nav-item">
+					<a class="nav-link active" href="./{{- template "ref_query" $root -}}">Summary</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="tree/{{- template "ref_query" $root -}}">Tree</a>
@@ -30,9 +31,17 @@
 					<a class="nav-link" href="tags/">Tags</a>
 				</li>
 				<li class="nav-item">
+					<a class="nav-link" href="contrib/">Merge requests</a>
+				</li>
+				<li class="nav-item">
 					<a class="nav-link" href="settings/">Settings</a>
 				</li>
 			</ul>
+		</div>
+		<div class="repo-header-extension">
+			<div class="repo-header-extension-content">
+				{{- .repo_description -}}
+			</div>
 		</div>
 		<div class="padding-wrapper">
 			<div class="key-val-grid-wrapper">
@@ -74,11 +83,6 @@
 					{{- end -}}
 				</tbody>
 			</table>
-		</div>
-		<div class="padding-wrapper">
-			<p>
-				<a href="contrib/" class="btn-normal">Merge requests</a>
-			</p>
 		</div>
 		{{- if .commits -}}
 			<div class="padding-wrapper scroll">

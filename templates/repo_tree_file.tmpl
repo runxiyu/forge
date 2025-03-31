@@ -13,13 +13,14 @@
 	</head>
 	<body class="repo-tree-file">
 		{{- template "header" . -}}
-		<div class="padding">
+		<div class="repo-header">
+			<h2>{{- .repo_name -}}</h2>
 			<ul class="nav-tabs-standalone">
 				<li class="nav-item">
 					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
 				</li>
-				<li class="nav-item active">
-					<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+				<li class="nav-item">
+					<a class="nav-link active" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
@@ -31,9 +32,19 @@
 					<a class="nav-link" href="../tags/">Tags</a>
 				</li>
 				<li class="nav-item">
+					<a class="nav-link" href="../contrib/">Merge requests</a>
+				</li>
+				<li class="nav-item">
 					<a class="nav-link" href="../settings/">Settings</a>
 				</li>
 			</ul>
+		</div>
+		<div class="repo-header-extension">
+			<div class="repo-header-extension-content">
+				{{- .repo_description -}}
+			</div>
+		</div>
+		<div class="padding">
 			<p>
 				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{- template "ref_query" $root -}}">raw</a>)
 			</p>
