@@ -1,0 +1,35 @@
+.\" SPDX-License-Identifier: AGPL-3.0-only
+.\" SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
+.Dd March 30, 2025
+.Dt FORGE 1
+.Os Lindenii Forge
+.Sh NAME
+.Nm forge
+.Nd Lindenii Forge server daemon
+.Sh SYNOPSIS
+.Nm
+.Op Fl config Ar path
+.Sh DESCRIPTION
+.Nm
+is the main server daemon for Lindenii Forge.
+.Pp
+All configuration is loaded from a configuration file; see
+.Xr forge 5 .
+.Pp
+All listeners are long-lived; the process runs until interrupted.
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl config Ar path
+The path to the configuration file. Defaults to
+.Pa /etc/lindenii/forge.scfg .
+.El
+.Sh FILES
+.Bl -tag -width Ds
+.It Pa /etc/lindenii/forge.scfg
+Default configuration file.
+.El
+.Sh SEE ALSO
+.Xr forge 5
+.Sh AUTHORS
+.An Runxi Yu Aq Mt https://runxiyu.org
+.An Test_User Aq Mt hax@runxiyu.org
