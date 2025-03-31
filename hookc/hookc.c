@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
- * SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
- * SPDX-FileContributor: Test_User <hax@runxiyu.org>
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Test_User <hax@runxiyu.org>
  */
 
 #include <errno.h>

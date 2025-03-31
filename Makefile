@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
+# SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
 .PHONY: clean version.go man source.tar.gz
 
