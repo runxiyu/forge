@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -eu
+
+if [ x"$(indent --version)" != x'FreeBSD indent 2.0' ]
+then
+	printf 'indent(1) version mismatch\n' >&2
+	exit 1
+fi
+
+find . -name '*.c' -exec indent '{}' ';'
