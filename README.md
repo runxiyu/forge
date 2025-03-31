@@ -40,7 +40,7 @@ We are currently using the
 
 The forge software serves its own source at `/:/source/`.
 
-## Support and development
+## Contribute
 
 Please submit patches by pushing to `contrib/...` in the official repo.
 
