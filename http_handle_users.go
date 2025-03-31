@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// httpHandleUsers is a useless stub.
 func httpHandleUsers(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	errorPage501(writer, params)
 }

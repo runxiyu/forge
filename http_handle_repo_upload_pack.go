@@ -12,6 +12,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// httpHandleUploadPack handles incoming Git fetch/pull/clone's over the Smart
+// HTTP protocol.
 func httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	var groupPath []string
 	var repoName string

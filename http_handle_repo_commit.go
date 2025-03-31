@@ -16,14 +16,16 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/misc"
 )
 
-// The file patch type from go-git isn't really usable in HTML templates
-// either.
+// usableFilePatch is a [diff.FilePatch] that is structured in a way more
+// friendly for use in HTML templates.
 type usableFilePatch struct {
 	From   diff.File
 	To     diff.File
 	Chunks []usableChunk
 }
 
+// usableChunk is a [diff.Chunk] that is structured in a way more friendly for
+// use in HTML templates.
 type usableChunk struct {
 	Operation diff.Operation
 	Content   string
@@ -66,7 +68,7 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 	params["commit_object"] = commitObj
 	params["commit_id"] = commitIDStr
 
-	parentCommitHash, patch, err = fmtCommitAsPatch(commitObj)
+	parentCommitHash, patch, err = commitToPatch(commitObj)
 	if err != nil {
 		errorPage500(writer, params, "Error getting patch from commit: "+err.Error())
 		return

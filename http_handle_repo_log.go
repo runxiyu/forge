@@ -10,7 +10,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// TODO: I probably shouldn't include *all* commits here...
+// httpHandleRepoLog provides a page with a complete Git log.
+//
+// TODO: This currently provides all commits in the branch. It should be
+// paginated and cached instead.
 func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var refHash plumbing.Hash

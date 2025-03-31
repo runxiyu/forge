@@ -26,6 +26,7 @@ var resourcesFS embed.FS
 
 var templates *template.Template
 
+// loadTemplates minifies and loads HTML templates.
 func loadTemplates() (err error) {
 	minifier := minify.New()
 	minifierOptions := html.Minifier{
@@ -36,7 +37,6 @@ func loadTemplates() (err error) {
 
 	templates = template.New("templates").Funcs(template.FuncMap{
 		"first_line":        firstLine,
-		"base_name":         baseName,
 		"path_escape":       pathEscape,
 		"query_escape":      queryEscape,
 		"dereference_error": dereferenceOrZero[error],
@@ -73,6 +73,8 @@ var (
 	manHandler    http.Handler
 )
 
+// This init sets up static and man handlers. The resulting handlers must be
+// used in the HTTP router, and do nothing unless called from elsewhere.
 func init() {
 	staticFS, err := fs.Sub(resourcesFS, "static")
 	if err != nil {

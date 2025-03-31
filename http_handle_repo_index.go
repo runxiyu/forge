@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
+// httpHandleRepoIndex provides the front page of a repo.
 func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string

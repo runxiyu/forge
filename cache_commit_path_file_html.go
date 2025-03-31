@@ -10,6 +10,7 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
+// The key is the commit ID raw hash, followed by the file path.
 var commitPathFileHTMLCache *ristretto.Cache[[]byte, template.HTML]
 
 func init() {

@@ -15,6 +15,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// fedauth checks whether a user's SSH public key matches the remote username
+// they claim to have on the service. If so, the association is recorded.
 func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
 	var err error
 
@@ -23,6 +25,8 @@ func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey st
 
 	var req *http.Request
 	switch service {
+	// TODO: Services should be configurable by the instance administrator
+	// and should not be hardcoded in the source code.
 	case "sr.ht":
 		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "https://meta.sr.ht/~"+usernameEscaped+".keys", nil)
 	case "github":

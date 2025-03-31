@@ -337,6 +337,10 @@ func hooksHandler(conn net.Conn) {
 	_, _ = conn.Write([]byte{hookRet})
 }
 
+// serveGitHooks handles connections on the specified network listener and
+// treats incoming connections as those from git hook handlers by spawning
+// sessions. The listener must be a SOCK_STREAM UNIX domain socket. The
+// function itself blocks.
 func serveGitHooks(listener net.Listener) error {
 	for {
 		conn, err := listener.Accept()
@@ -347,6 +351,8 @@ func serveGitHooks(listener net.Listener) error {
 	}
 }
 
+// getUcred fetches connection credentials as a [syscall.Ucred] from a given
+// [net.Conn]. It panics when conn is not a [net.UnixConn].
 func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
 	unixConn := conn.(*net.UnixConn)
 	var unixConnFD *os.File
@@ -362,6 +368,9 @@ func getUcred(conn net.Conn) (ucred *syscall.Ucred, err error) {
 	return ucred, nil
 }
 
+// allZero returns true if all runes in a given string are '0'. The comparison
+// is not constant time and must not be used in contexts where time-based side
+// channel attacks are a concern.
 func allZero(s string) bool {
 	for _, r := range s {
 		if r != '0' {

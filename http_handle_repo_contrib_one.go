@@ -12,6 +12,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+// httpHandleRepoContribOne provides an interface to each merge request of a
+// repo.
 func httpHandleRepoContribOne(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var mrIDStr string
 	var mrIDInt int

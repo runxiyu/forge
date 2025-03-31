@@ -9,6 +9,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// addUserSSH adds a new user solely based on their SSH public key.
+//
+// TODO: Audit all users of this function.
 func addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
 	var txn pgx.Tx
 

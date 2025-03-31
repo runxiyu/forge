@@ -14,6 +14,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+// httpHandleRepoRaw serves raw files, or directory listings that point to raw
+// files.
 func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var rawPathSpec, pathSpec string
 	var repo *git.Repository

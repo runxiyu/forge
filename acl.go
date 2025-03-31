@@ -9,8 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-// getRepoInfo returns the filesystem path and direct
-// access permission for a given repo and a provided ssh public key.
+// getRepoInfo returns the filesystem path and direct access permission for a
+// given repo and a provided ssh public key.
+//
+// TODO: Revamp.
 func getRepoInfo(ctx context.Context, groupPath []string, repoName, sshPubkey string) (repoID int, fsPath string, access bool, contribReq, userType string, userID int, err error) {
 	err = database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (

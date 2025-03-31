@@ -18,6 +18,10 @@ import (
 )
 
 // openRepo opens a git repository by group and repo name.
+//
+// TODO: This should be deprecated in favor of doing it in the relevant
+// request/router context in the future, as it cannot cover the nuance of
+// fields needed.
 func openRepo(ctx context.Context, groupPath []string, repoName string) (repo *git.Repository, description string, repoID int, err error) {
 	var fsPath string
 
@@ -64,6 +68,7 @@ WHERE g.depth = cardinality($1::text[])
 }
 
 // go-git's tree entries are not friendly for use in HTML templates.
+// This struct is a wrapper that is friendlier for use in templating.
 type displayTreeEntry struct {
 	Name      string
 	Mode      string
@@ -72,6 +77,8 @@ type displayTreeEntry struct {
 	IsSubtree bool
 }
 
+// makeDisplayTree takes git trees of form [object.Tree] and creates a slice of
+// [displayTreeEntry] for easier templating.
 func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 	for _, entry := range tree.Entries {
 		displayEntry := displayTreeEntry{} //exhaustruct:ignore
@@ -97,6 +104,11 @@ func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 	return displayTree
 }
 
+// commitIterSeqErr creates an [iter.Seq[*object.Commit]] from an
+// [object.CommitIter], and additionally returns a pointer to error.
+// The pointer to error is guaranteed to be populated with either nil or the
+// error returned by the commit iterator after the returned iterator is
+// finished.
 func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *error) {
 	var err error
 	return func(yield func(*object.Commit) bool) {
@@ -116,21 +128,8 @@ func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *
 	}, &err
 }
 
-func iterSeqLimit[T any](s iter.Seq[T], n uint) iter.Seq[T] {
-	return func(yield func(T) bool) {
-		var iterations uint
-		for v := range s {
-			if iterations > n-1 {
-				return
-			}
-			if !yield(v) {
-				return
-			}
-			iterations++
-		}
-	}
-}
-
+// getRecentCommits fetches numCommits commits, starting from the headHash in a
+// repo.
 func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []*object.Commit, err error) {
 	var commitIter object.CommitIter
 	var thisCommit *object.Commit
@@ -165,6 +164,9 @@ func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits i
 	return recentCommits, err
 }
 
+// getRecentCommitsDisplay generates a slice of [commitDisplay] friendly for
+// use in HTML templates, consisting of numCommits commits from headhash in the
+// repo.
 func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []commitDisplay, err error) {
 	var commitIter object.CommitIter
 	var thisCommit *object.Commit
@@ -219,7 +221,12 @@ type commitDisplay struct {
 	TreeHash  plumbing.Hash
 }
 
-func fmtCommitAsPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch *object.Patch, err error) {
+// commitToPatch creates an [object.Patch] from the first parent of a given
+// [object.Commit].
+//
+// TODO: This function should be deprecated as it only diffs with the first
+// parent and does not correctly handle merge commits.
+func commitToPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch *object.Patch, err error) {
 	var parentCommit *object.Commit
 	var commitTree *object.Tree
 

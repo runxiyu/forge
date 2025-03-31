@@ -12,6 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
+// httpHandleRepoBranches provides the branches page in repos.
 func httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string

@@ -14,6 +14,8 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
+// packPass contains information known when handling incoming SSH connections
+// that then needs to be used in hook socket connection handlers. See hookc(1).
 type packPass struct {
 	session      gliderSSH.Session
 	repo         *git.Repository
@@ -28,6 +30,7 @@ type packPass struct {
 	contribReq   string
 }
 
+// packPasses contains hook cookies mapped to their packPass.
 var packPasses = cmap.Map[string, packPass]{}
 
 // sshHandleRecvPack handles attempts to push to repos.

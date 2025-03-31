@@ -9,8 +9,8 @@ import (
 	gitFmtConfig "github.com/go-git/go-git/v5/plumbing/format/config"
 )
 
-// gitInit initializes a bare git repository with the
-// forge-deployed hooks directory as the hooksPath.
+// gitInit initializes a bare git repository with the forge-deployed hooks
+// directory as the hooksPath.
 func gitInit(repoPath string) (err error) {
 	var repo *git.Repository
 	var gitConf *gitConfig.Config

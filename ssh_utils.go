@@ -16,6 +16,8 @@ import (
 
 var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
 
+// getRepoInfo2 also fetches repo information... it should be deprecated and
+// implemented in individual handlers.
 func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
 	var segments []string
 	var sepIndex int
@@ -66,6 +68,9 @@ func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []s
 	}
 }
 
+// writeRedError is a helper function that basically does a Fprintf but makes
+// the entire thing red, in terms of ANSI escape sequences. It's useful when
+// producing error messages on SSH connections.
 func writeRedError(w io.Writer, format string, args ...any) {
 	fmt.Fprintln(w, ansiec.Red+fmt.Sprintf(format, args...)+ansiec.Reset)
 }

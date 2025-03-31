@@ -13,8 +13,9 @@ import (
 	"go.lindenii.runxiyu.org/lindenii-common/scfg"
 )
 
-var database *pgxpool.Pool
-
+// config holds the global configuration used by this instance. There is
+// currently no synchronization mechanism, so it must not be modified after
+// request handlers are spawned.
 var config struct {
 	HTTP struct {
 		Net          string `scfg:"net"`
@@ -57,16 +58,23 @@ var config struct {
 	} `scfg:"db"`
 }
 
+// loadConfig loads a configuration file from the specified path and unmarshals
+// it to the global [config] struct. This may race with concurrent reads from
+// [config]; additional synchronization is necessary if the configuration is to
+// be made reloadable.
+//
+// TODO: Currently, it returns an error when the user specifies any unknown
+// configuration patterns, but silently ignores fields in the [config] struct
+// that is not present in the user's configuration file. We would prefer the
+// exact opposite behavior.
 func loadConfig(path string) (err error) {
 	var configFile *os.File
-	var decoder *scfg.Decoder
-
 	if configFile, err = os.Open(path); err != nil {
 		return err
 	}
 	defer configFile.Close()
 
-	decoder = scfg.NewDecoder(bufio.NewReader(configFile))
+	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
 	if err = decoder.Decode(&config); err != nil {
 		return err
 	}

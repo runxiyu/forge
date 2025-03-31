@@ -15,6 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// httpHandleLogin provides the login page for local users.
 func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var username, password string
 	var userID int

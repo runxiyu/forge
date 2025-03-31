@@ -5,6 +5,8 @@ package main
 
 import "strings"
 
+// sliceContainsNewlines returns true if and only if the given slice contains
+// one or more strings that contains newlines.
 func sliceContainsNewlines(s []string) bool {
 	for _, v := range s {
 		if strings.Contains(v, "\n") {

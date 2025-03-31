@@ -21,6 +21,9 @@ var (
 	serverPubkey       goSSH.PublicKey
 )
 
+// serveSSH serves SSH on a [net.Listener]. The listener should generally be a
+// TCP listener, although AF_UNIX SOCK_STREAM listeners may be appropriate in
+// rare cases.
 func serveSSH(listener net.Listener) error {
 	var hostKeyBytes []byte
 	var hostKey goSSH.Signer

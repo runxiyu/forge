@@ -13,6 +13,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// httpHandleGroupIndex provides index pages for groups, which includes a list
+// of its subgroups and repos, as well as a form for group maintainers to
+// create repos.
 func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var groupPath []string
 	var repos []nameDesc

@@ -20,6 +20,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+// httpHandleRepoTree provides a friendly, syntax-highlighted view of
+// individual files, and provides directory views that link to these files.
+//
+// TODO: Do not highlight files that are too large.
 func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var rawPathSpec, pathSpec string
 	var repo *git.Repository

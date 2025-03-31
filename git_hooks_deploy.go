@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 )
 
-// deployHooks deploys the git hooks client to the filesystem.
-// The git hooks client is expected to be embedded in resources_fs and must be
-// pre-compiled during the build process; see the Makefile.
+// deployHooks deploys the git hooks client to the filesystem. The git hooks
+// client is expected to be embedded in resourcesFS and must be pre-compiled
+// during the build process; see the Makefile.
 func deployHooks() (err error) {
 	err = func() (err error) {
 		var srcFD fs.File

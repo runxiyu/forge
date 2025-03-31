@@ -18,6 +18,8 @@ import (
 
 var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM))
 
+// renderReadmeAtTree looks for README files in the supplied Git tree and
+// returns its filename and rendered (and sanitized) HTML.
 func renderReadmeAtTree(tree *object.Tree) (readmeFilename string, readmeRenderedSafeHTML template.HTML) {
 	var readmeRenderedUnsafe bytes.Buffer
 	var readmeFile *object.File
@@ -60,6 +62,7 @@ func renderReadmeAtTree(tree *object.Tree) (readmeFilename string, readmeRendere
 	return "", ""
 }
 
+// escapeHTML just escapes a string and wraps it in [template.HTML].
 func escapeHTML(s string) template.HTML {
 	return template.HTML(html.EscapeString(s)) //#nosec G203
 }

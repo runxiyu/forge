@@ -120,6 +120,8 @@ func ircBotSession() error {
 	}
 }
 
+// ircSendDirect sends an IRC message directly to the connection and bypasses
+// the buffering system.
 func ircSendDirect(s string) error {
 	ech := make(chan error, 1)
 
@@ -131,6 +133,7 @@ func ircSendDirect(s string) error {
 	return <-ech
 }
 
+// TODO: Delay and warnings?
 func ircBotLoop() {
 	ircSendBuffered = make(chan string, config.IRC.SendQ)
 	ircSendDirectChan = make(chan errorBack[string])

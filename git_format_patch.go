@@ -12,7 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-// get_patch_from_commit formats a commit object as if it was returned by
+// fmtCommitPatch formats a commit object as if it was returned by
 // git-format-patch.
 func fmtCommitPatch(commit *object.Commit) (final string, err error) {
 	var patch *object.Patch
@@ -21,7 +21,7 @@ func fmtCommitPatch(commit *object.Commit) (final string, err error) {
 	var date string
 	var commitTitle, commitDetails string
 
-	if _, patch, err = fmtCommitAsPatch(commit); err != nil {
+	if _, patch, err = commitToPatch(commit); err != nil {
 		return "", err
 	}
 

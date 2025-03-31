@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// getUserFromRequest returns the user ID and username associated with the
+// session cookie in a given [http.Request].
 func getUserFromRequest(request *http.Request) (id int, username string, err error) {
 	var sessionCookie *http.Cookie
 

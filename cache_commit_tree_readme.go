@@ -16,6 +16,7 @@ type treeReadmeCacheEntry struct {
 	ReadmeRendered template.HTML
 }
 
+// The key is the commit ID raw hash, optionally followed by a path.
 var treeReadmeCache *ristretto.Cache[[]byte, treeReadmeCacheEntry]
 
 func init() {

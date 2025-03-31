@@ -10,6 +10,8 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
+// httpHandleIndex provides the main index page which includes a list of groups
+// and some global information such as SSH keys.
 func httpHandleIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var err error
 	var groups []nameDesc

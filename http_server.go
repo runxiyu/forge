@@ -15,6 +15,10 @@ import (
 
 type forgeHTTPRouter struct{}
 
+// ServeHTTP handles all incoming HTTP requests and routes them to the correct
+// location.
+//
+// TODO: This function is way too large.
 func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var remoteAddr string
 	if config.HTTP.ReverseProxy {

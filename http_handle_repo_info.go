@@ -12,6 +12,10 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// httpHandleRepoInfo provides advertised refs of a repo for use in Git's Smart
+// HTTP protocol.
+//
+// TODO: Reject access from web browsers.
 func httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	groupPath := params["group_path"].([]string)
 	repoName := params["repo_name"].(string)

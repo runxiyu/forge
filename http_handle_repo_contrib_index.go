@@ -9,12 +9,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// idTitleStatus describes properties of a merge request that needs to be
+// present in MR listings.
 type idTitleStatus struct {
 	ID     int
 	Title  string
 	Status string
 }
 
+// httpHandleRepoContribIndex provides an index to merge requests of a repo.
 func httpHandleRepoContribIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var rows pgx.Rows
 	var result []idTitleStatus
