@@ -1,6 +1,6 @@
 # Lindenii Forge
 
-[![builds.sr.ht status](https://builds.sr.ht/~runxiyu/forge.svg)](https://builds.sr.ht/~runxiyu/forge?)
+[![builds.sr.ht status](https://builds.sr.ht/~runxiyu/forge.svg)](https://builds.sr.ht/~runxiyu/forge)
 
 **Work in progress.**
 
