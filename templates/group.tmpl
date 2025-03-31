@@ -13,7 +13,6 @@
 	<body class="group">
 		{{- template "header" . -}}
 		<div class="padding-wrapper">
-			<p>{{- range $i, $s := .group_path -}}{{- $s -}}{{- if ne $i (minus (len $group_path) 1) }} / {{ end -}}{{- end -}}
 			{{- if .description -}}
 			<p>{{- .description -}}</p>
 			{{- end -}}
