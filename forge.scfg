@@ -76,3 +76,8 @@ hooks {
 	# Where should hook executables be put?
 	execs /usr/libexec/lindenii/forge/hooks
 }
+
+lmtp {
+	# On which UNIX domain socket should we listen for LMTP on?
+	socket /var/run/lindenii/forge/lmtp.sock
+}

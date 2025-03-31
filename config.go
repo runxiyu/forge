@@ -31,6 +31,9 @@ var config struct {
 		Socket string `scfg:"socket"`
 		Execs  string `scfg:"execs"`
 	} `scfg:"hooks"`
+	LMTP struct {
+		Socket string `scfg:"socket"`
+	} `scfg:"lmtp"`
 	Git struct {
 		RepoDir string `scfg:"repo_dir"`
 	} `scfg:"git"`

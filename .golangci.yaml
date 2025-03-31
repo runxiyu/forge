@@ -18,6 +18,7 @@ linters:
     - nestif      # e
     - gocognit    # e
     - gocyclo     # e
+    - dupl        # e
     - cyclop      # e
     - goconst     # e
     - funlen      # e
