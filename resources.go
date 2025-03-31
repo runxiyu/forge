@@ -13,16 +13,7 @@ import (
 	"github.com/tdewolff/minify/v2/html"
 )
 
-// We embed all source for easy AGPL compliance.
-//
-//go:embed .gitignore .gitattributes
-//go:embed LICENSE README.md
-//go:embed *.go go.mod go.sum
-//go:embed *.scfg
-//go:embed Makefile
-//go:embed static/* templates/* scripts/* sql/* man/*
-//go:embed hookc/*.c
-//go:embed vendor/*
+//go:embed LICENSE source.tar.gz
 var sourceFS embed.FS
 
 var sourceHandler = http.StripPrefix(

@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # SPDX-FileContributor: Runxi Yu <https://runxiyu.org>
 
-.PHONY: clean version.go man
+.PHONY: clean version.go man source.tar.gz
 
 CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -D_GNU_SOURCE
 MAN_PAGES = forge.5 hookc.1
 
-forge: version.go hookc/*.c hookc/hookc man # TODO
-	go mod vendor
+forge: source.tar.gz version.go hookc/*.c hookc/hookc man # TODO
 	go build .
 
 man: $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt)
@@ -28,3 +27,7 @@ version.go:
 clean:
 	$(RM) forge version.go vendor
 
+source.tar.gz:
+	rm -f source.tar.gz
+	go mod vendor
+	git ls-files -z | xargs -0 tar -czf source.tar.gz vendor
