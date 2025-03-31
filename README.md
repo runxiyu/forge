@@ -16,22 +16,22 @@ primarily designed for self-hosting by small organizations and individuals.
   and [`#lindenii`](https://web.libera.chat/#lindenii)
   on [Libera.Chat](https://libera.chat)
 
-## Planned features
+## Implemented features
 
 * Umambiguously parsable URL
 * Groups and subgroups
 * Repo hosting
-* Merge requests
-  * Push to `contrib/` branches to automatically create MRs
-  * Integration with traditional mailing list workflows
-* Ticket trackers
-  * Email integration with IMAP archives
+* Push to `contrib/` branches to automatically create merge requests
+* Basic federated authentication
+
+## Planned features
+
+* Integration with mailing list workflows
+* Ticket trackers and discussions
   * Web interface
-* Discussions
   * Email integration with IMAP archives
-  * Web interface
-* Multiple user interfaces: web, SSH, email, custom API
-* Federated authentication
+* SSH API
+* Email access
 
 ## License
 
@@ -44,9 +44,10 @@ The forge software serves its own source at `/:/source/`.
 
 Please submit patches by pushing to `contrib/...` in the official repo.
 
-We have several Git repo mirrors on a few places:
-* [Lindenii Forge itself](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/)
-* [The Lindenii Project's cgit](https://git.lindenii.runxiyu.org/forge.git/)
+We have several repo mirrors:
+
+* [Official repo on our own instance of Lindenii Forge](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/)
+* [The Lindenii Project's backup cgit](https://git.lindenii.runxiyu.org/forge.git/)
 * [SourceHut](https://git.sr.ht/~runxiyu/forge/)
 * [Codeberg](https://codeberg.org/lindenii/forge/)
 * [GitHub](https://github.com/runxiyu/forge/)
