@@ -1,4 +1,4 @@
-/*
+/*-
  * SPDX-License-Identifier: AGPL-3.0-only
  * SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
  * SPDX-FileCopyrightText: Copyright (c) 2025 Test_User <hax@runxiyu.org>
@@ -23,18 +23,21 @@
 #define USE_SPLICE 0
 #endif
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[])
+{
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 		perror("signal");
 		return EXIT_FAILURE;
 	}
 
-	const char *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
+	const char     *socket_path = getenv("LINDENII_FORGE_HOOKS_SOCKET_PATH");
 	if (socket_path == NULL) {
 		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_SOCKET_PATH undefined\n");
 		return EXIT_FAILURE;
 	}
-	const char *cookie = getenv("LINDENII_FORGE_HOOKS_COOKIE");
+
+	const char     *cookie = getenv("LINDENII_FORGE_HOOKS_COOKIE");
 	if (cookie == NULL) {
 		dprintf(STDERR_FILENO, "environment variable LINDENII_FORGE_HOOKS_COOKIE undefined\n");
 		return EXIT_FAILURE;
@@ -45,27 +48,30 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * All hooks in git (see builtin/receive-pack.c) use a pipe by setting
-	 * .in = -1 on the child_process struct, which enables us to use
-	 * splice(2) to move the data to the UNIX domain socket.
+	 * All hooks in git (see builtin/receive-pack.c) use a pipe by
+	 * setting .in = -1 on the child_process struct, which enables us to
+	 * use splice(2) to move the data to the UNIX domain socket.
 	 */
-	struct stat stdin_stat;
+
+	struct stat	stdin_stat;
 	if (fstat(STDIN_FILENO, &stdin_stat) == -1) {
 		perror("fstat on stdin");
 		return EXIT_FAILURE;
 	}
+
 	if (!S_ISFIFO(stdin_stat.st_mode)) {
 		dprintf(STDERR_FILENO, "stdin must be a pipe\n");
 		return EXIT_FAILURE;
 	}
-	#if USE_SPLICE
-	int stdin_pipe_size = fcntl(STDIN_FILENO, F_GETPIPE_SZ);
+
+#if USE_SPLICE
+	int		stdin_pipe_size = fcntl(STDIN_FILENO, F_GETPIPE_SZ);
 	if (stdin_pipe_size == -1) {
 		perror("fcntl on stdin");
 		return EXIT_FAILURE;
 	}
 #else
-	int stdin_pipe_size = 65536;
+	int		stdin_pipe_size = 65536;
 #endif
 
 	if (stdin_pipe_size == -1) {
@@ -76,7 +82,7 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Same for stderr.
 	 */
-	struct stat stderr_stat;
+	struct stat	stderr_stat;
 	if (fstat(STDERR_FILENO, &stderr_stat) == -1) {
 		perror("fstat on stderr");
 		return EXIT_FAILURE;
@@ -85,22 +91,24 @@ int main(int argc, char *argv[]) {
 		dprintf(STDERR_FILENO, "stderr must be a pipe\n");
 		return EXIT_FAILURE;
 	}
+
 #if USE_SPLICE
-	int stderr_pipe_size = fcntl(STDERR_FILENO, F_GETPIPE_SZ);
+	int		stderr_pipe_size = fcntl(STDERR_FILENO, F_GETPIPE_SZ);
 	if (stderr_pipe_size == -1) {
 		perror("fcntl on stderr");
 		return EXIT_FAILURE;
 	}
 #else
-	int stderr_pipe_size = 65536;
+	int		stderr_pipe_size = 65536;
 #endif
+
 	if (stderr_pipe_size == -1) {
 		perror("fcntl on stderr");
 		return EXIT_FAILURE;
 	}
 
 	/* Connecting back to the main daemon */
-	int sock;
+	int		sock;
 	struct sockaddr_un addr;
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock == -1) {
@@ -119,7 +127,7 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Send the 64-byte cookit back.
 	 */
-	ssize_t cookie_bytes_sent = send(sock, cookie, 64, 0);
+	ssize_t		cookie_bytes_sent = send(sock, cookie, 64, 0);
 	switch (cookie_bytes_sent) {
 	case -1:
 		perror("send cookie");
@@ -136,8 +144,8 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Report arguments.
 	 */
-	uint64_t argc64 = (uint64_t)argc;
-	ssize_t bytes_sent = send(sock, &argc64, sizeof(argc64), 0);
+	uint64_t	argc64 = (uint64_t) argc;
+	ssize_t		bytes_sent = send(sock, &argc64, sizeof(argc64), 0);
 	switch (bytes_sent) {
 	case -1:
 		perror("send argc");
@@ -151,7 +159,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 	for (int i = 0; i < argc; i++) {
-		unsigned long len = strlen(argv[i]) + 1;
+		unsigned long	len = strlen(argv[i]) + 1;
 		bytes_sent = send(sock, argv[i], len, 0);
 		if (bytes_sent == -1) {
 			perror("send argv");
@@ -168,10 +176,10 @@ int main(int argc, char *argv[]) {
 	/*
 	 * Report GIT_* environment.
 	 */
-	extern char **environ;
+	extern char   **environ;
 	for (char **env = environ; *env != NULL; env++) {
 		if (strncmp(*env, "GIT_", 4) == 0) {
-			unsigned long len = strlen(*env) + 1;
+			unsigned long	len = strlen(*env) + 1;
 			bytes_sent = send(sock, *env, len, 0);
 			if (bytes_sent == -1) {
 				perror("send env");
@@ -201,7 +209,7 @@ int main(int argc, char *argv[]) {
 	 * Splice stdin to the daemon. For pre-receive it's just old/new/ref.
 	 */
 #if USE_SPLICE
-	ssize_t stdin_bytes_spliced;
+	ssize_t		stdin_bytes_spliced;
 	while ((stdin_bytes_spliced = splice(STDIN_FILENO, NULL, sock, NULL, stdin_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 	if (stdin_bytes_spliced == -1) {
@@ -210,8 +218,8 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 #else
-	char buf[65536];
-	ssize_t n;
+	char		buf[65536];
+	ssize_t		n;
 	while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
 		if (write(sock, buf, n) != n) {
 			perror("write to internal socket");
@@ -243,11 +251,11 @@ int main(int argc, char *argv[]) {
 	 * FIXME: It doesn't make sense to require the return value to be
 	 * sent before the log message. However, if we were to keep splicing,
 	 * it's difficult to get the last byte before EOF. Perhaps we could
-	 * hack together some sort of OOB message or ancillary data, or perhaps
-	 * even use signals.
+	 * hack together some sort of OOB message or ancillary data, or
+	 * perhaps even use signals.
 	 */
-	char status_buf[1];
-	ssize_t bytes_read = read(sock, status_buf, 1);
+	char		status_buf[1];
+	ssize_t		bytes_read = read(sock, status_buf, 1);
 	switch (bytes_read) {
 	case -1:
 		perror("read status code from internal socket");
@@ -266,14 +274,15 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 * Now we can splice data from the UNIX domain socket to stderr.
-	 * This data is directly passed to the user (with "remote: " prepended).
+	 * Now we can splice data from the UNIX domain socket to stderr. This
+	 * data is directly passed to the user (with "remote: " prepended).
 	 *
-	 * We usually don't actually use this as the daemon could easily write
-	 * to the SSH connection's stderr directly anyway.
+	 * We usually don't actually use this as the daemon could easily
+	 * write to the SSH connection's stderr directly anyway.
 	 */
+
 #if USE_SPLICE
-	ssize_t stderr_bytes_spliced;
+	ssize_t		stderr_bytes_spliced;
 	while ((stderr_bytes_spliced = splice(sock, NULL, STDERR_FILENO, NULL, stderr_pipe_size, SPLICE_F_MORE)) > 0) {
 	}
 	if (stderr_bytes_spliced == -1 && errno != ECONNRESET) {
