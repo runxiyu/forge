@@ -15,8 +15,10 @@ man: $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt)
 man/%.html: man/%
 	mandoc -Thtml -O style=./mandoc.css $< > $@
 
-man/%.txt: man/%
-	mandoc $< | col -b > $@
+man/%.txt: man/% utils/colb
+	mandoc $< | ./utils/colb > $@
+
+utils/colb: utils/colb.c
 
 hookc/hookc:
 
