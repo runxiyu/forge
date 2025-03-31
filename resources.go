@@ -77,8 +77,10 @@ func loadTemplates() (err error) {
 	return err
 }
 
-var staticHandler http.Handler
-var manHandler http.Handler
+var (
+	staticHandler http.Handler
+	manHandler    http.Handler
+)
 
 func init() {
 	staticFS, err := fs.Sub(resourcesFS, "static")
