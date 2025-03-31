@@ -13,7 +13,11 @@
 		{{- $dir_mode := .dir_mode -}}
 		{{- $ref_type := .ref_type -}}
 		{{- $ref := .ref_name -}}
-		{{- range $i := .separator_index -}}
+		{{- $separator_index := .separator_index -}}
+		{{- if eq $separator_index -1 -}}
+			{{- $separator_index = len $url_segments -}}
+		{{- end -}}
+		{{- range $i := $separator_index -}}
 			{{- $segment := index $url_segments $i -}}
 			{{- $path = printf "%s/%s" $path $segment -}}
 			<span class="breadcrumb-separator">/</span>
