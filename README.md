@@ -10,6 +10,7 @@ primarily designed for self-hosting by small organizations and individuals.
 * [Upstream source repository](https://forge.lindenii.runxiyu.org/lindenii/forge/:/repos/server/)
   ([backup](https://git.lindenii.runxiyu.org/forge.git/))
 * [Website and documentation](https://lindenii.runxiyu.org/forge/)
+* [Manual pages](https://forge.lindenii.runxiyu.org/:/man/)
 * [Temporary issue tracker](https://todo.sr.ht/~runxiyu/forge)
 * IRC [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
   on [irc.runxiyu.org](https://irc.runxiyu.org)\
