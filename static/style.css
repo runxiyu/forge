@@ -555,7 +555,7 @@ td > ul {
 	padding-bottom: 0.2rem;
 }
 
-.repo-header, .padding-wrapper, .repo-header-extension-content, #main-header {
+.repo-header, .padding-wrapper, .repo-header-extension-content, #main-header, .readingwidth {
 	padding-left: 1rem;
 	padding-right: 1rem;
 	max-width: 60rem;

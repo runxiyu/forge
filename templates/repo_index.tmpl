@@ -43,47 +43,14 @@
 				{{- .repo_description -}}
 			</div>
 		</div>
-		<div class="padding-wrapper">
-			<div class="key-val-grid-wrapper">
-				<section id="repo-info" class="key-val-grid">
-					<div class="title-row">Repo info</div>
-					<div class="row-label">Name</div>
-					<div class="row-value">{{- .repo_name -}}</div>
-					{{- if .repo_description -}}
-						<div class="row-label">Description</div>
-						<div class="row-value">{{- .repo_description -}}</div>
-					{{- end -}}
-					<div class="row-label">SSH remote</div>
-					<div class="row-value"><code>{{- .ssh_clone_url -}}</code></div>
-					{{- if .notes -}}
-						<div class="row-label">Notes</div>
-						<div class="row-value">
-							<ul>
-								{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}
-							</ul>
-						</div>
-					{{- end -}}
-				</section>
-			</div>
+		{{- if .notes -}}
+		<div id="notes">Notes</div>
+			<ul>
+				{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}
+			</ul>
 		</div>
-		<div class="padding-wrapper">
-			<table id="branches">
-				<thead>
-					<tr class="title-row">
-						<th colspan="1">Branches</th>
-					</tr>
-				</thead>
-				<tbody>
-					{{- range .branches -}}
-					<tr>
-						<td>
-							<a href="./?branch={{ . }}">{{ . }}</a>
-						</td>
-					</tr>
-					{{- end -}}
-				</tbody>
-			</table>
-		</div>
+		{{- end -}}
+		<p class="readingwidth"><code>{{- .ssh_clone_url -}}</code></p>
 		{{- if .commits -}}
 			<div class="padding-wrapper scroll">
 				<table id="recent-commits" class="wide">

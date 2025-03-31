@@ -199,6 +199,12 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					return
 				}
 				httpHandleRepoTree(writer, request, params)
+			case "branches":
+				if redirectDir(writer, request) {
+					return
+				}
+				httpHandleRepoBranches(writer, request, params)
+				return
 			case "raw":
 				if anyContain(segments[sepIndex+4:], "/") {
 					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
