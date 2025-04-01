@@ -63,11 +63,14 @@ func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, 
 		if err = gitdiff.Apply(&patchedBuf, sourceBuf, diffFile); err != nil {
 			return err
 		}
-		proc := exec.CommandContext(session.ctx, "git", "hash-object", "w", "-t", "blob", "--stdin")
+		proc := exec.CommandContext(session.ctx, "git", "hash-object", "-w", "-t", "blob", "--stdin")
 		proc.Env = append(os.Environ(), "GIT_DIR="+fsPath)
 		proc.Stdout = &hashBuf
 		proc.Stdin = &patchedBuf
 		if err = proc.Start(); err != nil {
+			return err
+		}
+		if err = proc.Wait(); err != nil {
 			return err
 		}
 		newHash := hashBuf.Bytes()
