@@ -18,6 +18,11 @@ func errorPage400(w http.ResponseWriter, params map[string]any, msg string) {
 	_ = templates.ExecuteTemplate(w, "400", params)
 }
 
+func errorPage400Colon(w http.ResponseWriter, params map[string]any) {
+	w.WriteHeader(http.StatusBadRequest)
+	_ = templates.ExecuteTemplate(w, "400_colon", params)
+}
+
 func errorPage403(w http.ResponseWriter, params map[string]any, msg string) {
 	w.WriteHeader(http.StatusForbidden)
 	params["complete_error_msg"] = msg

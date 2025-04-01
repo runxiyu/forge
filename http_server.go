@@ -48,6 +48,13 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		segments = segments[:len(segments)-1]
 	}
 
+	for _, v := range segments {
+		if strings.Contains(v, ":") {
+			errorPage400Colon(writer, params)
+			return
+		}
+	}
+
 	params["url_segments"] = segments
 	params["dir_mode"] = dirMode
 	params["global"] = globalData
