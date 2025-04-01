@@ -14,6 +14,8 @@ linters:
     - nakedret         # patterns should be consistent
     - nonamedreturns   # i like named returns
     - wrapcheck        # wrapping all errors is just not necessary
+    - varnamelen       # "from" and "to" are very valid
+    - stylecheck
     - maintidx    # e
     - nestif      # e
     - gocognit    # e
@@ -26,6 +28,12 @@ linters:
     - nlreturn    # e
     - unused      # e
     - exhaustruct # e
+
+linters-settings:
+  revive:
+    rules:
+      - name: error-strings
+        disabled: true
 
 issues:
   max-issues-per-linter: 0

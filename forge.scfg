@@ -80,4 +80,7 @@ hooks {
 lmtp {
 	# On which UNIX domain socket should we listen for LMTP on?
 	socket /var/run/lindenii/forge/lmtp.sock
+
+	# What's the maximum acceptable message size?
+	max_size 1000000
 }

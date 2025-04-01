@@ -32,7 +32,8 @@ var config struct {
 		Execs  string `scfg:"execs"`
 	} `scfg:"hooks"`
 	LMTP struct {
-		Socket string `scfg:"socket"`
+		Socket  string `scfg:"socket"`
+		MaxSize int64  `scfg:"max_size"`
 	} `scfg:"lmtp"`
 	Git struct {
 		RepoDir string `scfg:"repo_dir"`
