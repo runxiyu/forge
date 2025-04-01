@@ -5,6 +5,7 @@ go 1.24.1
 require (
 	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/alexedwards/argon2id v1.0.0
+	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/dgraph-io/ristretto/v2 v2.1.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gliderlabs/ssh v0.3.8

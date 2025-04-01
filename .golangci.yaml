@@ -16,6 +16,8 @@ linters:
     - wrapcheck        # wrapping all errors is just not necessary
     - varnamelen       # "from" and "to" are very valid
     - stylecheck
+    - containedctx
+    - godot
     - maintidx    # e
     - nestif      # e
     - gocognit    # e
