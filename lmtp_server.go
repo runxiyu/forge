@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -21,8 +22,10 @@ import (
 type lmtpHandler struct{}
 
 type lmtpSession struct {
-	from string
-	to   []string
+	from   string
+	to     []string
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 func (session *lmtpSession) Reset() {
@@ -31,6 +34,7 @@ func (session *lmtpSession) Reset() {
 }
 
 func (session *lmtpSession) Logout() error {
+	session.cancel()
 	return nil
 }
 
@@ -49,7 +53,11 @@ func (session *lmtpSession) Rcpt(to string, _ *smtp.RcptOptions) error {
 }
 
 func (*lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
-	session := &lmtpSession{}
+	ctx, cancel := context.WithCancel(context.Background())
+	session := &lmtpSession{
+		ctx:    ctx,
+		cancel: cancel,
+	}
 	return session, nil
 }
 
