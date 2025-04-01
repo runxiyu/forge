@@ -181,7 +181,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 
 			// TODO: subgroups
 
-			if params["repo"], params["repo_description"], params["repo_id"], err = openRepo(request.Context(), groupPath, moduleName); err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], _, err = openRepo(request.Context(), groupPath, moduleName); err != nil {
 				errorPage500(writer, params, "Error opening repo: "+err.Error())
 				return
 			}
