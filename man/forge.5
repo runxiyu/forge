@@ -104,6 +104,20 @@ Maximum send queue size.
 .It Ic nick , user , gecos
 Identity fields for the IRC connection.
 .El
+.It Ic lmtp
+Configuration for the LMTP/MX component. You may wish to refer to
+.Xr forge-mail 5
+for information on configuring your SMTP server.
+.Bl -tag -width Ds
+.It Ic socket
+The path to the UNIX domain socket to listen on.
+.It Ic max_size
+The maximum acceptable ingress message size.
+.It Ic domain
+The domain-part of our LMTP server.
+.It Ic read_timeout , write_timeout
+General timeouts for LMTP connections.
+.El
 .El
 .Sh FILES
 .Bl -tag -width Ds

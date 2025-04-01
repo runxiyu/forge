@@ -4,7 +4,7 @@
 .PHONY: clean version.go man source.tar.gz
 
 CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -D_GNU_SOURCE
-MAN_PAGES = forge.5 hookc.1 forge.1
+MAN_PAGES = forge.5 hookc.1 forge.1 forge-mail.5
 
 forge: source.tar.gz version.go hookc/*.c hookc/hookc man # TODO
 	go build .
