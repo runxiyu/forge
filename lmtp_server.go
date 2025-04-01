@@ -168,5 +168,13 @@ func (session *lmtpSession) Data(r io.Reader) error {
 end:
 	session.to = nil
 	session.from = ""
-	return err
+	switch err {
+	case nil:
+		return nil
+	default:
+		return &smtp.SMTPError{
+			Code:    550,
+			Message: err.Error(),
+		}
+	}
 }
