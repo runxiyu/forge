@@ -17,7 +17,7 @@ man/%.html: man/%
 man/%.txt: man/% utils/colb
 	mandoc $< | ./utils/colb > $@
 
-utils/colb: utils/colb.c
+utils/colb:
 
 hookc/hookc:
 
