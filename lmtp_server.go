@@ -7,6 +7,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net"
@@ -48,13 +49,11 @@ func (session *lmtpSession) Rcpt(to string, _ *smtp.RcptOptions) error {
 }
 
 func (*lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
-	// TODO
 	session := &lmtpSession{}
 	return session, nil
 }
 
 func serveLMTP(listener net.Listener) error {
-	// TODO: Manually construct smtp.Server
 	smtpServer := smtp.NewServer(&lmtpHandler{})
 	smtpServer.LMTP = true
 	smtpServer.Domain = config.LMTP.Domain
@@ -99,7 +98,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 
 	switch strings.ToLower(email.Header.Get("Auto-Submitted")) {
 	case "auto-generated", "auto-replied":
-		// disregard automatic emails like OOO replies
+		// Disregard automatic emails like OOO replies.
 		slog.Info("ignoring automatic message",
 			"from", session.from,
 			"to", strings.Join(session.to, ","),
@@ -117,12 +116,53 @@ func (session *lmtpSession) Data(r io.Reader) error {
 	)
 
 	// Make local copies of the values before to ensure the references will
-	// still be valid when the queued task function is evaluated.
+	// still be valid when the task is run.
 	from = session.from
 	to = session.to
 
-	// TODO: Process the actual message contents
-	_, _ = from, to
+	_ = from
+
+	for _, to := range to {
+		if !strings.HasSuffix(to, "@"+config.LMTP.Domain) {
+			continue
+		}
+		localPart := to[:len(to)-len("@"+config.LMTP.Domain)]
+		segments, err := pathToSegments(localPart)
+		if err != nil {
+			// TODO: Should the entire email fail or should we just
+			// notify them out of band?
+			err = fmt.Errorf("cannot parse path: %w", err)
+			goto end
+		}
+		sepIndex := -1
+		for i, part := range segments {
+			if part == ":" {
+				sepIndex = i
+				break
+			}
+		}
+		if segments[len(segments)-1] == "" {
+			segments = segments[:len(segments)-1] // We don't care about dir or not.
+		}
+		if sepIndex == -1 || len(segments) <= sepIndex+2 {
+			err = errors.New("illegal path")
+			goto end
+		}
+
+		groupPath := segments[:sepIndex]
+		moduleType := segments[sepIndex+1]
+		moduleName := segments[sepIndex+2]
+		switch moduleType {
+		case "repos":
+			err = lmtpHandlePatch(groupPath, moduleName, email)
+			if err != nil {
+				goto end
+			}
+		default:
+			err = fmt.Errorf("Emailing any endpoint other than repositories, is not supported yet.") // TODO
+			goto end
+		}
+	}
 
 end:
 	session.to = nil

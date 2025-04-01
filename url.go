@@ -51,6 +51,16 @@ func getParamRefTypeName(request *http.Request) (retRefType, retRefName string, 
 func parseReqURI(requestURI string) (segments []string, params url.Values, err error) {
 	path, paramsStr, _ := strings.Cut(requestURI, "?")
 
+	segments, err = pathToSegments(path)
+	if err != nil {
+		return
+	}
+
+	params, err = url.ParseQuery(paramsStr)
+	return
+}
+
+func pathToSegments(path string) (segments []string, err error) {
 	segments = strings.Split(strings.TrimPrefix(path, "/"), "/")
 
 	for i, segment := range segments {
@@ -60,7 +70,6 @@ func parseReqURI(requestURI string) (segments []string, params url.Values, err e
 		}
 	}
 
-	params, err = url.ParseQuery(paramsStr)
 	return
 }
 

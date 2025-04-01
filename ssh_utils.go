@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"strings"
 
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 )
@@ -23,7 +22,10 @@ func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []s
 	var sepIndex int
 	var moduleType, moduleName string
 
-	segments = strings.Split(strings.TrimPrefix(sshPath, "/"), "/")
+	segments, err = pathToSegments(sshPath)
+	if err != nil {
+		return
+	}
 
 	for i, segment := range segments {
 		var err error
