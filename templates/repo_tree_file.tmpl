@@ -8,7 +8,7 @@
 <html lang="en">
 	<head>
 		{{- template "head_common" . -}}
-		<link rel="stylesheet" href="/:/static/chroma.css" />
+		<link rel="stylesheet" href="/-/static/chroma.css" />
 		<title>/{{ .path_spec }} &ndash; {{ .repo_name }} &ndash; {{ template "group_path_plain" .group_path }} &ndash; {{ .global.forge_title -}}</title>
 	</head>
 	<body class="repo-tree-file">
@@ -46,7 +46,7 @@
 		</div>
 		<div class="padding">
 			<p>
-				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/:/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{- template "ref_query" $root -}}">raw</a>)
+				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/-/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{- template "ref_query" $root -}}">raw</a>)
 			</p>
 			{{- .file_contents -}}
 		</div>

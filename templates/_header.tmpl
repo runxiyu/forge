@@ -26,9 +26,9 @@
 	</nav>
 	<div id="main-header-user">
 		{{- if ne .user_id_string "" -}}
-			<a href="/:/users/{{- .user_id_string -}}">{{- .username -}}</a>
+			<a href="/-/users/{{- .user_id_string -}}">{{- .username -}}</a>
 		{{- else -}}
-			<a href="/:/login/">Login</a>
+			<a href="/-/login/">Login</a>
 		{{- end -}}
 	</div>
 </header>
