@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/emersion/go-message"
 	"github.com/emersion/go-smtp"
@@ -53,7 +54,14 @@ func (*lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
 }
 
 func serveLMTP(listener net.Listener) error {
+	// TODO: Manually construct smtp.Server
 	smtpServer := smtp.NewServer(&lmtpHandler{})
+	smtpServer.LMTP = true
+	smtpServer.Domain = config.LMTP.Domain
+	smtpServer.Addr = config.LMTP.Socket
+	smtpServer.WriteTimeout = time.Duration(config.LMTP.WriteTimeout) * time.Second
+	smtpServer.ReadTimeout = time.Duration(config.LMTP.ReadTimeout) * time.Second
+	smtpServer.EnableSMTPUTF8 = true
 	return smtpServer.Serve(listener)
 }
 

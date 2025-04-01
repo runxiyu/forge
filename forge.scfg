@@ -83,4 +83,11 @@ lmtp {
 
 	# What's the maximum acceptable message size?
 	max_size 1000000
+
+	# What is our domainpart?
+	domain forge.example.org
+
+	# General timeouts
+	read_timeout 300
+	write_timeout 300
 }
