@@ -7,10 +7,10 @@
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
 primarily designed for self-hosting by small organizations and individuals.
 
-* [Upstream source repository](https://forge.lindenii.runxiyu.org/forge/:/repos/server/)
+* [Upstream source repository](https://forge.lindenii.runxiyu.org/forge/-/repos/server/)
   ([backup](https://git.lindenii.runxiyu.org/forge.git/))
 * [Website and documentation](https://lindenii.runxiyu.org/forge/)
-* [Manual pages](https://forge.lindenii.runxiyu.org/:/man/)
+* [Manual pages](https://forge.lindenii.runxiyu.org/-/man/)
 * [Temporary issue tracker](https://todo.sr.ht/~runxiyu/forge)
 * IRC [`#lindenii`](https://webirc.runxiyu.org/kiwiirc/#lindenii)
   on [irc.runxiyu.org](https://irc.runxiyu.org)\
@@ -39,7 +39,7 @@ primarily designed for self-hosting by small organizations and individuals.
 We are currently using the
 [GNU Affero General Public License version 3](https://www.gnu.org/licenses/agpl-3.0.html).
 
-The forge software serves its own source at `/:/source/`.
+The forge software serves its own source at `/-/source/`.
 
 # Contribute
 
@@ -47,7 +47,7 @@ Please submit patches by pushing to `contrib/...` in the official repo.
 
 We have several repo mirrors:
 
-* [Official repo on our own instance of Lindenii Forge](https://forge.lindenii.runxiyu.org/forge/:/repos/server/)
+* [Official repo on our own instance of Lindenii Forge](https://forge.lindenii.runxiyu.org/forge/-/repos/server/)
 * [The Lindenii Project's backup cgit](https://git.lindenii.runxiyu.org/forge.git/)
 * [SourceHut](https://git.sr.ht/~runxiyu/forge/)
 * [Codeberg](https://codeberg.org/lindenii/forge/)
