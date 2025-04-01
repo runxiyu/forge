@@ -127,7 +127,8 @@ func (session *lmtpSession) Data(r io.Reader) error {
 			continue
 		}
 		localPart := to[:len(to)-len("@"+config.LMTP.Domain)]
-		segments, err := pathToSegments(localPart)
+		var segments []string
+		segments, err = pathToSegments(localPart)
 		if err != nil {
 			// TODO: Should the entire email fail or should we just
 			// notify them out of band?
@@ -159,7 +160,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 				goto end
 			}
 		default:
-			err = fmt.Errorf("Emailing any endpoint other than repositories, is not supported yet.") // TODO
+			err = errors.New("Emailing any endpoint other than repositories, is not supported yet.") // TODO
 			goto end
 		}
 	}
