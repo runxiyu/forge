@@ -136,7 +136,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 		}
 		sepIndex := -1
 		for i, part := range segments {
-			if part == ":" {
+			if part == "-" {
 				sepIndex = i
 				break
 			}

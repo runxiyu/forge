@@ -70,7 +70,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	if segments[0] == ":" {
+	if segments[0] == "-" {
 		if len(segments) < 2 {
 			errorPage404(writer, params)
 			return
@@ -91,7 +91,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		}
 	}
 
-	if segments[0] == ":" {
+	if segments[0] == "-" {
 		switch segments[1] {
 		case "login":
 			httpHandleLogin(writer, request, params)
@@ -110,7 +110,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 
 	sepIndex = -1
 	for i, part := range segments {
-		if part == ":" {
+		if part == "-" {
 			sepIndex = i
 			break
 		}

@@ -35,13 +35,13 @@ func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []s
 		}
 	}
 
-	if segments[0] == ":" {
+	if segments[0] == "-" {
 		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath
 	}
 
 	sepIndex = -1
 	for i, part := range segments {
-		if part == ":" {
+		if part == "-" {
 			sepIndex = i
 			break
 		}
