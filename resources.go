@@ -17,7 +17,7 @@ import (
 var sourceFS embed.FS
 
 var sourceHandler = http.StripPrefix(
-	"/:/source/",
+	"/-/source/",
 	http.FileServer(http.FS(sourceFS)),
 )
 
@@ -80,10 +80,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	staticHandler = http.StripPrefix("/:/static/", http.FileServer(http.FS(staticFS)))
+	staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
 	manFS, err := fs.Sub(resourcesFS, "man")
 	if err != nil {
 		panic(err)
 	}
-	manHandler = http.StripPrefix("/:/man/", http.FileServer(http.FS(manFS)))
+	manHandler = http.StripPrefix("/-/man/", http.FileServer(http.FS(manFS)))
 }
