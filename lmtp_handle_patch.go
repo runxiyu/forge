@@ -5,22 +5,27 @@ package main
 
 import (
 	"bytes"
-	// "crypto/rand"
-	// "fmt"
+	"crypto/rand"
+	"encoding/hex"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 	"github.com/emersion/go-message"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, email *message.Entity) (err error) {
 	var diffFiles []*gitdiff.File
 	var preamble string
 	if diffFiles, preamble, err = gitdiff.Parse(email.Body); err != nil {
+		return
+	}
+
+	var header *gitdiff.PatchHeader
+	if header, err = gitdiff.ParsePatchHeader(preamble); err != nil {
 		return
 	}
 
@@ -31,61 +36,96 @@ func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, 
 		return
 	}
 
-	var headRef *plumbing.Reference
-	if headRef, err = repo.Head(); err != nil {
+	headRef, err := repo.Head()
+	if err != nil {
+		return
+	}
+	headCommit, err := repo.CommitObject(headRef.Hash())
+	if err != nil {
+		return
+	}
+	headTree, err := headCommit.Tree()
+	if err != nil {
 		return
 	}
 
-	var headCommit *object.Commit
-	if headCommit, err = repo.CommitObject(headRef.Hash()); err != nil {
-		return
-	}
+	headTreeHash := headTree.Hash.String()
 
-	var headTree *object.Tree
-	if headTree, err = headCommit.Tree(); err != nil {
-		return
-	}
-
-	// TODO: Try to not shell out
-
+	blobUpdates := make(map[string][]byte)
 	for _, diffFile := range diffFiles {
-		var sourceFile *object.File
-		if sourceFile, err = headTree.File(diffFile.OldName); err != nil {
+		sourceFile, err := headTree.File(diffFile.OldName)
+		if err != nil {
 			return err
 		}
-		var sourceString string
-		if sourceString, err = sourceFile.Contents(); err != nil {
+		sourceString, err := sourceFile.Contents()
+		if err != nil {
 			return err
 		}
-		hashBuf := bytes.Buffer{}
-		patchedBuf := bytes.Buffer{}
+
 		sourceBuf := bytes.NewReader(stringToBytes(sourceString))
-		if err = gitdiff.Apply(&patchedBuf, sourceBuf, diffFile); err != nil {
+		var patchedBuf bytes.Buffer
+		if err := gitdiff.Apply(&patchedBuf, sourceBuf, diffFile); err != nil {
 			return err
 		}
-		proc := exec.CommandContext(session.ctx, "git", "hash-object", "-w", "-t", "blob", "--stdin")
-		proc.Env = append(os.Environ(), "GIT_DIR="+fsPath)
-		proc.Stdout = &hashBuf
-		proc.Stdin = &patchedBuf
-		if err = proc.Start(); err != nil {
+
+		var hashBuf bytes.Buffer
+
+		// It's really difficult to do this via go-git so we're just
+		// going to use upstream git for now.
+		// TODO
+		cmd := exec.CommandContext(session.ctx, "git", "hash-object", "-w", "-t", "blob", "--stdin")
+		cmd.Env = append(os.Environ(), "GIT_DIR="+fsPath)
+		cmd.Stdout = &hashBuf
+		cmd.Stdin = &patchedBuf
+		if err := cmd.Run(); err != nil {
 			return err
 		}
-		if err = proc.Wait(); err != nil {
+
+		newHashStr := strings.TrimSpace(hashBuf.String())
+		newHash, err := hex.DecodeString(newHashStr)
+		if err != nil {
 			return err
 		}
-		newHash := hashBuf.Bytes()
-		if len(newHash) != 20*2+1 { // TODO: Hardcoded from the size of plumbing.Hash
-			panic("unexpected hash size")
+
+		blobUpdates[diffFile.NewName] = newHash
+		if diffFile.NewName != diffFile.OldName {
+			blobUpdates[diffFile.OldName] = nil // Mark for deletion.
 		}
-		// TODO: Add to tree
 	}
 
-	// contribBranchName := rand.Text()
+	newTreeSha, err := buildTreeRecursive(session.ctx, fsPath, headTreeHash, blobUpdates)
+	if err != nil {
+		return err
+	}
 
-	// TODO: Store the branch
+	commitMsg := header.Title
+	if header.Body != "" {
+		commitMsg += "\n\n" + header.Body
+	}
 
-	// fmt.Println(repo, diffFiles, preamble)
-	_ = preamble
+	env := append(os.Environ(),
+		"GIT_DIR="+fsPath,
+		"GIT_AUTHOR_NAME="+header.Author.Name,
+		"GIT_AUTHOR_EMAIL="+header.Author.Email,
+		"GIT_AUTHOR_DATE="+header.AuthorDate.Format(time.RFC3339),
+	)
+	commitCmd := exec.CommandContext(session.ctx, "git", "commit-tree", newTreeSha, "-p", headCommit.Hash.String(), "-m", commitMsg)
+	commitCmd.Env = env
+
+	var commitOut bytes.Buffer
+	commitCmd.Stdout = &commitOut
+	if err := commitCmd.Run(); err != nil {
+		return err
+	}
+	newCommitSha := strings.TrimSpace(commitOut.String())
+
+	newBranchName := rand.Text()
+
+	refCmd := exec.CommandContext(session.ctx, "git", "update-ref", "refs/heads/contrib/"+newBranchName, newCommitSha) //#nosec G204
+	refCmd.Env = append(os.Environ(), "GIT_DIR="+fsPath)
+	if err := refCmd.Run(); err != nil {
+		return err
+	}
 
 	return nil
 }
