@@ -158,12 +158,24 @@ func (session *lmtpSession) Data(r io.Reader) error {
 			goto end
 		}
 
+		mbox := bytes.Buffer{}
+		if _, err = fmt.Fprint(&mbox, "From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001\r\n"); err != nil {
+			slog.Error("error handling patch... malloc???", "error", err)
+			goto end
+		}
+		data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
+		if _, err = mbox.Write(data); err != nil {
+			slog.Error("error handling patch... malloc???", "error", err)
+			goto end
+		}
+		// TODO: Is mbox's From escaping necessary here?
+
 		groupPath := segments[:sepIndex]
 		moduleType := segments[sepIndex+1]
 		moduleName := segments[sepIndex+2]
 		switch moduleType {
 		case "repos":
-			err = lmtpHandlePatch(session, groupPath, moduleName, email)
+			err = lmtpHandlePatch(session, groupPath, moduleName, &mbox)
 			if err != nil {
 				slog.Error("error handling patch", "error", err)
 				goto end
@@ -182,8 +194,9 @@ end:
 		return nil
 	default:
 		return &smtp.SMTPError{
-			Code:    550,
-			Message: err.Error(),
+			Code:         550,
+			Message:      "Permanent failure: " + err.Error(),
+			EnhancedCode: [3]int{5, 7, 1},
 		}
 	}
 }
