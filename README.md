@@ -41,9 +41,15 @@ We are currently using the
 
 The forge software serves its own source at `/-/source/`.
 
-# Contribute
+## Contribute
 
 Please submit patches by pushing to `contrib/...` in the official repo.
+
+Alternatively, send email to
+[`forge/-/repos/server@forge.lindenii.runxiyu.org`](mailto:forge%2F-%2Frepos%2Fserver@forge.lindenii.runxiyu.org).
+Note that emailing patches is still experimental.
+
+## Mirrors
 
 We have several repo mirrors:
 
