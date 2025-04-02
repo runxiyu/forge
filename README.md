@@ -22,10 +22,11 @@ primarily designed for self-hosting by small organizations and individuals.
 * Repo hosting
 * Push to `contrib/` branches to automatically create merge requests
 * Basic federated authentication
+* Converting mailed patches to branches
 
 ## Planned features
 
-* Integration with mailing list workflows
+* Further Integration with mailing list workflows
 * Ticket trackers and discussions
   * Web interface
   * Email integration with IMAP archives
