@@ -26,18 +26,11 @@ func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (strin
 		}
 
 		if strings.HasPrefix(nameJ, nameI) && len(nameI) < len(nameJ) {
-			if entries[i].mode == "40000" {
-				return false
-			}
-			return true
+			return !(entries[i].mode == "40000")
 		}
 
 		if strings.HasPrefix(nameI, nameJ) && len(nameJ) < len(nameI) {
-			// nameJ is a prefix of nameI
-			if entries[j].mode == "40000" {
-				return true
-			}
-			return false
+			return entries[j].mode == "40000"
 		}
 
 		return nameI < nameJ
@@ -66,7 +59,7 @@ func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (strin
 	return strings.TrimSpace(out.String()), nil
 }
 
-func buildTreeRecursive(ctx context.Context, repoPath string, baseTree string, updates map[string][]byte) (string, error) {
+func buildTreeRecursive(ctx context.Context, repoPath, baseTree string, updates map[string][]byte) (string, error) {
 	treeCache := make(map[string][]treeEntry)
 
 	var walk func(string, string) error
