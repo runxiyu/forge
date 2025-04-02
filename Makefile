@@ -3,7 +3,7 @@
 
 .PHONY: clean version.go man source.tar.gz
 
-CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -D_GNU_SOURCE
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-forge-mail.5
 
 forge: source.tar.gz version.go hookc/*.c hookc/hookc man # TODO
@@ -20,6 +20,9 @@ man/%.txt: man/% utils/colb
 utils/colb:
 
 hookc/hookc:
+
+git2d/git2d: git2d/*.c
+	$(CC) $(CFLAGS) `pkg-config --cflags --libs libgit2` -lpthread -o git2d/git2d $<
 
 version.go:
 	printf 'package main\n\nconst VERSION = "%s"\n' `git describe --tags --always --dirty` > $@
