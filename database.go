@@ -17,7 +17,7 @@ import (
 // privilege escalation.
 
 // database serves as the primary database handle for this entire application.
-// Transactions or single reads may be used therefrom. A [pgxpool.Pool] is
+// Transactions or single reads may be used from it. A [pgxpool.Pool] is
 // necessary to safely use pgx concurrently; pgx.Conn, etc. are insufficient.
 var database *pgxpool.Pool
 
