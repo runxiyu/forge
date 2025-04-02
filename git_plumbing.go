@@ -18,9 +18,29 @@ import (
 func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (string, error) {
 	var buf bytes.Buffer
 
-	// Must
 	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].name < entries[j].name
+		nameI, nameJ := entries[i].name, entries[j].name
+
+		if nameI == nameJ { // meh
+			return !(entries[i].mode == "40000") && (entries[j].mode == "40000")
+		}
+
+		if strings.HasPrefix(nameJ, nameI) && len(nameI) < len(nameJ) {
+			if entries[i].mode == "40000" {
+				return false
+			}
+			return true
+		}
+
+		if strings.HasPrefix(nameI, nameJ) && len(nameJ) < len(nameI) {
+			// nameJ is a prefix of nameI
+			if entries[j].mode == "40000" {
+				return true
+			}
+			return false
+		}
+
+		return nameI < nameJ
 	})
 
 	for _, e := range entries {
