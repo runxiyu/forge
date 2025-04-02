@@ -60,6 +60,9 @@ func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (strin
 	if err := cmd.Run(); err != nil {
 		return "", err
 	}
+	if err := cmd.Wait(); err != nil {
+		return "", err
+	}
 	return strings.TrimSpace(out.String()), nil
 }
 
@@ -73,6 +76,9 @@ func buildTreeRecursive(ctx context.Context, repoPath string, baseTree string, u
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		if err := cmd.Run(); err != nil {
+			return err
+		}
+		if err := cmd.Wait(); err != nil {
 			return err
 		}
 		data := out.Bytes()
