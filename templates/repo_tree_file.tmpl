@@ -17,25 +17,25 @@
 			<h2>{{- .repo_name -}}</h2>
 			<ul class="nav-tabs-standalone">
 				<li class="nav-item">
-					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}{{- template "ref_query" $root -}}">Summary</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link active" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+					<a class="nav-link active" href="{{- .repo_url_root -}}tree/{{- template "ref_query" $root -}}">Tree</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}log/{{- template "ref_query" $root -}}">Log</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="../branches/">Branches</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}branches/">Branches</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="../tags/">Tags</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}tags/">Tags</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="../contrib/">Merge requests</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}contrib/">Merge requests</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="../settings/">Settings</a>
+					<a class="nav-link" href="{{- .repo_url_root -}}settings/">Settings</a>
 				</li>
 			</ul>
 		</div>
