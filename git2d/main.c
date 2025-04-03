@@ -67,7 +67,7 @@ session(void *_conn)
 	int err;
 	git_repository *repo = NULL;
 
-	char path[4096];
+	char path[4096] = {0};
 	conn_io_t io = {.fd = conn };
 	struct bare_reader reader = {
 		.buffer = &io,
