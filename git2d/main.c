@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -32,6 +33,7 @@ void *
 session(void *_conn)
 {
 	int		conn = *(int *)_conn;
+	free((int *)_conn);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
@@ -107,16 +109,12 @@ free_repo:
 	git_repository_free(repo);
 
 close:
-	close(conn);
-	free((int *)_conn);
+	// TODO: Implement proper error handling
+	dprintf(conn, "%d\n", ret);
 
-	/* TODO: Handle ret */
+	close(conn);
 
 	return NULL;
-
-	/* TODO: Actually use it properly */
-	if (0)
-		goto close;
 }
 
 int
