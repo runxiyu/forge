@@ -18,6 +18,7 @@ linters:
     - stylecheck
     - containedctx
     - godot
+    - dogsled
     - maintidx    # e
     - nestif      # e
     - gocognit    # e
