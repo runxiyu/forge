@@ -152,13 +152,6 @@ session(void *_conn)
 
 		const char *msg = git_commit_summary(commit);
 		const git_signature *author = git_commit_author(commit);
-		time_t time = git_commit_time(commit);
-		char timebuf[64];
-		struct tm *tm = localtime(&time);
-		if (tm)
-			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm);
-		else
-			strcpy(timebuf, "unknown");
 
 		/* ID */
 		bare_put_data(&writer, oid.id, GIT_OID_RAWSZ);
@@ -167,14 +160,23 @@ session(void *_conn)
 		size_t msg_len = msg ? strlen(msg) : 0;
 		bare_put_data(&writer, (const uint8_t *)(msg ? msg : ""), msg_len);
 
-		/* Author */
+		/* Author's name */
 		const char *author_name = author ? author->name : "";
-		size_t author_len = strlen(author_name);
-		bare_put_data(&writer, (const uint8_t *)author_name, author_len);
+		bare_put_data(&writer, (const uint8_t *)author_name, strlen(author_name));
+
+		/* Author's email */
+		const char *author_email = author ? author->email : "";
+		bare_put_data(&writer, (const uint8_t *)author_email, strlen(author_email));
 
 		/* Author's date */
-		size_t time_len = strlen(timebuf);
-		bare_put_data(&writer, (const uint8_t *)timebuf, time_len);
+		time_t time = git_commit_time(commit);
+		char timebuf[64];
+		struct tm *tm = localtime(&time);
+		if (tm)
+			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm);
+		else
+			strcpy(timebuf, "unknown");
+		bare_put_data(&writer, (const uint8_t *)timebuf, strlen(timebuf));
 
 		git_commit_free(commit);
 		count++;
