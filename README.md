@@ -1,7 +1,5 @@
 # Lindenii Forge
 
-[![builds.sr.ht status](https://builds.sr.ht/~runxiyu/forge.svg)](https://builds.sr.ht/~runxiyu/forge)
-
 **Work in progress.**
 
 Lindenii Forge aims to be an uncomplicated yet featured software forge,
