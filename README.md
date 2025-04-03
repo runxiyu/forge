@@ -2,8 +2,10 @@
 
 **Work in progress.**
 
-This is the new implementation in the [Hare](https://harelang.org) programming
-language.
+I tried to reimplement in the [Hare](https://harelang.org) programming
+language. It's one of my favorite programming languages, but sadly due to the
+lack of multithreading and since it's still a very unstable moving target,
+I'm still mainly working on the Go branch.
 
 ## Architecture
 
