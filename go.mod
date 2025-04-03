@@ -3,11 +3,14 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
+	git.sr.ht/~sircmpwn/go-bare v0.0.0-20210406120253-ab86bc2846d9
 	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/dgraph-io/ristretto/v2 v2.1.0
 	github.com/dustin/go-humanize v1.0.1
+	github.com/emersion/go-message v0.18.2
+	github.com/emersion/go-smtp v0.21.3
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.14.0 // has too many deps :(
 	github.com/jackc/pgx/v5 v5.7.4
@@ -22,7 +25,6 @@ require (
 
 require (
 	dario.cat/mergo v1.0.1 // indirect
-	git.sr.ht/~sircmpwn/go-bare v0.0.0-20210406120253-ab86bc2846d9 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
@@ -31,9 +33,7 @@ require (
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
-	github.com/emersion/go-message v0.18.2 // indirect
 	github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
-	github.com/emersion/go-smtp v0.21.3 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
