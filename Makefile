@@ -22,7 +22,7 @@ utils/colb:
 hookc/hookc:
 
 git2d/git2d: git2d/main.o git2d/bare.o git2d/utf8.c
-	$(CC) $(CFLAGS) `pkg-config --cflags --libs libgit2` -lpthread -o git2d/git2d $^
+	$(CC) $(CFLAGS) -o git2d/git2d $^ `pkg-config --cflags --libs libgit2` -lpthread 
 
 version.go:
 	printf 'package main\n\nconst VERSION = "%s"\n' `git describe --tags --always --dirty` > $@
