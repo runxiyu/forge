@@ -6,7 +6,7 @@
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-forge-mail.5
 
-forge: source.tar.gz version.go hookc/*.c hookc/hookc man # TODO
+forge: source.tar.gz version.go hookc/*.c hookc/hookc git2d/git2d man # TODO
 	go build .
 
 man: $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt)
