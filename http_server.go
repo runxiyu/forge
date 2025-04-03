@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -183,6 +184,12 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				errorPage500(writer, params, "Error opening repo: "+err.Error())
 				return
 			}
+
+			repoURLRoot := "/"
+			for _, part := range segments[:sepIndex+3] {
+				repoURLRoot = repoURLRoot + url.PathEscape(part) + "/"
+			}
+			params["repo_url_root"] = repoURLRoot
 
 			if len(segments) == sepIndex+3 {
 				if redirectDir(writer, request) {
