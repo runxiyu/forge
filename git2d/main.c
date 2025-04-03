@@ -3,6 +3,11 @@
  * SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
  */
 
+/*
+ * TODO: Pool repositories (and take care of thread safety)
+ * libgit2 has a nice builtin per-repo cache that we could utilize this way.
+ */
+
 #include <err.h>
 #include <errno.h>
 #include <git2.h>
@@ -31,16 +36,33 @@ conn_read(void *buffer, void *dst, uint64_t sz)
 	return (rsz == (ssize_t)sz) ? BARE_ERROR_NONE : BARE_ERROR_READ_FAILED;
 }
 
+static bare_error
+conn_write(void *buffer, const void *src, uint64_t sz)
+{
+	conn_io_t *io = buffer;
+	const uint8_t *data = src;
+	uint64_t total = 0;
+
+	while (total < sz) {
+		ssize_t written = write(io->fd, data + total, sz - total);
+		if (written < 0) {
+			if (errno == EINTR)
+				continue;
+			return BARE_ERROR_WRITE_FAILED;
+		}
+		if (written == 0)
+			break;
+		total += written;
+	}
+
+	return (total == sz) ? BARE_ERROR_NONE : BARE_ERROR_WRITE_FAILED;
+}
+
 void *
 session(void *_conn)
 {
 	int		conn = *(int *)_conn;
 	free((int *)_conn);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-	int		ret = 0;
-#pragma GCC diagnostic pop
 
 	int		err;
 	git_repository *repo = NULL;
@@ -51,24 +73,27 @@ session(void *_conn)
 		.buffer = &io,
 		.read = conn_read,
 	};
+	struct bare_writer writer = {
+		.buffer = &io,
+		.write = conn_write,
+	};
 
 	err = bare_get_data(&reader, (uint8_t *)path, sizeof(path) - 1);
 	if (err != BARE_ERROR_NONE) {
-		ret = 10;
 		goto close;
 	}
 	path[sizeof(path) - 1] = '\0';
 
 	err = git_repository_open_ext(&repo, path, GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
 	if (err != 0) {
-		ret = 1;
+		bare_put_uint(&writer, 1);
 		goto close;
 	}
 
 	git_object     *obj = NULL;
 	err = git_revparse_single(&obj, repo, "HEAD^{tree}");
 	if (err != 0) {
-		ret = 2;
+		bare_put_uint(&writer, 2);
 		goto free_repo;
 	}
 	git_tree       *tree = (git_tree *) obj;
@@ -76,30 +101,32 @@ session(void *_conn)
 	git_tree_entry *entry = NULL;
 	err = git_tree_entry_bypath(&entry, tree, "README.md");
 	if (err != 0) {
-		ret = 3;
+		bare_put_uint(&writer, 3);
 		goto free_tree;
 	}
 
 	git_otype	objtype = git_tree_entry_type(entry);
 	if (objtype != GIT_OBJECT_BLOB) {
-		ret = 4;
+		bare_put_uint(&writer, 4);
 		goto free_tree_entry;
 	}
 
 	git_object     *obj2 = NULL;
 	err = git_tree_entry_to_object(&obj2, repo, entry);
 	if (err != 0) {
-		ret = 5;
+		bare_put_uint(&writer, 5);
 		goto free_tree_entry;
 	}
 
 	git_blob       *blob = (git_blob *) obj2;
 	const void     *content = git_blob_rawcontent(blob);
 	if (content == NULL) {
-		ret = 6;
+		bare_put_uint(&writer, 6);
 		goto free_blob;
 	}
-	write(conn, content, git_blob_rawsize(blob));
+
+	bare_put_uint(&writer, 0);
+	bare_put_data(&writer, content, git_blob_rawsize(blob));
 
 free_blob:
 	git_blob_free(blob);
@@ -111,9 +138,6 @@ free_repo:
 	git_repository_free(repo);
 
 close:
-	// TODO: Implement proper error handling
-	dprintf(conn, "%d\n", ret);
-
 	close(conn);
 
 	return NULL;

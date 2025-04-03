@@ -17,7 +17,7 @@ typedef enum {
 	BARE_ERROR_INVALID_UTF8,
 } bare_error;
 
-typedef bare_error (*bare_write_func)(void *buffer, void *src, uint64_t sz);
+typedef bare_error (*bare_write_func)(void *buffer, const void *src, uint64_t sz);
 typedef bare_error (*bare_read_func)(void *buffer, void *dst, uint64_t sz);
 
 struct bare_writer {
@@ -60,11 +60,11 @@ bare_error bare_get_f64(struct bare_reader *ctx, double *x);
 bare_error bare_put_bool(struct bare_writer *ctx, bool x);
 bare_error bare_get_bool(struct bare_reader *ctx, bool *x);
 
-bare_error bare_put_fixed_data(struct bare_writer *ctx, uint8_t *src, uint64_t sz);
+bare_error bare_put_fixed_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz);
 bare_error bare_get_fixed_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz);
-bare_error bare_put_data(struct bare_writer *ctx, uint8_t *src, uint64_t sz);
+bare_error bare_put_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz);
 bare_error bare_get_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz);
-bare_error bare_put_str(struct bare_writer *ctx, char *src, uint64_t sz);
+bare_error bare_put_str(struct bare_writer *ctx, const char *src, uint64_t sz);
 bare_error bare_get_str(struct bare_reader *ctx, char *dst, uint64_t sz);
 
 #endif /* BARE_H */

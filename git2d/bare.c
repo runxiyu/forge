@@ -318,7 +318,7 @@ bare_get_bool(struct bare_reader *ctx, bool *x)
 }
 
 bare_error
-bare_put_fixed_data(struct bare_writer *ctx, uint8_t *src, uint64_t sz)
+bare_put_fixed_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
 {
 	return ctx->write(ctx->buffer, (void *)src, sz);
 }
@@ -330,7 +330,7 @@ bare_get_fixed_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz)
 }
 
 bare_error
-bare_put_data(struct bare_writer *ctx, uint8_t *src, uint64_t sz)
+bare_put_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
 {
 	bare_error err = BARE_ERROR_NONE;
 
@@ -361,7 +361,7 @@ bare_get_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz)
 }
 
 bare_error
-bare_put_str(struct bare_writer *ctx, char *src, uint64_t sz)
+bare_put_str(struct bare_writer *ctx, const char *src, uint64_t sz)
 {
 	if (!checkstr(src, sz)) {
 		return BARE_ERROR_INVALID_UTF8;
