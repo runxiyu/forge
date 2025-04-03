@@ -69,10 +69,10 @@
 							<tr>
 								<td class="commit-title"><a href="commit/{{- .Hash -}}">{{- .Message | first_line -}}</a></td>
 								<td class="commit-author">
-									<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
+									<a class="email-name" href="mailto:{{- .Email -}}">{{- .Author -}}</a>
 								</td>
 								<td class="commit-time">
-									{{- .Author.When.Format "2006-01-02 15:04:05 -0700" -}}
+									{{- .Date -}}
 								</td>
 							</tr>
 						{{- end -}}
