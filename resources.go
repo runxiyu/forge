@@ -21,7 +21,9 @@ var sourceHandler = http.StripPrefix(
 	http.FileServer(http.FS(sourceFS)),
 )
 
-//go:embed templates/* static/* hookc/hookc man/*.html man/*.txt man/*.css
+//go:embed templates/* static/*
+//go:embed man/*.html man/*.txt man/*.css
+//go:embed hookc/hookc git2d/git2d
 var resourcesFS embed.FS
 
 var templates *template.Template
