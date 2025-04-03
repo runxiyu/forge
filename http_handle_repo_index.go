@@ -4,109 +4,102 @@
 package main
 
 import (
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/storer"
+	"git.sr.ht/~sircmpwn/go-bare"
 )
 
-// httpHandleRepoIndex provides the front page of a repo.
-func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
-	var repo *git.Repository
-	var repoName string
-	var groupPath []string
-	var refHash plumbing.Hash
-	var refHashSlice []byte
-	var err error
-	var commitObj *object.Commit
-	var tree *object.Tree
+type commitDisplay struct {
+	Hash    string
+	Author  string
+	Email   string
+	Date    string
+	Message string
+}
+
+// httpHandleRepoIndex provides the front page of a repo using git2d.
+func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[string]any) {
+	repoName := params["repo_name"].(string)
+	groupPath := params["group_path"].([]string)
+
+	_, repoPath, _, _, _, _, _ := getRepoInfo(req.Context(), groupPath, repoName, "") // TODO: Don't use getRepoInfo
+
 	var notes []string
-	var branches []string
-	var branchesIter storer.ReferenceIter
-	var commits []commitDisplayOld
-
-	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
-
 	if strings.Contains(repoName, "\n") || sliceContainsNewlines(groupPath) {
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 
-	refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string))
+	conn, err := net.Dial("unix", config.Git.Socket)
 	if err != nil {
-		goto no_ref
+		errorPage500(w, params, "git2d connection failed: "+err.Error())
+		return
 	}
-	refHashSlice = refHash[:]
+	defer conn.Close()
 
-	branchesIter, err = repo.Branches()
-	if err == nil {
-		_ = branchesIter.ForEach(func(branch *plumbing.Reference) error {
-			branches = append(branches, branch.Name().Short())
-			return nil
+	writer := bare.NewWriter(conn)
+	if err := writer.WriteData([]byte(repoPath)); err != nil {
+		errorPage500(w, params, "sending repo path failed: "+err.Error())
+		return
+	}
+
+	reader := bare.NewReader(conn)
+	status, err := reader.ReadUint()
+	if err != nil {
+		errorPage500(w, params, "reading status failed: "+err.Error())
+		return
+	}
+	if status != 0 {
+		errorPage500(w, params, fmt.Sprintf("git2d error: %d", status))
+		return
+	}
+
+	/* README */
+	readmeRaw, err := reader.ReadData()
+	if err != nil {
+		readmeRaw = nil
+	}
+	readmeFilename, readmeRendered := renderReadme(readmeRaw, "README.md")
+
+	/* Commits */
+	var commits []commitDisplay
+	for {
+		id, err := reader.ReadData()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			errorPage500(w, params, "error reading commit ID: "+err.Error())
+			return
+		}
+
+		title, _ := reader.ReadData()
+		authorName, _ := reader.ReadData()
+		authorEmail, _ := reader.ReadData()
+		authorDate, _ := reader.ReadData()
+
+		commits = append(commits, commitDisplay{
+			Hash:    hex.EncodeToString(id),
+			Author:  string(authorName),
+			Email:   string(authorEmail),
+			Date:    string(authorDate),
+			Message: string(title),
 		})
-	}
-	params["branches"] = branches
-
-	if value, found := indexCommitsDisplayCache.Get(refHashSlice); found {
-		if value != nil {
-			commits = value
-		} else {
-			goto readme
-		}
-	} else {
-		start := time.Now()
-		commits, err = getRecentCommitsDisplay(repo, refHash, 5)
-		if err != nil {
-			commits = nil
-		}
-		cost := time.Since(start).Nanoseconds()
-		indexCommitsDisplayCache.Set(refHashSlice, commits, cost)
-		if err != nil {
-			goto readme
-		}
 	}
 
 	params["commits"] = commits
-
-readme:
-
-	if value, found := treeReadmeCache.Get(refHashSlice); found {
-		params["files"] = value.DisplayTree
-		params["readme_filename"] = value.ReadmeFilename
-		params["readme"] = value.ReadmeRendered
-	} else {
-		start := time.Now()
-		if commitObj, err = repo.CommitObject(refHash); err != nil {
-			goto no_ref
-		}
-
-		if tree, err = commitObj.Tree(); err != nil {
-			goto no_ref
-		}
-		displayTree := makeDisplayTree(tree)
-		readmeFilename, readmeRendered := renderReadmeAtTree(tree)
-		cost := time.Since(start).Nanoseconds()
-
-		params["files"] = displayTree
-		params["readme_filename"] = readmeFilename
-		params["readme"] = readmeRendered
-
-		entry := treeReadmeCacheEntry{
-			DisplayTree:    displayTree,
-			ReadmeFilename: readmeFilename,
-			ReadmeRendered: readmeRendered,
-		}
-		treeReadmeCache.Set(refHashSlice, entry, cost)
-	}
-
-no_ref:
-
+	params["readme_filename"] = readmeFilename
+	params["readme"] = readmeRendered
 	params["http_clone_url"] = genHTTPRemoteURL(groupPath, repoName)
 	params["ssh_clone_url"] = genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
-	renderTemplate(writer, "repo_index", params)
+	renderTemplate(w, "repo_index", params)
+
+	// TODO: Caching
 }
