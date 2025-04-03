@@ -8,6 +8,7 @@
 #include <git2.h>
 #include <pthread.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <stdio.h>
@@ -134,6 +135,8 @@ main(int argc, char **argv)
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strcpy(addr.sun_path, argv[1]);
+
+	umask(0077);
 
 	if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un))) {
 		if (errno == EADDRINUSE) {
