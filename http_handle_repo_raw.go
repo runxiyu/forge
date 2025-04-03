@@ -77,6 +77,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 			}
 			cost := time.Since(start).Nanoseconds()
 			commitPathFileRawCache.Set(cacheHandle, fileContent, cost)
+			writer.Header().Set("Content-Type", "application/octet-stream")
 			fmt.Fprint(writer, fileContent)
 			return
 		}
