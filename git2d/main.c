@@ -120,8 +120,12 @@ close:
 }
 
 int
-main(void)
+main(int argc, char **argv)
 {
+	if (argc != 2) {
+		errx(1, "provide one argument: the socket path");
+	}
+
 	git_libgit2_init();
 
 	int		sock;
@@ -131,11 +135,11 @@ main(void)
 	struct sockaddr_un addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strcpy(addr.sun_path, "/home/runxiyu/Lindenii/forge/git2d.sock");
+	strcpy(addr.sun_path, argv[1]);
 
 	if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un))) {
 		if (errno == EADDRINUSE) {
-			unlink("/home/runxiyu/Lindenii/forge/git2d.sock");
+			unlink(argv[1]);
 			if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)))
 				err(1, "bind");
 		} else {
