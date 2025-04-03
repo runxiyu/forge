@@ -15,8 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 
-void
-*
+void *
 session(void *_conn)
 {
 	int		conn = *(int *)_conn;
