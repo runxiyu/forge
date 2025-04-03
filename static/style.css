@@ -562,7 +562,6 @@ td > ul {
 /* TODO */
 
 .commit-list-small .event {
-	border: 1px solid var(--lighter-border-color);
 	background-color: var(--lighter-box-background-color);
 	padding: 0.5rem;
 	margin-bottom: 1rem;
