@@ -174,7 +174,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				if errors.Is(err, errNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
-					errorPage500(writer, params, "Error querying ref type: "+err.Error())
+					errorPage400(writer, params, "Error querying ref type: "+err.Error())
 					return
 				}
 			}
