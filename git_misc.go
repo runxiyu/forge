@@ -165,7 +165,7 @@ func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits i
 // getRecentCommitsDisplay generates a slice of [commitDisplay] friendly for
 // use in HTML templates, consisting of numCommits commits from headhash in the
 // repo.
-func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []commitDisplay, err error) {
+func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []commitDisplayOld, err error) {
 	var commitIter object.CommitIter
 	var thisCommit *object.Commit
 
@@ -173,7 +173,7 @@ func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCo
 	if err != nil {
 		return nil, err
 	}
-	recentCommits = make([]commitDisplay, 0)
+	recentCommits = make([]commitDisplayOld, 0)
 	defer commitIter.Close()
 	if numCommits < 0 {
 		for {
@@ -183,7 +183,7 @@ func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCo
 			} else if err != nil {
 				return nil, err
 			}
-			recentCommits = append(recentCommits, commitDisplay{
+			recentCommits = append(recentCommits, commitDisplayOld{
 				thisCommit.Hash,
 				thisCommit.Author,
 				thisCommit.Committer,
@@ -199,7 +199,7 @@ func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCo
 			} else if err != nil {
 				return nil, err
 			}
-			recentCommits = append(recentCommits, commitDisplay{
+			recentCommits = append(recentCommits, commitDisplayOld{
 				thisCommit.Hash,
 				thisCommit.Author,
 				thisCommit.Committer,
@@ -211,7 +211,7 @@ func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCo
 	return recentCommits, err
 }
 
-type commitDisplay struct {
+type commitDisplayOld struct {
 	Hash      plumbing.Hash
 	Author    object.Signature
 	Committer object.Signature

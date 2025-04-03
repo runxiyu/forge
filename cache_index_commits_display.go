@@ -9,11 +9,11 @@ import (
 )
 
 // The key is the commit ID raw hash.
-var indexCommitsDisplayCache *ristretto.Cache[[]byte, []commitDisplay]
+var indexCommitsDisplayCache *ristretto.Cache[[]byte, []commitDisplayOld]
 
 func init() {
 	var err error
-	indexCommitsDisplayCache, err = ristretto.NewCache(&ristretto.Config[[]byte, []commitDisplay]{
+	indexCommitsDisplayCache, err = ristretto.NewCache(&ristretto.Config[[]byte, []commitDisplayOld]{
 		NumCounters: 1e4,
 		MaxCost:     1 << 60,
 		BufferItems: 8192,

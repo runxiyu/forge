@@ -27,7 +27,7 @@ func httpHandleRepoIndex(writer http.ResponseWriter, _ *http.Request, params map
 	var notes []string
 	var branches []string
 	var branchesIter storer.ReferenceIter
-	var commits []commitDisplay
+	var commits []commitDisplayOld
 
 	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
