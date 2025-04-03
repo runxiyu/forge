@@ -145,7 +145,7 @@ session(void *_conn)
 
 	int count = 0;
 	git_oid oid;
-	while (count < 5 && git_revwalk_next(&oid, walker) == 0) {
+	while (count < 3 && git_revwalk_next(&oid, walker) == 0) {
 		git_commit *commit = NULL;
 		if (git_commit_lookup(&commit, repo, &oid) != 0)
 			break;
