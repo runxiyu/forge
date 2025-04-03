@@ -10,10 +10,23 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "bare.h"
+
+typedef struct {
+	int fd;
+} conn_io_t;
+
+static bare_error
+conn_read(void *buffer, void *dst, uint64_t sz)
+{
+	conn_io_t *io = buffer;
+	ssize_t rsz = read(io->fd, dst, sz);
+	return (rsz == (ssize_t)sz) ? BARE_ERROR_NONE : BARE_ERROR_READ_FAILED;
+}
 
 void *
 session(void *_conn)
@@ -28,12 +41,24 @@ session(void *_conn)
 	int		err;
 	git_repository *repo = NULL;
 
-	git_libgit2_init();
+	char path[4096];
+	conn_io_t io = {.fd = conn};
+	struct bare_reader reader = {
+		.buffer = &io,
+		.read = conn_read,
+	};
 
-	err = git_repository_open_ext(&repo, "/home/runxiyu/Lindenii/forge/test.git", GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
+	err = bare_get_data(&reader, (uint8_t *)path, sizeof(path) - 1);
+	if (err != BARE_ERROR_NONE) {
+		ret = 10;
+		goto close;
+	}
+	path[sizeof(path) - 1] = '\0';
+
+	err = git_repository_open_ext(&repo, path, GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
 	if (err != 0) {
 		ret = 1;
-		goto free_libgit2;
+		goto close;
 	}
 
 	git_object     *obj = NULL;
@@ -80,8 +105,6 @@ free_tree:
 	git_tree_free(tree);
 free_repo:
 	git_repository_free(repo);
-free_libgit2:
-	git_libgit2_shutdown();
 
 close:
 	close(conn);
@@ -99,6 +122,8 @@ close:
 int
 main(void)
 {
+	git_libgit2_init();
+
 	int		sock;
 	if ((sock = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0)) < 0)
 		err(1, "socket");
@@ -129,12 +154,13 @@ main(void)
 		if (*conn == -1)
 			err(1, "accept");
 
-		puts("got");
-
 		pthread_t	thread;
 
 		pthread_create(&thread, NULL, session, (void *)conn);
 	}
 
 	close(sock);
+
+	git_libgit2_shutdown();
 }
+
