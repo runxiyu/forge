@@ -42,6 +42,9 @@ git {
 
 	# Where should git2d listen on?
 	socket /var/run/lindenii/forge/git2d.sock
+
+	# Where should we put git2d?
+	daemon_path /usr/libexec/lindenii/forge/git2d
 }
 
 ssh {

@@ -39,8 +39,9 @@ var config struct {
 		ReadTimeout  uint32 `scfg:"read_timeout"`
 	} `scfg:"lmtp"`
 	Git struct {
-		RepoDir string `scfg:"repo_dir"`
-		Socket  string `scfg:"socket"`
+		RepoDir    string `scfg:"repo_dir"`
+		Socket     string `scfg:"socket"`
+		DaemonPath string `scfg:"daemon_path"`
 	} `scfg:"git"`
 	SSH struct {
 		Net  string `scfg:"net"`

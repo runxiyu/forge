@@ -8,6 +8,7 @@ import (
 	"flag"
 	"net"
 	"net/http"
+	"os/exec"
 	"syscall"
 	"time"
 
@@ -31,6 +32,17 @@ func main() {
 	if err := loadTemplates(); err != nil {
 		clog.Fatal(1, "Loading templates: "+err.Error())
 	}
+	if err := deployGit2D(); err != nil {
+		clog.Fatal(1, "Deploying git2d: "+err.Error())
+	}
+
+	// Launch Git2D
+	go func() {
+		cmd := exec.Command(config.Git.DaemonPath, config.Git.Socket) //#nosec G204
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// UNIX socket listener for hooks
 	{
