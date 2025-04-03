@@ -26,7 +26,7 @@
  * occurs, this pointer will be a guess that depends on the particular
  * error, but it will always advance at least one byte.
  */
-static void *
+inline void *
 utf8_decode(void *buf, uint32_t *c, int *e)
 {
 	static const char lengths[] = {
