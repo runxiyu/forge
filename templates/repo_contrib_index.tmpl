@@ -46,7 +46,7 @@
 		<div class="padding-wrapper">
 			<h2>How to submit a merge request</h2>
 			<pre>git clone {{ .ssh_clone_url }}
-cd powxy
+cd {{ .repo_name }}
 git checkout -b contrib/name_of_your_contribution
 # edit and commit stuff
 git push -u origin HEAD</pre>
