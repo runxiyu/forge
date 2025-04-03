@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <git2.h>
 #include <pthread.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -124,6 +125,8 @@ main(int argc, char **argv)
 	if (argc != 2) {
 		errx(1, "provide one argument: the socket path");
 	}
+
+	signal(SIGPIPE, SIG_IGN);
 
 	git_libgit2_init();
 
