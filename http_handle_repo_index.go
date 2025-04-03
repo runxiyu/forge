@@ -59,14 +59,14 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 		return
 	}
 
-	/* README */
+	// README
 	readmeRaw, err := reader.ReadData()
 	if err != nil {
 		readmeRaw = nil
 	}
 	readmeFilename, readmeRendered := renderReadme(readmeRaw, "README.md")
 
-	/* Commits */
+	// Commits
 	var commits []commitDisplay
 	for {
 		id, err := reader.ReadData()
