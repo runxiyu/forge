@@ -546,7 +546,7 @@ td > ul {
 	padding-bottom: 0.2rem;
 }
 
-.repo-header, .padding-wrapper, .repo-header-extension-content, #main-header, .readingwidth {
+.repo-header, .padding-wrapper, .repo-header-extension-content, #main-header, .readingwidth, .commit-list-small {
 	padding-left: 1rem;
 	padding-right: 1rem;
 	max-width: 60rem;
@@ -557,4 +557,56 @@ td > ul {
 
 .padding-wrapper {
 	margin-bottom: 1rem;
+}
+
+/* TODO */
+
+.commit-list-small .event {
+	border: 1px solid var(--lighter-border-color);
+	background-color: var(--lighter-box-background-color);
+	padding: 0.5rem;
+	margin-bottom: 1rem;
+	max-width: 30rem;
+}
+
+.commit-list-small .event:last-child {
+	margin-bottom: 1rem;
+}
+
+.commit-list-small a {
+	color: var(--link-color);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.commit-list-small a:hover {
+	text-decoration: underline;
+	text-decoration-color: var(--text-decoration-color);
+}
+
+.commit-list-small .event > div {
+	font-size: 0.95rem;
+	line-height: 1.4;
+}
+
+.commit-list-small .pull-right {
+	float: right;
+	font-size: 0.85em;
+	color: var(--light-text-color);
+	margin-left: 1rem;
+}
+
+.commit-list-small pre.commit {
+	margin: 0.25rem 0 0 0;
+	padding: 0;
+	font-family: inherit;
+	font-size: 0.95rem;
+	color: var(--text-color);
+	white-space: pre-wrap;
+}
+
+.commit-list-small .commit-error {
+	color: var(--danger-color);
+	font-weight: bold;
+	margin-top: 1rem;
 }

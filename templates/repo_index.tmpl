@@ -52,35 +52,26 @@
 		{{- end -}}
 		<p class="readingwidth"><code>{{- .ssh_clone_url -}}</code></p>
 		{{- if .commits -}}
-			<div class="padding-wrapper scroll">
-				<table id="recent-commits" class="wide">
-					<thead>
-						<tr class="title-row">
-							<th colspan="3">Recent commits (<a href="log/{{- template "ref_query" $root -}}">see all</a>)</th>
-						</tr>
-						<tr>
-							<th scope="col">Title</th>
-							<th scope="col">Author</th>
-							<th scope="col">Author date</th>
-						</tr>
-					</thead>
-					<tbody>
-						{{- range .commits -}}
-							<tr>
-								<td class="commit-title"><a href="commit/{{- .Hash -}}">{{- .Message | first_line -}}</a></td>
-								<td class="commit-author">
-									<a class="email-name" href="mailto:{{- .Email -}}">{{- .Author -}}</a>
-								</td>
-								<td class="commit-time">
-									{{- .Date -}}
-								</td>
-							</tr>
-						{{- end -}}
-						{{- if dereference_error .commits_err -}}
-							Error while obtaining commit log: {{ .commits_err }}
-						{{- end -}}
-					</tbody>
-				</table>
+			<div class="commit-list-small">
+				{{- range .commits -}}
+					<div class="event">
+						<div>
+							<a href="commit/{{- .Hash -}}" title="{{- .Hash -}}" rel="nofollow">
+								{{- .Hash | printf "%.8s" -}}
+							</a>
+							&nbsp;&mdash;&nbsp;<a href="mailto:{{- .Email -}}">{{- .Author -}}</a>
+							<small class="pull-right">
+								<span title="{{- .Date -}}">{{- .Date -}}</span>
+							</small>
+						</div>
+						<pre class="commit">{{- .Message | first_line -}}</pre>
+					</div>
+				{{- end -}}
+				{{- if dereference_error .commits_err -}}
+					<div class="commit-error">
+						Error while obtaining commit log: {{ .commits_err }}
+					</div>
+				{{- end -}}
 			</div>
 		{{- end -}}
 		{{- if .readme -}}
