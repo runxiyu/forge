@@ -44,17 +44,25 @@
 			</div>
 		</div>
 		<div class="padding-wrapper">
+			<h2>How to submit a merge request</h2>
+			<pre>git clone {{ .ssh_clone_url }}
+cd powxy
+git checkout -b contrib/name_of_your_contribution
+# edit and commit stuff
+git push -u origin HEAD</pre>
+			<p>Pushes that update branches in other namespaces, or pushes to existing contribution branches belonging to other SSH keys, will be automatically
+rejected, unless you are an authenticated maintainer. Otherwise, a merge request is automatically opened, and the maintainers are notified via IRC.</p>
+			<p>Alternatively, you may <a href="https://git-send-email.io">email patches</a> to <a href="mailto:{{ .repo_patch_mailing_list }}">{{ .repo_patch_mailing_list }}</a>.</p>
+		</div>
+		<div class="padding-wrapper">
 			<table id="recent-merge_requests" class="wide">
 				<thead>
-					<tr class="title-row">
-						<th colspan="3">Merge requests</th>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Title</th>
+						<th scope="col">Status</th>
 					</tr>
 				</thead>
-				<tr>
-					<th scope="col">ID</th>
-					<th scope="col">Title</th>
-					<th scope="col">Status</th>
-				</tr>
 				<tbody>
 					{{- range .merge_requests -}}
 						<tr>

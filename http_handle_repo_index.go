@@ -95,8 +95,6 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 	params["commits"] = commits
 	params["readme_filename"] = readmeFilename
 	params["readme"] = readmeRendered
-	params["http_clone_url"] = genHTTPRemoteURL(groupPath, repoName)
-	params["ssh_clone_url"] = genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
 	renderTemplate(w, "repo_index", params)

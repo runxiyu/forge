@@ -190,6 +190,9 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				repoURLRoot = repoURLRoot + url.PathEscape(part) + "/"
 			}
 			params["repo_url_root"] = repoURLRoot
+			params["repo_patch_mailing_list"] = repoURLRoot[1:] + "@" + config.LMTP.Domain
+			params["http_clone_url"] = genHTTPRemoteURL(groupPath, moduleName)
+			params["ssh_clone_url"] = genSSHRemoteURL(groupPath, moduleName)
 
 			if len(segments) == sepIndex+3 {
 				if redirectDir(writer, request) {
