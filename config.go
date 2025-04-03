@@ -40,6 +40,7 @@ var config struct {
 	} `scfg:"lmtp"`
 	Git struct {
 		RepoDir string `scfg:"repo_dir"`
+		Socket  string `scfg:"socket"`
 	} `scfg:"git"`
 	SSH struct {
 		Net  string `scfg:"net"`

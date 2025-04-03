@@ -37,7 +37,11 @@ irc {
 }
 
 git {
+	# Where should newly-created Git repositories be stored?
 	repo_dir /var/lib/lindenii/forge/repos
+
+	# Where should git2d listen on?
+	socket /var/run/lindenii/forge/git2d.sock
 }
 
 ssh {
