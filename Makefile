@@ -21,7 +21,7 @@ utils/colb:
 
 hookc/hookc:
 
-git2d/git2d: git2d/main.o git2d/bare.o git2d/utf8.c
+git2d/git2d: git2d/main.c git2d/bare.c git2d/utf8.c
 	$(CC) $(CFLAGS) -o git2d/git2d $^ `pkg-config --cflags --libs libgit2` -lpthread 
 
 version.go:
