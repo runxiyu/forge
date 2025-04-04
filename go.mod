@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.16.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
-	github.com/dgraph-io/ristretto/v2 v2.1.0
+	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-smtp v0.21.3
