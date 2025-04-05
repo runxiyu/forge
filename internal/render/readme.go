@@ -13,7 +13,7 @@ import (
 	"github.com/niklasfasching/go-org/org"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM))

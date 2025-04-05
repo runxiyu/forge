@@ -16,7 +16,7 @@ import (
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 	"github.com/go-git/go-git/v5"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 func (s *Server) lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {

@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"go.lindenii.runxiyu.org/forge/git2c"
-	"go.lindenii.runxiyu.org/forge/render"
+	"go.lindenii.runxiyu.org/forge/internal/git2c"
+	"go.lindenii.runxiyu.org/forge/internal/render"
 )
 
 // httpHandleRepoTree provides a friendly, syntax-highlighted view of

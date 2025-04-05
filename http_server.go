@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 // ServeHTTP handles all incoming HTTP requests and routes them to the correct

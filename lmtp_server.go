@@ -17,7 +17,7 @@ import (
 
 	"github.com/emersion/go-message"
 	"github.com/emersion/go-smtp"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 type lmtpHandler struct{}

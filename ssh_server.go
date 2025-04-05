@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	gliderSSH "github.com/gliderlabs/ssh"
-	"go.lindenii.runxiyu.org/forge/ansiec"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/ansiec"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 	goSSH "golang.org/x/crypto/ssh"
 )
 

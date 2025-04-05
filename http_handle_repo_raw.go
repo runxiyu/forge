@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strings"
 
-	"go.lindenii.runxiyu.org/forge/git2c"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/git2c"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 // httpHandleRepoRaw serves raw files, or directory listings that point to raw

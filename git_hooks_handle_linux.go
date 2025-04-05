@@ -23,8 +23,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/jackc/pgx/v5"
-	"go.lindenii.runxiyu.org/forge/ansiec"
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/ansiec"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 var (

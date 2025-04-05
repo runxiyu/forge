@@ -14,7 +14,7 @@ import (
 	"sort"
 	"strings"
 
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (string, error) {

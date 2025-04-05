@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"go.lindenii.runxiyu.org/forge/misc"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
 // We don't use path.Join because it collapses multiple slashes into one.

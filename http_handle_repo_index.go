@@ -6,8 +6,8 @@ package forge
 import (
 	"net/http"
 
-	"go.lindenii.runxiyu.org/forge/git2c"
-	"go.lindenii.runxiyu.org/forge/render"
+	"go.lindenii.runxiyu.org/forge/internal/git2c"
+	"go.lindenii.runxiyu.org/forge/internal/render"
 )
 
 type commitDisplay struct {
