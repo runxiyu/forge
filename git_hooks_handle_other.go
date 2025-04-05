@@ -25,11 +25,6 @@ import (
 	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
-var (
-	errGetFD    = errors.New("unable to get file descriptor")
-	errGetUcred = errors.New("failed getsockopt")
-)
-
 // hooksHandler handles a connection from hookc via the
 // unix socket.
 func (s *Server) hooksHandler(conn net.Conn) {

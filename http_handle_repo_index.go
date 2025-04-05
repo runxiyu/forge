@@ -11,14 +11,6 @@ import (
 	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
-type commitDisplay struct {
-	Hash    string
-	Author  string
-	Email   string
-	Date    string
-	Message string
-}
-
 // httpHandleRepoIndex provides the front page of a repo using git2d.
 func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[string]any) {
 	repoName := params["repo_name"].(string)

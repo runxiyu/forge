@@ -8,8 +8,6 @@ import (
 	"errors"
 	"io"
 	"iter"
-	"os"
-	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -65,42 +63,6 @@ WHERE g.depth = cardinality($1::text[])
 	return
 }
 
-// go-git's tree entries are not friendly for use in HTML templates.
-// This struct is a wrapper that is friendlier for use in templating.
-type displayTreeEntry struct {
-	Name      string
-	Mode      string
-	Size      uint64
-	IsFile    bool
-	IsSubtree bool
-}
-
-// makeDisplayTree takes git trees of form [object.Tree] and creates a slice of
-// [displayTreeEntry] for easier templating.
-func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
-	for _, entry := range tree.Entries {
-		displayEntry := displayTreeEntry{} //exhaustruct:ignore
-		var err error
-		var osMode os.FileMode
-
-		if osMode, err = entry.Mode.ToOSFileMode(); err != nil {
-			displayEntry.Mode = "x---------"
-		} else {
-			displayEntry.Mode = osMode.String()
-		}
-
-		displayEntry.IsFile = entry.Mode.IsFile()
-
-		size, _ := tree.Size(entry.Name)
-		displayEntry.Size = uint64(size) //#nosec G115
-
-		displayEntry.Name = strings.TrimPrefix(entry.Name, "/")
-
-		displayTree = append(displayTree, displayEntry)
-	}
-	return displayTree
-}
-
 // commitIterSeqErr creates an [iter.Seq[*object.Commit]] from an
 // [object.CommitIter], and additionally returns a pointer to error.
 // The pointer to error is guaranteed to be populated with either nil or the
@@ -123,99 +85,6 @@ func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *
 			}
 		}
 	}, &err
-}
-
-// getRecentCommits fetches numCommits commits, starting from the headHash in a
-// repo.
-func getRecentCommits(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []*object.Commit, err error) {
-	var commitIter object.CommitIter
-	var thisCommit *object.Commit
-
-	commitIter, err = repo.Log(&git.LogOptions{From: headHash}) //exhaustruct:ignore
-	if err != nil {
-		return nil, err
-	}
-	recentCommits = make([]*object.Commit, 0)
-	defer commitIter.Close()
-	if numCommits < 0 {
-		for {
-			thisCommit, err = commitIter.Next()
-			if errors.Is(err, io.EOF) {
-				return recentCommits, nil
-			} else if err != nil {
-				return nil, err
-			}
-			recentCommits = append(recentCommits, thisCommit)
-		}
-	} else {
-		for range numCommits {
-			thisCommit, err = commitIter.Next()
-			if errors.Is(err, io.EOF) {
-				return recentCommits, nil
-			} else if err != nil {
-				return nil, err
-			}
-			recentCommits = append(recentCommits, thisCommit)
-		}
-	}
-	return recentCommits, err
-}
-
-// getRecentCommitsDisplay generates a slice of [commitDisplay] friendly for
-// use in HTML templates, consisting of numCommits commits from headhash in the
-// repo.
-func getRecentCommitsDisplay(repo *git.Repository, headHash plumbing.Hash, numCommits int) (recentCommits []commitDisplayOld, err error) {
-	var commitIter object.CommitIter
-	var thisCommit *object.Commit
-
-	commitIter, err = repo.Log(&git.LogOptions{From: headHash}) //exhaustruct:ignore
-	if err != nil {
-		return nil, err
-	}
-	recentCommits = make([]commitDisplayOld, 0)
-	defer commitIter.Close()
-	if numCommits < 0 {
-		for {
-			thisCommit, err = commitIter.Next()
-			if errors.Is(err, io.EOF) {
-				return recentCommits, nil
-			} else if err != nil {
-				return nil, err
-			}
-			recentCommits = append(recentCommits, commitDisplayOld{
-				thisCommit.Hash,
-				thisCommit.Author,
-				thisCommit.Committer,
-				thisCommit.Message,
-				thisCommit.TreeHash,
-			})
-		}
-	} else {
-		for range numCommits {
-			thisCommit, err = commitIter.Next()
-			if errors.Is(err, io.EOF) {
-				return recentCommits, nil
-			} else if err != nil {
-				return nil, err
-			}
-			recentCommits = append(recentCommits, commitDisplayOld{
-				thisCommit.Hash,
-				thisCommit.Author,
-				thisCommit.Committer,
-				thisCommit.Message,
-				thisCommit.TreeHash,
-			})
-		}
-	}
-	return recentCommits, err
-}
-
-type commitDisplayOld struct {
-	Hash      plumbing.Hash
-	Author    object.Signature
-	Committer object.Signature
-	Message   string
-	TreeHash  plumbing.Hash
 }
 
 // commitToPatch creates an [object.Patch] from the first parent of a given
