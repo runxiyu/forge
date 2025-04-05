@@ -12,7 +12,6 @@ session(void *_conn)
 	free((int *)_conn);
 
 	int err;
-	git_repository *repo = NULL;
 
 	char path[4096] = {0};
 	conn_io_t io = {.fd = conn };
@@ -25,18 +24,22 @@ session(void *_conn)
 		.write = conn_write,
 	};
 
+	/* Repo path */
 	err = bare_get_data(&reader, (uint8_t *) path, sizeof(path) - 1);
 	if (err != BARE_ERROR_NONE) {
 		goto close;
 	}
 	path[sizeof(path) - 1] = '\0';
 
+	/* Open repo */
+	git_repository *repo = NULL;
 	err = git_repository_open_ext(&repo, path, GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
 	if (err != 0) {
 		bare_put_uint(&writer, 1);
 		goto close;
 	}
 
+	/* Command */
 	uint64_t cmd = 0;
 	err = bare_get_uint(&reader, &cmd);
 	if (err != BARE_ERROR_NONE) {
@@ -54,6 +57,7 @@ session(void *_conn)
 		goto free_repo;
 	}
 
+	/* HEAD tree */
 	git_object *obj = NULL;
 	err = git_revparse_single(&obj, repo, "HEAD^{tree}");
 	if (err != 0) {
@@ -70,27 +74,23 @@ session(void *_conn)
 		bare_put_uint(&writer, 5);
 		goto free_tree;
 	}
-
 	git_otype objtype = git_tree_entry_type(entry);
 	if (objtype != GIT_OBJECT_BLOB) {
 		bare_put_uint(&writer, 6);
 		goto free_tree_entry;
 	}
-
 	git_object *obj2 = NULL;
 	err = git_tree_entry_to_object(&obj2, repo, entry);
 	if (err != 0) {
 		bare_put_uint(&writer, 7);
 		goto free_tree_entry;
 	}
-
 	git_blob *blob = (git_blob *) obj2;
 	const void *content = git_blob_rawcontent(blob);
 	if (content == NULL) {
 		bare_put_uint(&writer, 8);
 		goto free_blob;
 	}
-
 	bare_put_uint(&writer, 0);
 	bare_put_data(&writer, content, git_blob_rawsize(blob));
 
