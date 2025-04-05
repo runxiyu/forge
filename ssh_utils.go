@@ -10,7 +10,7 @@ import (
 	"io"
 	"net/url"
 
-	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
+	"go.lindenii.runxiyu.org/forge/ansiec"
 )
 
 var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
