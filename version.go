@@ -1,3 +1,3 @@
 package forge
 
-var version = "unknown" //nolint:gochecknoglobals
+var version = "unknown"
