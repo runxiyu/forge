@@ -8,33 +8,33 @@ import (
 	"strings"
 )
 
-// These are all trivial functions that are used in HTML templates.
-// See resources.go.
+// These are all trivial functions that are intended to be used in HTML
+// templates.
 
-// firstLine returns the first line of a string.
-func firstLine(s string) string {
+// FirstLine returns the first line of a string.
+func FirstLine(s string) string {
 	before, _, _ := strings.Cut(s, "\n")
 	return before
 }
 
-// pathEscape escapes the input as an URL path segment.
-func pathEscape(s string) string {
+// PathEscape escapes the input as an URL path segment.
+func PathEscape(s string) string {
 	return url.PathEscape(s)
 }
 
-// queryEscape escapes the input as an URL query segment.
-func queryEscape(s string) string {
+// QueryEscape escapes the input as an URL query segment.
+func QueryEscape(s string) string {
 	return url.QueryEscape(s)
 }
 
-// dereference dereferences a pointer.
-func dereference[T any](p *T) T {
+// Dereference dereferences a pointer.
+func Dereference[T any](p *T) T {
 	return *p
 }
 
-// dereferenceOrZero dereferences a pointer. If the pointer is nil, the zero
+// DereferenceOrZero dereferences a pointer. If the pointer is nil, the zero
 // value of its associated type is returned instead.
-func dereferenceOrZero[T any](p *T) T {
+func DereferenceOrZero[T any](p *T) T {
 	if p != nil {
 		return *p
 	}
@@ -42,7 +42,7 @@ func dereferenceOrZero[T any](p *T) T {
 	return z
 }
 
-// minus subtracts two numbers.
-func minus(a, b int) int {
+// Minus subtracts two numbers.
+func Minus(a, b int) int {
 	return a - b
 }
