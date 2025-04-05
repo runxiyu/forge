@@ -36,18 +36,19 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		return
 	}
 
-	if files != nil {
+	switch {
+	case files != nil:
 		params["files"] = files
 		params["readme_filename"] = "README.md"
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
 		renderTemplate(writer, "repo_raw_dir", params)
-	} else if content != "" {
+	case content != "":
 		if redirectNoDir(writer, request) {
 			return
 		}
 		writer.Header().Set("Content-Type", "application/octet-stream")
 		fmt.Fprint(writer, content)
-	} else {
+	default:
 		errorPage500(writer, params, "Unknown error fetching repo raw data")
 	}
 }

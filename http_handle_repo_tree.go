@@ -37,16 +37,17 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		return
 	}
 
-	if files != nil {
+	switch {
+	case files != nil:
 		params["files"] = files
 		params["readme_filename"] = "README.md"
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
 		renderTemplate(writer, "repo_tree_dir", params)
-	} else if content != "" {
+	case content != "":
 		rendered := renderHighlightedFile(pathSpec, content)
 		params["file_contents"] = rendered
 		renderTemplate(writer, "repo_tree_file", params)
-	} else {
+	default:
 		errorPage500(writer, params, "Unknown object type, something is seriously wrong")
 	}
 }
