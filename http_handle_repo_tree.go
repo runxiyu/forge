@@ -4,20 +4,15 @@
 package main
 
 import (
-	"bytes"
+	"errors"
+	"fmt"
 	"html/template"
+	"io"
+	"net"
 	"net/http"
-	"path"
 	"strings"
-	"time"
 
-	"github.com/alecthomas/chroma/v2"
-	chromaHTML "github.com/alecthomas/chroma/v2/formatters/html"
-	chromaLexers "github.com/alecthomas/chroma/v2/lexers"
-	chromaStyles "github.com/alecthomas/chroma/v2/styles"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	"git.sr.ht/~sircmpwn/go-bare"
 )
 
 // httpHandleRepoTree provides a friendly, syntax-highlighted view of
@@ -25,143 +20,116 @@ import (
 //
 // TODO: Do not highlight files that are too large.
 func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
-	var rawPathSpec, pathSpec string
-	var repo *git.Repository
-	var refHash plumbing.Hash
-	var refHashSlice []byte
-	var commitObject *object.Commit
-	var tree *object.Tree
-	var err error
-
-	rawPathSpec = params["rest"].(string)
-	repo, pathSpec = params["repo"].(*git.Repository), strings.TrimSuffix(rawPathSpec, "/")
+	repoName := params["repo_name"].(string)
+	groupPath := params["group_path"].([]string)
+	rawPathSpec := params["rest"].(string)
+	pathSpec := strings.TrimSuffix(rawPathSpec, "/")
 	params["path_spec"] = pathSpec
 
-	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
-		errorPage500(writer, params, "Error getting ref hash: "+err.Error())
+	_, repoPath, _, _, _, _, _ := getRepoInfo(request.Context(), groupPath, repoName, "")
+
+	conn, err := net.Dial("unix", config.Git.Socket)
+	if err != nil {
+		errorPage500(writer, params, "git2d connection failed: "+err.Error())
 		return
 	}
-	refHashSlice = refHash[:]
+	defer conn.Close()
 
-	cacheHandle := append(refHashSlice, stringToBytes(pathSpec)...) //nolint:gocritic
+	brWriter := bare.NewWriter(conn)
+	brReader := bare.NewReader(conn)
 
-	if value, found := treeReadmeCache.Get(cacheHandle); found {
-		params["files"] = value.DisplayTree
-		params["readme_filename"] = value.ReadmeFilename
-		params["readme"] = value.ReadmeRendered
-		renderTemplate(writer, "repo_tree_dir", params)
+	if err := brWriter.WriteData([]byte(repoPath)); err != nil {
+		errorPage500(writer, params, "sending repo path failed: "+err.Error())
+		return
+	}
+	if err := brWriter.WriteUint(2); err != nil {
+		errorPage500(writer, params, "sending command failed: "+err.Error())
+		return
+	}
+	if err := brWriter.WriteData([]byte(pathSpec)); err != nil {
+		errorPage500(writer, params, "sending path failed: "+err.Error())
 		return
 	}
 
-	if value, found := commitPathFileHTMLCache.Get(cacheHandle); found {
-		params["file_contents"] = value
-		renderTemplate(writer, "repo_tree_file", params)
+	status, err := brReader.ReadUint()
+	if err != nil {
+		errorPage500(writer, params, "reading status failed: "+err.Error())
 		return
 	}
-	start := time.Now()
 
-	var target *object.Tree
-	if pathSpec == "" {
-		if commitObject, err = repo.CommitObject(refHash); err != nil {
-			errorPage500(writer, params, "Error getting commit object: "+err.Error())
+	switch status {
+	case 0:
+		kind, err := brReader.ReadUint()
+		if err != nil {
+			errorPage500(writer, params, "reading object kind failed: "+err.Error())
 			return
 		}
-		if tree, err = commitObject.Tree(); err != nil {
-			errorPage500(writer, params, "Error getting file tree: "+err.Error())
+
+		switch kind {
+		case 1:
+			// Tree
+			count, err := brReader.ReadUint()
+			if err != nil {
+				errorPage500(writer, params, "reading entry count failed: "+err.Error())
+				return
+			}
+			files := make([]displayTreeEntry, 0, count)
+			for i := uint64(0); i < count; i++ {
+				typeCode, err := brReader.ReadUint()
+				if err != nil {
+					errorPage500(writer, params, "error reading entry type: "+err.Error())
+					return
+				}
+				mode, err := brReader.ReadUint()
+				if err != nil {
+					errorPage500(writer, params, "error reading entry mode: "+err.Error())
+					return
+				}
+				size, err := brReader.ReadUint()
+				if err != nil {
+					errorPage500(writer, params, "error reading entry size: "+err.Error())
+					return
+				}
+				name, err := brReader.ReadData()
+				if err != nil {
+					errorPage500(writer, params, "error reading entry name: "+err.Error())
+					return
+				}
+
+				files = append(files, displayTreeEntry{
+					Name:      string(name),
+					Mode:      fmt.Sprintf("%06o", mode),
+					Size:      int64(size),
+					IsFile:    typeCode == 2,
+					IsSubtree: typeCode == 1,
+				})
+			}
+			params["files"] = files
+			params["readme_filename"] = "README.md"
+			params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
+			renderTemplate(writer, "repo_tree_dir", params)
+
+		case 2:
+			// Blob
+			content, err := brReader.ReadData()
+			if err != nil && !errors.Is(err, io.EOF) {
+				errorPage500(writer, params, "error reading file content: "+err.Error())
+				return
+			}
+			rendered := renderHighlightedFile(pathSpec, string(content))
+			params["file_contents"] = rendered
+			renderTemplate(writer, "repo_tree_file", params)
+
+		default:
+			errorPage500(writer, params, fmt.Sprintf("unknown kind: %d", kind))
 			return
 		}
 
-		displayTree := makeDisplayTree(tree)
-		readmeFilename, readmeRendered := renderReadmeAtTree(tree)
-		cost := time.Since(start).Nanoseconds()
-
-		params["files"] = displayTree
-		params["readme_filename"] = readmeFilename
-		params["readme"] = readmeRendered
-
-		entry := treeReadmeCacheEntry{
-			DisplayTree:    displayTree,
-			ReadmeFilename: readmeFilename,
-			ReadmeRendered: readmeRendered,
-		}
-		treeReadmeCache.Set(cacheHandle, entry, cost)
-
-		renderTemplate(writer, "repo_tree_dir", params)
+	case 3:
+		errorPage500(writer, params, fmt.Sprintf("path not found: %s", pathSpec))
 		return
+
+	default:
+		errorPage500(writer, params, fmt.Sprintf("unknown status code: %d", status))
 	}
-
-	if commitObject, err = repo.CommitObject(refHash); err != nil {
-		errorPage500(writer, params, "Error getting commit object: "+err.Error())
-		return
-	}
-	if tree, err = commitObject.Tree(); err != nil {
-		errorPage500(writer, params, "Error getting file tree: "+err.Error())
-		return
-	}
-	if target, err = tree.Tree(pathSpec); err != nil {
-		var file *object.File
-		var fileContent string
-		var lexer chroma.Lexer
-		var iterator chroma.Iterator
-		var style *chroma.Style
-		var formatter *chromaHTML.Formatter
-		var formattedHTML template.HTML
-
-		if file, err = tree.File(pathSpec); err != nil {
-			errorPage500(writer, params, "Error retrieving path: "+err.Error())
-			return
-		}
-		if redirectNoDir(writer, request) {
-			return
-		}
-		if fileContent, err = file.Contents(); err != nil {
-			errorPage500(writer, params, "Error reading file: "+err.Error())
-			return
-		}
-		lexer = chromaLexers.Match(pathSpec)
-		if lexer == nil {
-			lexer = chromaLexers.Fallback
-		}
-		if iterator, err = lexer.Tokenise(nil, fileContent); err != nil {
-			errorPage500(writer, params, "Error tokenizing code: "+err.Error())
-			return
-		}
-		var formattedHTMLStr bytes.Buffer
-		style = chromaStyles.Get("autumn")
-		formatter = chromaHTML.New(chromaHTML.WithClasses(true), chromaHTML.TabWidth(8))
-		if err = formatter.Format(&formattedHTMLStr, style, iterator); err != nil {
-			errorPage500(writer, params, "Error formatting code: "+err.Error())
-			return
-		}
-		formattedHTML = template.HTML(formattedHTMLStr.Bytes()) //#nosec G203
-		cost := time.Since(start).Nanoseconds()
-
-		commitPathFileHTMLCache.Set(cacheHandle, formattedHTML, cost)
-
-		params["file_contents"] = formattedHTML
-
-		renderTemplate(writer, "repo_tree_file", params)
-		return
-	}
-
-	if len(rawPathSpec) != 0 && rawPathSpec[len(rawPathSpec)-1] != '/' {
-		http.Redirect(writer, request, path.Base(pathSpec)+"/", http.StatusSeeOther)
-		return
-	}
-
-	displayTree := makeDisplayTree(target)
-	readmeFilename, readmeRendered := renderReadmeAtTree(target)
-	cost := time.Since(start).Nanoseconds()
-
-	entry := treeReadmeCacheEntry{
-		DisplayTree:    displayTree,
-		ReadmeFilename: readmeFilename,
-		ReadmeRendered: readmeRendered,
-	}
-	treeReadmeCache.Set(cacheHandle, entry, cost)
-
-	params["readme_filename"], params["readme"] = readmeFilename, readmeRendered
-	params["files"] = displayTree
-
-	renderTemplate(writer, "repo_tree_dir", params)
 }
