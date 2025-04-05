@@ -2,3 +2,5 @@
 * linguist-detectable
 go.mod -linguist-detectable
 go.sum -linguist-detectable
+.golangci.yaml -linguist-detectable
+.build.yml -linguist-detectable
