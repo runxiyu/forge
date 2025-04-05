@@ -10,6 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/storer"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 // httpHandleRepoBranches provides the branches page in repos.
@@ -24,7 +25,7 @@ func (s *server) httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Requ
 
 	repo, repoName, groupPath = params["repo"].(*git.Repository), params["repo_name"].(string), params["group_path"].([]string)
 
-	if strings.Contains(repoName, "\n") || sliceContainsNewlines(groupPath) {
+	if strings.Contains(repoName, "\n") || misc.SliceContainsNewlines(groupPath) {
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 

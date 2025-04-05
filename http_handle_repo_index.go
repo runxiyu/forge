@@ -5,7 +5,6 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	"go.lindenii.runxiyu.org/forge/git2c"
 	"go.lindenii.runxiyu.org/forge/render"
@@ -26,11 +25,6 @@ func (s *server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 
 	_, repoPath, _, _, _, _, _ := s.getRepoInfo(req.Context(), groupPath, repoName, "") // TODO: Don't use getRepoInfo
 
-	var notes []string
-	if strings.Contains(repoName, "\n") || sliceContainsNewlines(groupPath) {
-		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
-	}
-
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
 		errorPage500(w, params, err.Error())
@@ -47,7 +41,6 @@ func (s *server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 	params["commits"] = commits
 	params["readme_filename"] = readme.Filename
 	_, params["readme"] = render.Readme(readme.Content, readme.Filename)
-	params["notes"] = notes
 
 	renderTemplate(w, "repo_index", params)
 
