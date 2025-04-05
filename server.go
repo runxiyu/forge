@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"go.lindenii.runxiyu.org/forge/internal/database"
+	"go.lindenii.runxiyu.org/forge/internal/irc"
 	"go.lindenii.runxiyu.org/forge/internal/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 	goSSH "golang.org/x/crypto/ssh"
@@ -31,9 +32,6 @@ type Server struct {
 	sourceHandler http.Handler
 	staticHandler http.Handler
 
-	ircSendBuffered   chan string
-	ircSendDirectChan chan errorBack[string]
-
 	// globalData is passed as "global" when rendering HTML templates.
 	globalData map[string]any
 
@@ -45,6 +43,8 @@ type Server struct {
 	packPasses cmap.Map[string, packPass]
 
 	templates *template.Template
+
+	ircBot *irc.Bot
 }
 
 func (s *Server) Setup() {
@@ -192,7 +192,7 @@ func (s *Server) Run() {
 	}
 
 	// IRC bot
-	go s.ircBotLoop()
+	go s.ircBot.ConnectLoop()
 
 	select {}
 }

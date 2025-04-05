@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"go.lindenii.runxiyu.org/forge/internal/database"
+	"go.lindenii.runxiyu.org/forge/internal/irc"
 	"go.lindenii.runxiyu.org/forge/internal/scfg"
 )
 
@@ -46,15 +47,7 @@ type Config struct {
 		Key  string `scfg:"key"`
 		Root string `scfg:"root"`
 	} `scfg:"ssh"`
-	IRC struct {
-		Net   string `scfg:"net"`
-		Addr  string `scfg:"addr"`
-		TLS   bool   `scfg:"tls"`
-		SendQ uint   `scfg:"sendq"`
-		Nick  string `scfg:"nick"`
-		User  string `scfg:"user"`
-		Gecos string `scfg:"gecos"`
-	} `scfg:"irc"`
+	IRC     irc.Config `scfg:"irc"`
 	General struct {
 		Title string `scfg:"title"`
 	} `scfg:"general"`

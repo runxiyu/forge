@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
 	"net"
 	"os"
 	"path/filepath"
@@ -250,11 +249,7 @@ func (s *Server) hooksHandler(conn net.Conn) {
 						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", s.genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRLocalID)
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
 
-						select {
-						case s.ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
-						default:
-							slog.Error("IRC SendQ exceeded")
-						}
+						s.ircBot.Send("PRIVMSG #chat :New merge request at " + mergeRequestWebURL)
 					} else { // Existing contrib branch
 						var existingMRUser int
 						var isAncestor bool

@@ -1,28 +1,44 @@
-// SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
-
-package forge
+package irc
 
 import (
 	"crypto/tls"
 	"log/slog"
 	"net"
 
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
-type errorBack[T any] struct {
-	content   T
-	errorBack chan error
+type Config struct {
+	Net   string `scfg:"net"`
+	Addr  string `scfg:"addr"`
+	TLS   bool   `scfg:"tls"`
+	SendQ uint   `scfg:"sendq"`
+	Nick  string `scfg:"nick"`
+	User  string `scfg:"user"`
+	Gecos string `scfg:"gecos"`
 }
 
-func (s *Server) ircBotSession() error {
+type Bot struct {
+	config            *Config
+	ircSendBuffered   chan string
+	ircSendDirectChan chan misc.ErrorBack[string]
+}
+
+func NewBot(c *Config) (b *Bot) {
+	b = &Bot{
+		config: c,
+	}
+	return
+}
+
+func (b *Bot) Connect() error {
 	var err error
 	var underlyingConn net.Conn
-	if s.config.IRC.TLS {
-		underlyingConn, err = tls.Dial(s.config.IRC.Net, s.config.IRC.Addr, nil)
+	if b.config.TLS {
+		underlyingConn, err = tls.Dial(b.config.Net, b.config.Addr, nil)
 	} else {
-		underlyingConn, err = net.Dial(s.config.IRC.Net, s.config.IRC.Addr)
+		underlyingConn, err = net.Dial(b.config.Net, b.config.Addr)
 	}
 	if err != nil {
 		return err
@@ -36,11 +52,11 @@ func (s *Server) ircBotSession() error {
 		return conn.WriteString(s + "\r\n")
 	}
 
-	_, err = logAndWriteLn("NICK " + s.config.IRC.Nick)
+	_, err = logAndWriteLn("NICK " + b.config.Nick)
 	if err != nil {
 		return err
 	}
-	_, err = logAndWriteLn("USER " + s.config.IRC.User + " 0 * :" + s.config.IRC.Gecos)
+	_, err = logAndWriteLn("USER " + b.config.User + " 0 * :" + b.config.Gecos)
 	if err != nil {
 		return err
 	}
@@ -81,7 +97,7 @@ func (s *Server) ircBotSession() error {
 				if !ok {
 					slog.Error("unable to convert source of JOIN to client")
 				}
-				if c.Nick != s.config.IRC.Nick {
+				if c.Nick != b.config.Nick {
 					continue
 				}
 			default:
@@ -93,20 +109,20 @@ func (s *Server) ircBotSession() error {
 		select {
 		case err = <-readLoopError:
 			return err
-		case line := <-s.ircSendBuffered:
+		case line := <-b.ircSendBuffered:
 			_, err = logAndWriteLn(line)
 			if err != nil {
 				select {
-				case s.ircSendBuffered <- line:
+				case b.ircSendBuffered <- line:
 				default:
 					slog.Error("unable to requeue message", "line", line)
 				}
 				writeLoopAbort <- struct{}{}
 				return err
 			}
-		case lineErrorBack := <-s.ircSendDirectChan:
-			_, err = logAndWriteLn(lineErrorBack.content)
-			lineErrorBack.errorBack <- err
+		case lineErrorBack := <-b.ircSendDirectChan:
+			_, err = logAndWriteLn(lineErrorBack.Content)
+			lineErrorBack.ErrorChan <- err
 			if err != nil {
 				writeLoopAbort <- struct{}{}
 				return err
@@ -115,26 +131,34 @@ func (s *Server) ircBotSession() error {
 	}
 }
 
-// ircSendDirect sends an IRC message directly to the connection and bypasses
+// SendDirect sends an IRC message directly to the connection and bypasses
 // the buffering system.
-func (s *Server) ircSendDirect(line string) error {
+func (b *Bot) SendDirect(line string) error {
 	ech := make(chan error, 1)
 
-	s.ircSendDirectChan <- errorBack[string]{
-		content:   line,
-		errorBack: ech,
+	b.ircSendDirectChan <- misc.ErrorBack[string]{
+		Content:   line,
+		ErrorChan: ech,
 	}
 
 	return <-ech
 }
 
+func (b *Bot) Send(line string) {
+	select {
+	case b.ircSendBuffered <- line:
+	default:
+		slog.Error("irc sendq full", "line", line)
+	}
+}
+
 // TODO: Delay and warnings?
-func (s *Server) ircBotLoop() {
-	s.ircSendBuffered = make(chan string, s.config.IRC.SendQ)
-	s.ircSendDirectChan = make(chan errorBack[string])
+func (b *Bot) ConnectLoop() {
+	b.ircSendBuffered = make(chan string, b.config.SendQ)
+	b.ircSendDirectChan = make(chan misc.ErrorBack[string])
 
 	for {
-		err := s.ircBotSession()
+		err := b.Connect()
 		slog.Error("irc session error", "error", err)
 	}
 }
