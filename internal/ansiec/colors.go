@@ -3,7 +3,7 @@
 
 package ansiec
 
-var (
+const (
 	Black   = "\x1b[30m"
 	Red     = "\x1b[31m"
 	Green   = "\x1b[32m"
@@ -14,7 +14,7 @@ var (
 	White   = "\x1b[37m"
 )
 
-var (
+const (
 	BrightBlack   = "\x1b[30;1m"
 	BrightRed     = "\x1b[31;1m"
 	BrightGreen   = "\x1b[32;1m"

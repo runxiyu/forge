@@ -3,7 +3,7 @@
 
 package ansiec
 
-var (
+const (
 	Bold      = "\x1b[1m"
 	Underline = "\x1b[4m"
 	Reversed  = "\x1b[7m"
