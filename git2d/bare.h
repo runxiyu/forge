@@ -67,4 +67,6 @@ bare_error bare_get_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz);
 bare_error bare_put_str(struct bare_writer *ctx, const char *src, uint64_t sz);
 bare_error bare_get_str(struct bare_reader *ctx, char *dst, uint64_t sz);
 
+/* Note that the _str implementation here does not check for UTF-8 validity. */
+
 #endif /* BARE_H */

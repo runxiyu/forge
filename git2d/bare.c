@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 #include "bare.h"
-#include "utf8.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -18,41 +17,6 @@ enum {
 	U64SZ = 8,
 	MAXVARINTSZ = 10,
 };
-
-static bool
-checkstr(const char *x, uint64_t sz)
-{
-	if (x == NULL || sz == 0) {
-		return true;
-	}
-
-	int err = 0;
-	uint32_t cp = 0;
-	char *buf = (void *)x;
-	uint64_t chunk = 4;
-	char *pad = (char *)(char[4]){0, 0, 0, 0};
-
-#define _utf8_decode(buf) \
-	do { \
-		buf = utf8_decode(buf, &cp, &err); \
-		if (err > 0) { \
-			return false; \
-		} \
-	} while (0)
-
-	for (; sz >= chunk; sz -= chunk) {
-		_utf8_decode(buf);
-	}
-
-	if (sz > 0) {
-		memcpy(pad, buf, sz);
-		_utf8_decode(pad);
-	}
-
-#undef _utf8_decode
-
-	return true;
-}
 
 bare_error
 bare_put_uint(struct bare_writer *ctx, uint64_t x)
@@ -363,21 +327,11 @@ bare_get_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz)
 bare_error
 bare_put_str(struct bare_writer *ctx, const char *src, uint64_t sz)
 {
-	if (!checkstr(src, sz)) {
-		return BARE_ERROR_INVALID_UTF8;
-	}
-
 	return bare_put_data(ctx, (uint8_t *)src, sz);
 }
 
 bare_error
 bare_get_str(struct bare_reader *ctx, char *dst, uint64_t sz)
 {
-	bare_error err = bare_get_data(ctx, (uint8_t *)dst, sz);\
-
-	if (err == BARE_ERROR_NONE) {
-		err = !checkstr(dst, sz) ? BARE_ERROR_INVALID_UTF8 : err;
-	}
-
-	return err;
+	return bare_get_data(ctx, (uint8_t *)dst, sz);
 }
