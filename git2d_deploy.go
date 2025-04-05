@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func deployGit2D() (err error) {
+func (s *server) deployGit2D() (err error) {
 	var srcFD fs.File
 	var dstFD *os.File
 
@@ -18,7 +18,7 @@ func deployGit2D() (err error) {
 	}
 	defer srcFD.Close()
 
-	if dstFD, err = os.OpenFile(config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+	if dstFD, err = os.OpenFile(s.config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 		return err
 	}
 	defer dstFD.Close()

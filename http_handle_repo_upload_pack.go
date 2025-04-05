@@ -14,7 +14,7 @@ import (
 
 // httpHandleUploadPack handles incoming Git fetch/pull/clone's over the Smart
 // HTTP protocol.
-func httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
+func (s *server) httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	var groupPath []string
 	var repoName string
 	var repoPath string
@@ -67,7 +67,7 @@ func httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, par
 	writer.WriteHeader(http.StatusOK)
 
 	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
-	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket)
+	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
 	}

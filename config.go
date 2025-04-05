@@ -16,7 +16,7 @@ import (
 // config holds the global configuration used by this instance. There is
 // currently no synchronization mechanism, so it must not be modified after
 // request handlers are spawned.
-var config struct {
+type Config struct {
 	HTTP struct {
 		Net          string `scfg:"net"`
 		Addr         string `scfg:"addr"`
@@ -76,7 +76,7 @@ var config struct {
 // configuration patterns, but silently ignores fields in the [config] struct
 // that is not present in the user's configuration file. We would prefer the
 // exact opposite behavior.
-func loadConfig(path string) (err error) {
+func (s *server) loadConfig(path string) (err error) {
 	var configFile *os.File
 	if configFile, err = os.Open(path); err != nil {
 		return err
@@ -84,19 +84,19 @@ func loadConfig(path string) (err error) {
 	defer configFile.Close()
 
 	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
-	if err = decoder.Decode(&config); err != nil {
+	if err = decoder.Decode(&s.config); err != nil {
 		return err
 	}
 
-	if config.DB.Type != "postgres" {
+	if s.config.DB.Type != "postgres" {
 		return errors.New("unsupported database type")
 	}
 
-	if database, err = pgxpool.New(context.Background(), config.DB.Conn); err != nil {
+	if database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
 		return err
 	}
 
-	globalData["forge_title"] = config.General.Title
+	globalData["forge_title"] = s.config.General.Title
 
 	return nil
 }

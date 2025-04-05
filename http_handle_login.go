@@ -16,7 +16,7 @@ import (
 )
 
 // httpHandleLogin provides the login page for local users.
-func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var username, password string
 	var userID int
 	var passwordHash string
@@ -71,7 +71,7 @@ func httpHandleLogin(writer http.ResponseWriter, request *http.Request, params m
 	}
 
 	now = time.Now()
-	expiry = now.Add(time.Duration(config.HTTP.CookieExpiry) * time.Second)
+	expiry = now.Add(time.Duration(s.config.HTTP.CookieExpiry) * time.Second)
 
 	cookie = http.Cookie{
 		Name:     "session",

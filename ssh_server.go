@@ -25,13 +25,13 @@ var (
 // serveSSH serves SSH on a [net.Listener]. The listener should generally be a
 // TCP listener, although AF_UNIX SOCK_STREAM listeners may be appropriate in
 // rare cases.
-func serveSSH(listener net.Listener) error {
+func (s *server) serveSSH(listener net.Listener) error {
 	var hostKeyBytes []byte
 	var hostKey goSSH.Signer
 	var err error
 	var server *gliderSSH.Server
 
-	if hostKeyBytes, err = os.ReadFile(config.SSH.Key); err != nil {
+	if hostKeyBytes, err = os.ReadFile(s.config.SSH.Key); err != nil {
 		return err
 	}
 
@@ -52,7 +52,7 @@ func serveSSH(listener net.Listener) error {
 			}
 
 			slog.Info("incoming ssh", "addr", session.RemoteAddr().String(), "key", clientPubkeyStr, "command", session.RawCommand())
-			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
+			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(s.config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
 
@@ -67,13 +67,13 @@ func serveSSH(listener net.Listener) error {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = sshHandleUploadPack(session, clientPubkeyStr, cmd[1])
+				err = s.sshHandleUploadPack(session, clientPubkeyStr, cmd[1])
 			case "git-receive-pack":
 				if len(cmd) > 2 {
 					fmt.Fprintln(session.Stderr(), "Too many arguments\r")
 					return
 				}
-				err = sshHandleRecvPack(session, clientPubkeyStr, cmd[1])
+				err = s.sshHandleRecvPack(session, clientPubkeyStr, cmd[1])
 			default:
 				fmt.Fprintln(session.Stderr(), "Unsupported command: "+cmd[0]+"\r")
 				return

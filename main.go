@@ -24,11 +24,13 @@ func main() {
 	)
 	flag.Parse()
 
-	if err := loadConfig(*configPath); err != nil {
+	s := server{}
+
+	if err := s.loadConfig(*configPath); err != nil {
 		slog.Error("loading configuration", "error", err)
 		os.Exit(1)
 	}
-	if err := deployHooks(); err != nil {
+	if err := s.deployHooks(); err != nil {
 		slog.Error("deploying hooks", "error", err)
 		os.Exit(1)
 	}
@@ -36,14 +38,14 @@ func main() {
 		slog.Error("loading templates", "error", err)
 		os.Exit(1)
 	}
-	if err := deployGit2D(); err != nil {
+	if err := s.deployGit2D(); err != nil {
 		slog.Error("deploying git2d", "error", err)
 		os.Exit(1)
 	}
 
 	// Launch Git2D
 	go func() {
-		cmd := exec.Command(config.Git.DaemonPath, config.Git.Socket) //#nosec G204
+		cmd := exec.Command(s.config.Git.DaemonPath, s.config.Git.Socket) //#nosec G204
 		cmd.Stderr = log.Writer()
 		cmd.Stdout = log.Writer()
 		if err := cmd.Run(); err != nil {
@@ -53,14 +55,14 @@ func main() {
 
 	// UNIX socket listener for hooks
 	{
-		hooksListener, err := net.Listen("unix", config.Hooks.Socket)
+		hooksListener, err := net.Listen("unix", s.config.Hooks.Socket)
 		if errors.Is(err, syscall.EADDRINUSE) {
-			slog.Warn("removing existing socket", "path", config.Hooks.Socket)
-			if err = syscall.Unlink(config.Hooks.Socket); err != nil {
-				slog.Error("removing existing socket", "path", config.Hooks.Socket, "error", err)
+			slog.Warn("removing existing socket", "path", s.config.Hooks.Socket)
+			if err = syscall.Unlink(s.config.Hooks.Socket); err != nil {
+				slog.Error("removing existing socket", "path", s.config.Hooks.Socket, "error", err)
 				os.Exit(1)
 			}
-			if hooksListener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
+			if hooksListener, err = net.Listen("unix", s.config.Hooks.Socket); err != nil {
 				slog.Error("listening hooks", "error", err)
 				os.Exit(1)
 			}
@@ -68,9 +70,9 @@ func main() {
 			slog.Error("listening hooks", "error", err)
 			os.Exit(1)
 		}
-		slog.Info("listening hooks on unix", "path", config.Hooks.Socket)
+		slog.Info("listening hooks on unix", "path", s.config.Hooks.Socket)
 		go func() {
-			if err = serveGitHooks(hooksListener); err != nil {
+			if err = s.serveGitHooks(hooksListener); err != nil {
 				slog.Error("serving hooks", "error", err)
 				os.Exit(1)
 			}
@@ -79,14 +81,14 @@ func main() {
 
 	// UNIX socket listener for LMTP
 	{
-		lmtpListener, err := net.Listen("unix", config.LMTP.Socket)
+		lmtpListener, err := net.Listen("unix", s.config.LMTP.Socket)
 		if errors.Is(err, syscall.EADDRINUSE) {
-			slog.Warn("removing existing socket", "path", config.LMTP.Socket)
-			if err = syscall.Unlink(config.LMTP.Socket); err != nil {
-				slog.Error("removing existing socket", "path", config.LMTP.Socket, "error", err)
+			slog.Warn("removing existing socket", "path", s.config.LMTP.Socket)
+			if err = syscall.Unlink(s.config.LMTP.Socket); err != nil {
+				slog.Error("removing existing socket", "path", s.config.LMTP.Socket, "error", err)
 				os.Exit(1)
 			}
-			if lmtpListener, err = net.Listen("unix", config.LMTP.Socket); err != nil {
+			if lmtpListener, err = net.Listen("unix", s.config.LMTP.Socket); err != nil {
 				slog.Error("listening LMTP", "error", err)
 				os.Exit(1)
 			}
@@ -94,9 +96,9 @@ func main() {
 			slog.Error("listening LMTP", "error", err)
 			os.Exit(1)
 		}
-		slog.Info("listening LMTP on unix", "path", config.LMTP.Socket)
+		slog.Info("listening LMTP on unix", "path", s.config.LMTP.Socket)
 		go func() {
-			if err = serveLMTP(lmtpListener); err != nil {
+			if err = s.serveLMTP(lmtpListener); err != nil {
 				slog.Error("serving LMTP", "error", err)
 				os.Exit(1)
 			}
@@ -105,14 +107,14 @@ func main() {
 
 	// SSH listener
 	{
-		sshListener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
-		if errors.Is(err, syscall.EADDRINUSE) && config.SSH.Net == "unix" {
-			slog.Warn("removing existing socket", "path", config.SSH.Addr)
-			if err = syscall.Unlink(config.SSH.Addr); err != nil {
-				slog.Error("removing existing socket", "path", config.SSH.Addr, "error", err)
+		sshListener, err := net.Listen(s.config.SSH.Net, s.config.SSH.Addr)
+		if errors.Is(err, syscall.EADDRINUSE) && s.config.SSH.Net == "unix" {
+			slog.Warn("removing existing socket", "path", s.config.SSH.Addr)
+			if err = syscall.Unlink(s.config.SSH.Addr); err != nil {
+				slog.Error("removing existing socket", "path", s.config.SSH.Addr, "error", err)
 				os.Exit(1)
 			}
-			if sshListener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
+			if sshListener, err = net.Listen(s.config.SSH.Net, s.config.SSH.Addr); err != nil {
 				slog.Error("listening SSH", "error", err)
 				os.Exit(1)
 			}
@@ -120,9 +122,9 @@ func main() {
 			slog.Error("listening SSH", "error", err)
 			os.Exit(1)
 		}
-		slog.Info("listening SSH on", "net", config.SSH.Net, "addr", config.SSH.Addr)
+		slog.Info("listening SSH on", "net", s.config.SSH.Net, "addr", s.config.SSH.Addr)
 		go func() {
-			if err = serveSSH(sshListener); err != nil {
+			if err = s.serveSSH(sshListener); err != nil {
 				slog.Error("serving SSH", "error", err)
 				os.Exit(1)
 			}
@@ -131,14 +133,14 @@ func main() {
 
 	// HTTP listener
 	{
-		httpListener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
-		if errors.Is(err, syscall.EADDRINUSE) && config.HTTP.Net == "unix" {
-			slog.Warn("removing existing socket", "path", config.HTTP.Addr)
-			if err = syscall.Unlink(config.HTTP.Addr); err != nil {
-				slog.Error("removing existing socket", "path", config.HTTP.Addr, "error", err)
+		httpListener, err := net.Listen(s.config.HTTP.Net, s.config.HTTP.Addr)
+		if errors.Is(err, syscall.EADDRINUSE) && s.config.HTTP.Net == "unix" {
+			slog.Warn("removing existing socket", "path", s.config.HTTP.Addr)
+			if err = syscall.Unlink(s.config.HTTP.Addr); err != nil {
+				slog.Error("removing existing socket", "path", s.config.HTTP.Addr, "error", err)
 				os.Exit(1)
 			}
-			if httpListener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
+			if httpListener, err = net.Listen(s.config.HTTP.Net, s.config.HTTP.Addr); err != nil {
 				slog.Error("listening HTTP", "error", err)
 				os.Exit(1)
 			}
@@ -147,12 +149,12 @@ func main() {
 			os.Exit(1)
 		}
 		server := http.Server{
-			Handler:      &forgeHTTPRouter{},
-			ReadTimeout:  time.Duration(config.HTTP.ReadTimeout) * time.Second,
-			WriteTimeout: time.Duration(config.HTTP.ReadTimeout) * time.Second,
-			IdleTimeout:  time.Duration(config.HTTP.ReadTimeout) * time.Second,
+			Handler:      &s,
+			ReadTimeout:  time.Duration(s.config.HTTP.ReadTimeout) * time.Second,
+			WriteTimeout: time.Duration(s.config.HTTP.ReadTimeout) * time.Second,
+			IdleTimeout:  time.Duration(s.config.HTTP.ReadTimeout) * time.Second,
 		} //exhaustruct:ignore
-		slog.Info("listening HTTP on", "net", config.HTTP.Net, "addr", config.HTTP.Addr)
+		slog.Info("listening HTTP on", "net", s.config.HTTP.Net, "addr", s.config.HTTP.Addr)
 		go func() {
 			if err = server.Serve(httpListener); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				slog.Error("serving HTTP", "error", err)
@@ -162,7 +164,7 @@ func main() {
 	}
 
 	// IRC bot
-	go ircBotLoop()
+	go s.ircBotLoop()
 
 	select {}
 }

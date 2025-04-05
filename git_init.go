@@ -11,7 +11,7 @@ import (
 
 // gitInit initializes a bare git repository with the forge-deployed hooks
 // directory as the hooksPath.
-func gitInit(repoPath string) (err error) {
+func (s *server) gitInit(repoPath string) (err error) {
 	var repo *git.Repository
 	var gitConf *gitConfig.Config
 
@@ -23,7 +23,7 @@ func gitInit(repoPath string) (err error) {
 		return err
 	}
 
-	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", config.Hooks.Execs)
+	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", s.config.Hooks.Execs)
 	gitConf.Raw.SetOption("receive", gitFmtConfig.NoSubsection, "advertisePushOptions", "true")
 
 	if err = repo.SetConfig(gitConf); err != nil {

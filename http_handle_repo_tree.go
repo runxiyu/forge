@@ -16,16 +16,16 @@ import (
 // individual files, and provides directory views that link to these files.
 //
 // TODO: Do not highlight files that are too large.
-func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	repoName := params["repo_name"].(string)
 	groupPath := params["group_path"].([]string)
 	rawPathSpec := params["rest"].(string)
 	pathSpec := strings.TrimSuffix(rawPathSpec, "/")
 	params["path_spec"] = pathSpec
 
-	_, repoPath, _, _, _, _, _ := getRepoInfo(request.Context(), groupPath, repoName, "")
+	_, repoPath, _, _, _, _, _ := s.getRepoInfo(request.Context(), groupPath, repoName, "")
 
-	client, err := git2c.NewClient(config.Git.Socket)
+	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
 		errorPage500(writer, params, err.Error())
 		return

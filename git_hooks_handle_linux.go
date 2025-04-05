@@ -34,7 +34,7 @@ var (
 
 // hooksHandler handles a connection from hookc via the
 // unix socket.
-func hooksHandler(conn net.Conn) {
+func (s *server) hooksHandler(conn net.Conn) {
 	var ctx context.Context
 	var cancel context.CancelFunc
 	var ucred *syscall.Ucred
@@ -187,7 +187,7 @@ func hooksHandler(conn net.Conn) {
 								return 1
 							}
 
-							ok, err := fedauth(ctx, packPass.userID, service, username, packPass.pubkey)
+							ok, err := s.fedauth(ctx, packPass.userID, service, username, packPass.pubkey)
 							if err != nil {
 								writeRedError(sshStderr, "Failed to verify federated user identifier %#v: %v", fedUserID, err)
 								return 1
@@ -247,7 +247,7 @@ func hooksHandler(conn net.Conn) {
 							writeRedError(sshStderr, "Error creating merge request: %v", err)
 							return 1
 						}
-						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRLocalID)
+						mergeRequestWebURL := fmt.Sprintf("%s/contrib/%d/", s.genHTTPRemoteURL(packPass.groupPath, packPass.repoName), newMRLocalID)
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
 
 						select {
@@ -342,13 +342,13 @@ func hooksHandler(conn net.Conn) {
 // treats incoming connections as those from git hook handlers by spawning
 // sessions. The listener must be a SOCK_STREAM UNIX domain socket. The
 // function itself blocks.
-func serveGitHooks(listener net.Listener) error {
+func (s *server) serveGitHooks(listener net.Listener) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			return err
 		}
-		go hooksHandler(conn)
+		go s.hooksHandler(conn)
 	}
 }
 

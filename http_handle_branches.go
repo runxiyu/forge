@@ -13,7 +13,7 @@ import (
 )
 
 // httpHandleRepoBranches provides the branches page in repos.
-func httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
+func (s *server) httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string
 	var groupPath []string
@@ -37,8 +37,8 @@ func httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params 
 	}
 	params["branches"] = branches
 
-	params["http_clone_url"] = genHTTPRemoteURL(groupPath, repoName)
-	params["ssh_clone_url"] = genSSHRemoteURL(groupPath, repoName)
+	params["http_clone_url"] = s.genHTTPRemoteURL(groupPath, repoName)
+	params["ssh_clone_url"] = s.genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
 	renderTemplate(writer, "repo_branches", params)

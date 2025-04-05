@@ -5,7 +5,6 @@ linters:
     - depguard
     - err113           # dynamically defined errors are fine for our purposes
     - forcetypeassert  # type assertion failures are usually programming errors
-    - gochecknoglobals # doesn't matter since this isn't a library
     - gochecknoinits   # we use inits sparingly for good reasons
     - godox            # they're just used as markers for where needs improvements
     - ireturn          # doesn't work well with how we use generics

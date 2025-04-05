@@ -34,8 +34,8 @@ type packPass struct {
 var packPasses = cmap.Map[string, packPass]{}
 
 // sshHandleRecvPack handles attempts to push to repos.
-func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
-	groupPath, repoName, repoID, repoPath, directAccess, contribReq, userType, userID, err := getRepoInfo2(session.Context(), repoIdentifier, pubkey)
+func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
+	groupPath, repoName, repoID, repoPath, directAccess, contribReq, userType, userID, err := s.getRepoInfo2(session.Context(), repoIdentifier, pubkey)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string)
 	}
 
 	hooksPath := repoConfCore.OptionAll("hooksPath")
-	if len(hooksPath) != 1 || hooksPath[0] != config.Hooks.Execs {
+	if len(hooksPath) != 1 || hooksPath[0] != s.config.Hooks.Execs {
 		return errors.New("repository has hooksPath set to an unexpected value")
 	}
 
@@ -114,7 +114,7 @@ func sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string)
 
 	proc := exec.CommandContext(session.Context(), "git-receive-pack", repoPath)
 	proc.Env = append(os.Environ(),
-		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+config.Hooks.Socket,
+		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket,
 		"LINDENII_FORGE_HOOKS_COOKIE="+cookie,
 	)
 	proc.Stdin = session

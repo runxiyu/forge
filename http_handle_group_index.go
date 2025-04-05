@@ -17,7 +17,7 @@ import (
 // httpHandleGroupIndex provides index pages for groups, which includes a list
 // of its subgroups and repos, as well as a form for group maintainers to
 // create repos.
-func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var groupPath []string
 	var repos []nameDesc
 	var subgroups []nameDesc
@@ -111,7 +111,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			return
 		}
 
-		filePath := filepath.Join(config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
+		filePath := filepath.Join(s.config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
 
 		_, err = database.Exec(
 			request.Context(),
@@ -126,7 +126,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			return
 		}
 
-		if err = gitInit(filePath); err != nil {
+		if err = s.gitInit(filePath); err != nil {
 			errorPage500(writer, params, "Error initializing repo: "+err.Error())
 			return
 		}

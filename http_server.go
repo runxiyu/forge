@@ -15,15 +15,13 @@ import (
 	"go.lindenii.runxiyu.org/forge/misc"
 )
 
-type forgeHTTPRouter struct{}
-
 // ServeHTTP handles all incoming HTTP requests and routes them to the correct
 // location.
 //
 // TODO: This function is way too large.
-func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var remoteAddr string
-	if config.HTTP.ReverseProxy {
+	if s.config.HTTP.ReverseProxy {
 		remoteAddrs, ok := request.Header["X-Forwarded-For"]
 		if ok && len(remoteAddrs) == 1 {
 			remoteAddr = remoteAddrs[0]
@@ -75,7 +73,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	}
 
 	if len(segments) == 0 {
-		httpHandleIndex(writer, request, params)
+		s.httpHandleIndex(writer, request, params)
 		return
 	}
 
@@ -100,7 +98,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	if segments[0] == "-" {
 		switch segments[1] {
 		case "login":
-			httpHandleLogin(writer, request, params)
+			s.httpHandleLogin(writer, request, params)
 			return
 		case "users":
 			httpHandleUsers(writer, request, params)
@@ -137,7 +135,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		if misc.RedirectDir(writer, request) {
 			return
 		}
-		httpHandleGroupIndex(writer, request, params)
+		s.httpHandleGroupIndex(writer, request, params)
 	case len(segments) == sepIndex+1:
 		errorPage404(writer, params)
 		return
@@ -159,7 +157,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					}
 					return
 				case "git-upload-pack":
-					if err = httpHandleUploadPack(writer, request, params); err != nil {
+					if err = s.httpHandleUploadPack(writer, request, params); err != nil {
 						errorPage500(writer, params, err.Error())
 					}
 					return
@@ -185,15 +183,15 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				repoURLRoot = repoURLRoot + url.PathEscape(part) + "/"
 			}
 			params["repo_url_root"] = repoURLRoot
-			params["repo_patch_mailing_list"] = repoURLRoot[1:len(repoURLRoot)-1] + "@" + config.LMTP.Domain
-			params["http_clone_url"] = genHTTPRemoteURL(groupPath, moduleName)
-			params["ssh_clone_url"] = genSSHRemoteURL(groupPath, moduleName)
+			params["repo_patch_mailing_list"] = repoURLRoot[1:len(repoURLRoot)-1] + "@" + s.config.LMTP.Domain
+			params["http_clone_url"] = s.genHTTPRemoteURL(groupPath, moduleName)
+			params["ssh_clone_url"] = s.genSSHRemoteURL(groupPath, moduleName)
 
 			if len(segments) == sepIndex+3 {
 				if misc.RedirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoIndex(writer, request, params)
+				s.httpHandleRepoIndex(writer, request, params)
 				return
 			}
 
@@ -212,12 +210,12 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				if len(segments) < sepIndex+5 && misc.RedirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoTree(writer, request, params)
+				s.httpHandleRepoTree(writer, request, params)
 			case "branches":
 				if misc.RedirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoBranches(writer, request, params)
+				s.httpHandleRepoBranches(writer, request, params)
 				return
 			case "raw":
 				if misc.AnyContain(segments[sepIndex+4:], "/") {
@@ -232,7 +230,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				if len(segments) < sepIndex+5 && misc.RedirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoRaw(writer, request, params)
+				s.httpHandleRepoRaw(writer, request, params)
 			case "log":
 				if len(segments) > sepIndex+4 {
 					errorPage400(writer, params, "Too many parameters")

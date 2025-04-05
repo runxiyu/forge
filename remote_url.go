@@ -14,12 +14,12 @@ import (
 
 // genSSHRemoteURL generates SSH remote URLs from a given group path and repo
 // name.
-func genSSHRemoteURL(groupPath []string, repoName string) string {
-	return strings.TrimSuffix(config.SSH.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
+func (s *server) genSSHRemoteURL(groupPath []string, repoName string) string {
+	return strings.TrimSuffix(s.config.SSH.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
 }
 
 // genHTTPRemoteURL generates HTTP remote URLs from a given group path and repo
 // name.
-func genHTTPRemoteURL(groupPath []string, repoName string) string {
-	return strings.TrimSuffix(config.HTTP.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
+func (s *server) genHTTPRemoteURL(groupPath []string, repoName string) string {
+	return strings.TrimSuffix(s.config.HTTP.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
 }

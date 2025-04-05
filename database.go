@@ -24,7 +24,7 @@ var database *pgxpool.Pool
 // queryNameDesc is a helper function that executes a query and returns a
 // list of nameDesc results. The query must return two string arguments, i.e. a
 // name and a description.
-func queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
+func (s *server) queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
 	var rows pgx.Rows
 
 	if rows, err = database.Query(ctx, query, args...); err != nil {

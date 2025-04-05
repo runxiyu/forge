@@ -18,7 +18,7 @@ var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
 
 // getRepoInfo2 also fetches repo information... it should be deprecated and
 // implemented in individual handlers.
-func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
+func (s *server) getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
 	var segments []string
 	var sepIndex int
 	var moduleType, moduleName string
@@ -64,7 +64,7 @@ func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []s
 	repoName = moduleName
 	switch moduleType {
 	case "repos":
-		_1, _2, _3, _4, _5, _6, _7 := getRepoInfo(ctx, groupPath, moduleName, sshPubkey)
+		_1, _2, _3, _4, _5, _6, _7 := s.getRepoInfo(ctx, groupPath, moduleName, sshPubkey)
 		return groupPath, repoName, _1, _2, _3, _4, _5, _6, _7
 	default:
 		return []string{}, "", 0, "", false, "", "", 0, errIllegalSSHRepoPath

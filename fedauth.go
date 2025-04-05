@@ -17,7 +17,7 @@ import (
 
 // fedauth checks whether a user's SSH public key matches the remote username
 // they claim to have on the service. If so, the association is recorded.
-func fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
+func (s *server) fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
 	var err error
 
 	matched := false
