@@ -116,6 +116,7 @@ session(void *_conn)
 		bare_put_data(&writer, (const uint8_t *)author_email, strlen(author_email));
 
 		/* Author's date */
+		/* TODO: Pass the integer instead of a string */
 		time_t time = git_commit_time(commit);
 		char timebuf[64];
 		struct tm *tm = localtime(&time);
