@@ -26,9 +26,8 @@ git2d/git2d: git2d/*.c
 	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
-	rm -rf forge vendor utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
+	rm -rf forge utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
 
 source.tar.gz: $(SOURCE_FILES)
 	rm -f source.tar.gz
-	go mod vendor
-	git ls-files -z | xargs -0 tar -czf source.tar.gz vendor
+	git ls-files -z | xargs -0 tar -czf source.tar.gz

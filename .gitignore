@@ -1,5 +1,4 @@
 /forge
-/vendor
 /source.tar.gz
 *.c.BAK
 *.o
