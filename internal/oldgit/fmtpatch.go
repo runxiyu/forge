@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package forge
+package oldgit
 
 import (
 	"bytes"
@@ -12,16 +12,16 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-// fmtCommitPatch formats a commit object as if it was returned by
+// FmtCommitPatch formats a commit object as if it was returned by
 // git-format-patch.
-func fmtCommitPatch(commit *object.Commit) (final string, err error) {
+func FmtCommitPatch(commit *object.Commit) (final string, err error) {
 	var patch *object.Patch
 	var buf bytes.Buffer
 	var author object.Signature
 	var date string
 	var commitTitle, commitDetails string
 
-	if _, patch, err = commitToPatch(commit); err != nil {
+	if _, patch, err = CommitToPatch(commit); err != nil {
 		return "", err
 	}
 

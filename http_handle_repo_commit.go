@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"go.lindenii.runxiyu.org/forge/internal/misc"
+	"go.lindenii.runxiyu.org/forge/internal/oldgit"
 	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
@@ -52,7 +53,7 @@ func (s *Server) httpHandleRepoCommit(writer http.ResponseWriter, request *http.
 	}
 	if commitIDStrSpecNoSuffix != commitIDStrSpec {
 		var patchStr string
-		if patchStr, err = fmtCommitPatch(commitObj); err != nil {
+		if patchStr, err = oldgit.FmtCommitPatch(commitObj); err != nil {
 			web.ErrorPage500(s.templates, writer, params, "Error formatting patch: "+err.Error())
 			return
 		}
@@ -69,7 +70,7 @@ func (s *Server) httpHandleRepoCommit(writer http.ResponseWriter, request *http.
 	params["commit_object"] = commitObj
 	params["commit_id"] = commitIDStr
 
-	parentCommitHash, patch, err = commitToPatch(commitObj)
+	parentCommitHash, patch, err = oldgit.CommitToPatch(commitObj)
 	if err != nil {
 		web.ErrorPage500(s.templates, writer, params, "Error getting patch from commit: "+err.Error())
 		return
