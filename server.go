@@ -45,6 +45,8 @@ type Server struct {
 	templates *template.Template
 
 	ircBot *irc.Bot
+
+	ready bool
 }
 
 func (s *Server) Setup() {
@@ -63,13 +65,19 @@ func (s *Server) Setup() {
 		"forge_version":                 version,
 		// Some other ones are populated after config parsing
 	}
-}
 
-func (s *Server) Run() {
 	misc.NoneOrPanic(s.loadTemplates())
 	misc.NoneOrPanic(misc.DeployBinary(misc.FirstOrPanic(embeddedResourcesFS.Open("git2d/git2d")), s.config.Git.DaemonPath))
 	misc.NoneOrPanic(misc.DeployBinary(misc.FirstOrPanic(embeddedResourcesFS.Open("hookc/hookc")), filepath.Join(s.config.Hooks.Execs, "pre-receive")))
 	misc.NoneOrPanic(os.Chmod(filepath.Join(s.config.Hooks.Execs, "pre-receive"), 0o755))
+
+	s.ready = true
+}
+
+func (s *Server) Run() error {
+	if !s.ready {
+		return errors.New("not ready")
+	}
 
 	// Launch Git2D
 	go func() {
