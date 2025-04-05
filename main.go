@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"io/fs"
 	"log"
 	"log/slog"
 	"net"
@@ -25,6 +26,16 @@ func main() {
 	flag.Parse()
 
 	s := server{}
+
+	s.sourceHandler = http.StripPrefix(
+		"/-/source/",
+		http.FileServer(http.FS(embeddedSourceFS)),
+	)
+	staticFS, err := fs.Sub(embeddedResourcesFS, "static")
+	if err != nil {
+		panic(err)
+	}
+	s.staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
 
 	if err := s.loadConfig(*configPath); err != nil {
 		slog.Error("loading configuration", "error", err)

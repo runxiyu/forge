@@ -87,10 +87,10 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 		switch segments[1] {
 		case "static":
-			staticHandler.ServeHTTP(writer, request)
+			s.staticHandler.ServeHTTP(writer, request)
 			return
 		case "source":
-			sourceHandler.ServeHTTP(writer, request)
+			s.sourceHandler.ServeHTTP(writer, request)
 			return
 		}
 	}

@@ -13,7 +13,7 @@ func (s *server) deployGit2D() (err error) {
 	var srcFD fs.File
 	var dstFD *os.File
 
-	if srcFD, err = resourcesFS.Open("git2d/git2d"); err != nil {
+	if srcFD, err = embeddedResourcesFS.Open("git2d/git2d"); err != nil {
 		return err
 	}
 	defer srcFD.Close()

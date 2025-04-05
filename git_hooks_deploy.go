@@ -19,7 +19,7 @@ func (s *server) deployHooks() (err error) {
 		var srcFD fs.File
 		var dstFD *os.File
 
-		if srcFD, err = resourcesFS.Open("hookc/hookc"); err != nil {
+		if srcFD, err = embeddedResourcesFS.Open("hookc/hookc"); err != nil {
 			return err
 		}
 		defer srcFD.Close()

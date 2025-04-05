@@ -7,7 +7,6 @@ import (
 	"embed"
 	"html/template"
 	"io/fs"
-	"net/http"
 
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
@@ -15,16 +14,11 @@ import (
 )
 
 //go:embed LICENSE source.tar.gz
-var sourceFS embed.FS
-
-var sourceHandler = http.StripPrefix(
-	"/-/source/",
-	http.FileServer(http.FS(sourceFS)),
-)
+var embeddedSourceFS embed.FS
 
 //go:embed templates/* static/*
 //go:embed hookc/hookc git2d/git2d
-var resourcesFS embed.FS
+var embeddedResourcesFS embed.FS
 
 var templates *template.Template
 
@@ -45,12 +39,12 @@ func loadTemplates() (err error) {
 		"minus":             minus,
 	})
 
-	err = fs.WalkDir(resourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(embeddedResourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if !d.IsDir() {
-			content, err := fs.ReadFile(resourcesFS, path)
+			content, err := fs.ReadFile(embeddedResourcesFS, path)
 			if err != nil {
 				return err
 			}
@@ -68,16 +62,4 @@ func loadTemplates() (err error) {
 		return nil
 	})
 	return err
-}
-
-var staticHandler http.Handler
-
-// This init sets up static handlers. The resulting handlers must be
-// used in the HTTP router, and do nothing unless called from elsewhere.
-func init() {
-	staticFS, err := fs.Sub(resourcesFS, "static")
-	if err != nil {
-		panic(err)
-	}
-	staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
 }
