@@ -53,7 +53,9 @@ func (enc *encoder) write(p []byte) {
 
 func (enc *encoder) encodeBlock(blk Block) error {
 	for _, dir := range blk {
-		enc.encodeDir(*dir)
+		if err := enc.encodeDir(*dir); err != nil {
+			return err
+		}
 	}
 	return enc.err
 }
@@ -78,7 +80,9 @@ func (enc *encoder) encodeDir(dir Directive) error {
 	if len(dir.Children) > 0 {
 		enc.write([]byte(" {\n"))
 		enc.push()
-		enc.encodeBlock(dir.Children)
+		if err := enc.encodeBlock(dir.Children); err != nil {
+			return err
+		}
 		enc.pop()
 
 		enc.writeIndent()
