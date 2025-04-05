@@ -19,8 +19,8 @@ import (
 // create repos.
 func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var groupPath []string
-	var repos []nameDesc
-	var subgroups []nameDesc
+	var repos []NameDesc
+	var subgroups []NameDesc
 	var err error
 	var groupID int
 	var groupDesc string
@@ -154,7 +154,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			errorPage500(writer, params, "Error getting repos: "+err.Error())
 			return
 		}
-		repos = append(repos, nameDesc{name, description})
+		repos = append(repos, NameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
 		errorPage500(writer, params, "Error getting repos: "+err.Error())
@@ -179,7 +179,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			errorPage500(writer, params, "Error getting subgroups: "+err.Error())
 			return
 		}
-		subgroups = append(subgroups, nameDesc{name, description})
+		subgroups = append(subgroups, NameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
 		errorPage500(writer, params, "Error getting subgroups: "+err.Error())

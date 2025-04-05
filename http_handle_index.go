@@ -14,9 +14,9 @@ import (
 // and some global information such as SSH keys.
 func (s *Server) httpHandleIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var err error
-	var groups []nameDesc
+	var groups []NameDesc
 
-	groups, err = s.queryNameDesc(request.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
+	groups, err = s.QueryNameDesc(request.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
 	if err != nil {
 		errorPage500(writer, params, "Error querying groups: "+err.Error())
 		return
