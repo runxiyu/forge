@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 // httpHandleGroupIndex provides index pages for groups, which includes a list
@@ -130,7 +131,7 @@ func httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, par
 			return
 		}
 
-		redirectUnconditionally(writer, request)
+		misc.RedirectUnconditionally(writer, request)
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 	"net/url"
 
 	"go.lindenii.runxiyu.org/forge/ansiec"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
@@ -22,7 +23,7 @@ func getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []s
 	var sepIndex int
 	var moduleType, moduleName string
 
-	segments, err = pathToSegments(sshPath)
+	segments, err = misc.PathToSegments(sshPath)
 	if err != nil {
 		return
 	}

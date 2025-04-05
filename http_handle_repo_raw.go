@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"go.lindenii.runxiyu.org/forge/git2c"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 // httpHandleRepoRaw serves raw files, or directory listings that point to raw
@@ -43,7 +44,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
 		renderTemplate(writer, "repo_raw_dir", params)
 	case content != "":
-		if redirectNoDir(writer, request) {
+		if misc.RedirectNoDir(writer, request) {
 			return
 		}
 		writer.Header().Set("Content-Type", "application/octet-stream")

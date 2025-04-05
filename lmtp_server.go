@@ -17,6 +17,7 @@ import (
 
 	"github.com/emersion/go-message"
 	"github.com/emersion/go-smtp"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 type lmtpHandler struct{}
@@ -136,7 +137,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 		}
 		localPart := to[:len(to)-len("@"+config.LMTP.Domain)]
 		var segments []string
-		segments, err = pathToSegments(localPart)
+		segments, err = misc.PathToSegments(localPart)
 		if err != nil {
 			// TODO: Should the entire email fail or should we just
 			// notify them out of band?

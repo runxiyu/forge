@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 type forgeHTTPRouter struct{}
@@ -39,7 +40,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	var sepIndex int
 	params := make(map[string]any)
 
-	if segments, _, err = parseReqURI(request.RequestURI); err != nil {
+	if segments, _, err = misc.ParseReqURI(request.RequestURI); err != nil {
 		errorPage400(writer, params, "Error parsing request URI: "+err.Error())
 		return
 	}
@@ -82,7 +83,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		if len(segments) < 2 {
 			errorPage404(writer, params)
 			return
-		} else if len(segments) == 2 && redirectDir(writer, request) {
+		} else if len(segments) == 2 && misc.RedirectDir(writer, request) {
 			return
 		}
 
@@ -133,7 +134,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 
 	switch {
 	case sepIndex == -1:
-		if redirectDir(writer, request) {
+		if misc.RedirectDir(writer, request) {
 			return
 		}
 		httpHandleGroupIndex(writer, request, params)
@@ -165,8 +166,8 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				}
 			}
 
-			if params["ref_type"], params["ref_name"], err = getParamRefTypeName(request); err != nil {
-				if errors.Is(err, errNoRefSpec) {
+			if params["ref_type"], params["ref_name"], err = misc.GetParamRefTypeName(request); err != nil {
+				if errors.Is(err, misc.ErrNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
 					errorPage400(writer, params, "Error querying ref type: "+err.Error())
@@ -189,7 +190,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 			params["ssh_clone_url"] = genSSHRemoteURL(groupPath, moduleName)
 
 			if len(segments) == sepIndex+3 {
-				if redirectDir(writer, request) {
+				if misc.RedirectDir(writer, request) {
 					return
 				}
 				httpHandleRepoIndex(writer, request, params)
@@ -199,7 +200,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 			repoFeature := segments[sepIndex+3]
 			switch repoFeature {
 			case "tree":
-				if anyContain(segments[sepIndex+4:], "/") {
+				if misc.AnyContain(segments[sepIndex+4:], "/") {
 					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
@@ -208,18 +209,18 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				} else {
 					params["rest"] = strings.Join(segments[sepIndex+4:], "/")
 				}
-				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
+				if len(segments) < sepIndex+5 && misc.RedirectDir(writer, request) {
 					return
 				}
 				httpHandleRepoTree(writer, request, params)
 			case "branches":
-				if redirectDir(writer, request) {
+				if misc.RedirectDir(writer, request) {
 					return
 				}
 				httpHandleRepoBranches(writer, request, params)
 				return
 			case "raw":
-				if anyContain(segments[sepIndex+4:], "/") {
+				if misc.AnyContain(segments[sepIndex+4:], "/") {
 					errorPage400(writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
@@ -228,7 +229,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 				} else {
 					params["rest"] = strings.Join(segments[sepIndex+4:], "/")
 				}
-				if len(segments) < sepIndex+5 && redirectDir(writer, request) {
+				if len(segments) < sepIndex+5 && misc.RedirectDir(writer, request) {
 					return
 				}
 				httpHandleRepoRaw(writer, request, params)
@@ -237,7 +238,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					errorPage400(writer, params, "Too many parameters")
 					return
 				}
-				if redirectDir(writer, request) {
+				if misc.RedirectDir(writer, request) {
 					return
 				}
 				httpHandleRepoLog(writer, request, params)
@@ -246,13 +247,13 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 					errorPage400(writer, params, "Incorrect number of parameters")
 					return
 				}
-				if redirectNoDir(writer, request) {
+				if misc.RedirectNoDir(writer, request) {
 					return
 				}
 				params["commit_id"] = segments[sepIndex+4]
 				httpHandleRepoCommit(writer, request, params)
 			case "contrib":
-				if redirectDir(writer, request) {
+				if misc.RedirectDir(writer, request) {
 					return
 				}
 				switch len(segments) {
