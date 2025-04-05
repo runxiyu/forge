@@ -104,9 +104,6 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 		case "users":
 			httpHandleUsers(writer, request, params)
 			return
-		case "gc":
-			httpHandleGC(writer, request, params)
-			return
 		default:
 			errorPage404(writer, params)
 			return
