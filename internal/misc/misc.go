@@ -5,13 +5,6 @@ package misc
 
 import "strings"
 
-func FirstOrPanic[T any](v T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
 // sliceContainsNewlines returns true if and only if the given slice contains
 // one or more strings that contains newlines.
 func SliceContainsNewlines(s []string) bool {

@@ -13,10 +13,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"go.lindenii.runxiyu.org/forge/internal/database"
+	"go.lindenii.runxiyu.org/forge/internal/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 	goSSH "golang.org/x/crypto/ssh"
 )
@@ -64,18 +66,10 @@ func (s *Server) Setup() {
 }
 
 func (s *Server) Run() {
-	if err := s.deployHooks(); err != nil {
-		slog.Error("deploying hooks", "error", err)
-		os.Exit(1)
-	}
-	if err := s.loadTemplates(); err != nil {
-		slog.Error("loading templates", "error", err)
-		os.Exit(1)
-	}
-	if err := s.deployGit2D(); err != nil {
-		slog.Error("deploying git2d", "error", err)
-		os.Exit(1)
-	}
+	misc.NoneOrPanic(s.loadTemplates())
+	misc.NoneOrPanic(misc.DeployBinary(misc.FirstOrPanic(embeddedResourcesFS.Open("git2d/git2d")), s.config.Git.DaemonPath))
+	misc.NoneOrPanic(misc.DeployBinary(misc.FirstOrPanic(embeddedResourcesFS.Open("hookc/hookc")), filepath.Join(s.config.Hooks.Execs, "pre-receive")))
+	misc.NoneOrPanic(os.Chmod(filepath.Join(s.config.Hooks.Execs, "pre-receive"), 0o755))
 
 	// Launch Git2D
 	go func() {
