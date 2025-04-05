@@ -24,7 +24,7 @@ func (s *Server) deployHooks() (err error) {
 		}
 		defer srcFD.Close()
 
-		if dstFD, err = os.OpenFile(filepath.Join(s.Config.Hooks.Execs, "hookc"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+		if dstFD, err = os.OpenFile(filepath.Join(s.config.Hooks.Execs, "hookc"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 			return err
 		}
 		defer dstFD.Close()
@@ -41,14 +41,14 @@ func (s *Server) deployHooks() (err error) {
 
 	// Go's embed filesystems do not store permissions; but in any case,
 	// they would need to be 0o755:
-	if err = os.Chmod(filepath.Join(s.Config.Hooks.Execs, "hookc"), 0o755); err != nil {
+	if err = os.Chmod(filepath.Join(s.config.Hooks.Execs, "hookc"), 0o755); err != nil {
 		return err
 	}
 
 	for _, hookName := range []string{
 		"pre-receive",
 	} {
-		if err = os.Symlink(filepath.Join(s.Config.Hooks.Execs, "hookc"), filepath.Join(s.Config.Hooks.Execs, hookName)); err != nil {
+		if err = os.Symlink(filepath.Join(s.config.Hooks.Execs, "hookc"), filepath.Join(s.config.Hooks.Execs, hookName)); err != nil {
 			if !errors.Is(err, fs.ErrExist) {
 				return err
 			}

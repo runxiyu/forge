@@ -77,7 +77,7 @@ func (s *Server) fedauth(ctx context.Context, userID int, service, remoteUsernam
 	}
 
 	var txn pgx.Tx
-	if txn, err = s.Database.Begin(ctx); err != nil {
+	if txn, err = s.database.Begin(ctx); err != nil {
 		return false, err
 	}
 	defer func() {

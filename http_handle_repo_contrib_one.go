@@ -33,7 +33,7 @@ func (s *Server) httpHandleRepoContribOne(writer http.ResponseWriter, request *h
 	}
 	mrIDInt = int(mrIDInt64)
 
-	if err = s.Database.QueryRow(request.Context(),
+	if err = s.database.QueryRow(request.Context(),
 		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE repo_id = $1 AND repo_local_id = $2",
 		params["repo_id"], mrIDInt,
 	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {

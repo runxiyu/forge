@@ -15,7 +15,7 @@ import (
 func (s *Server) addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
 	var txn pgx.Tx
 
-	if txn, err = s.Database.Begin(ctx); err != nil {
+	if txn, err = s.database.Begin(ctx); err != nil {
 		return
 	}
 	defer func() {

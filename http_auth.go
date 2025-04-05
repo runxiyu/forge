@@ -16,7 +16,7 @@ func (s *Server) getUserFromRequest(request *http.Request) (id int, username str
 		return
 	}
 
-	err = s.Database.QueryRow(
+	err = s.database.QueryRow(
 		request.Context(),
 		"SELECT user_id, COALESCE(username, '') FROM users u JOIN sessions s ON u.id = s.user_id WHERE s.session_id = $1;",
 		sessionCookie.Value,

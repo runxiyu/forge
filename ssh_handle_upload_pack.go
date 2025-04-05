@@ -20,7 +20,7 @@ func (s *Server) sshHandleUploadPack(session glider_ssh.Session, pubkey, repoIde
 	}
 
 	proc := exec.CommandContext(session.Context(), "git-upload-pack", repoPath)
-	proc.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.Config.Hooks.Socket)
+	proc.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
 	proc.Stdin = session
 	proc.Stdout = session
 	proc.Stderr = session.Stderr()

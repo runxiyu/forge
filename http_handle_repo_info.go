@@ -21,7 +21,7 @@ func (s *Server) httpHandleRepoInfo(writer http.ResponseWriter, request *http.Re
 	repoName := params["repo_name"].(string)
 	var repoPath string
 
-	if err := s.Database.QueryRow(request.Context(), `
+	if err := s.database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT

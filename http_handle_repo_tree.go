@@ -25,7 +25,7 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 
 	_, repoPath, _, _, _, _, _ := s.getRepoInfo(request.Context(), groupPath, repoName, "")
 
-	client, err := git2c.NewClient(s.Config.Git.Socket)
+	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
 		errorPage500(writer, params, err.Error())
 		return

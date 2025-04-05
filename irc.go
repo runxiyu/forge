@@ -19,10 +19,10 @@ type errorBack[T any] struct {
 func (s *Server) ircBotSession() error {
 	var err error
 	var underlyingConn net.Conn
-	if s.Config.IRC.TLS {
-		underlyingConn, err = tls.Dial(s.Config.IRC.Net, s.Config.IRC.Addr, nil)
+	if s.config.IRC.TLS {
+		underlyingConn, err = tls.Dial(s.config.IRC.Net, s.config.IRC.Addr, nil)
 	} else {
-		underlyingConn, err = net.Dial(s.Config.IRC.Net, s.Config.IRC.Addr)
+		underlyingConn, err = net.Dial(s.config.IRC.Net, s.config.IRC.Addr)
 	}
 	if err != nil {
 		return err
@@ -36,11 +36,11 @@ func (s *Server) ircBotSession() error {
 		return conn.WriteString(s + "\r\n")
 	}
 
-	_, err = logAndWriteLn("NICK " + s.Config.IRC.Nick)
+	_, err = logAndWriteLn("NICK " + s.config.IRC.Nick)
 	if err != nil {
 		return err
 	}
-	_, err = logAndWriteLn("USER " + s.Config.IRC.User + " 0 * :" + s.Config.IRC.Gecos)
+	_, err = logAndWriteLn("USER " + s.config.IRC.User + " 0 * :" + s.config.IRC.Gecos)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (s *Server) ircBotSession() error {
 				if !ok {
 					slog.Error("unable to convert source of JOIN to client")
 				}
-				if c.Nick != s.Config.IRC.Nick {
+				if c.Nick != s.config.IRC.Nick {
 					continue
 				}
 			default:
@@ -93,18 +93,18 @@ func (s *Server) ircBotSession() error {
 		select {
 		case err = <-readLoopError:
 			return err
-		case line := <-s.IrcSendBuffered:
+		case line := <-s.ircSendBuffered:
 			_, err = logAndWriteLn(line)
 			if err != nil {
 				select {
-				case s.IrcSendBuffered <- line:
+				case s.ircSendBuffered <- line:
 				default:
 					slog.Error("unable to requeue message", "line", line)
 				}
 				writeLoopAbort <- struct{}{}
 				return err
 			}
-		case lineErrorBack := <-s.IrcSendDirectChan:
+		case lineErrorBack := <-s.ircSendDirectChan:
 			_, err = logAndWriteLn(lineErrorBack.content)
 			lineErrorBack.errorBack <- err
 			if err != nil {
@@ -120,7 +120,7 @@ func (s *Server) ircBotSession() error {
 func (s *Server) ircSendDirect(line string) error {
 	ech := make(chan error, 1)
 
-	s.IrcSendDirectChan <- errorBack[string]{
+	s.ircSendDirectChan <- errorBack[string]{
 		content:   line,
 		errorBack: ech,
 	}
@@ -130,8 +130,8 @@ func (s *Server) ircSendDirect(line string) error {
 
 // TODO: Delay and warnings?
 func (s *Server) ircBotLoop() {
-	s.IrcSendBuffered = make(chan string, s.Config.IRC.SendQ)
-	s.IrcSendDirectChan = make(chan errorBack[string])
+	s.ircSendBuffered = make(chan string, s.config.IRC.SendQ)
+	s.ircSendDirectChan = make(chan errorBack[string])
 
 	for {
 		err := s.ircBotSession()

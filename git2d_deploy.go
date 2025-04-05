@@ -18,7 +18,7 @@ func (s *Server) deployGit2D() (err error) {
 	}
 	defer srcFD.Close()
 
-	if dstFD, err = os.OpenFile(s.Config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+	if dstFD, err = os.OpenFile(s.config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 		return err
 	}
 	defer dstFD.Close()

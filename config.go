@@ -84,19 +84,19 @@ func (s *Server) LoadConfig(path string) (err error) {
 	defer configFile.Close()
 
 	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
-	if err = decoder.Decode(&s.Config); err != nil {
+	if err = decoder.Decode(&s.config); err != nil {
 		return err
 	}
 
-	if s.Config.DB.Type != "postgres" {
+	if s.config.DB.Type != "postgres" {
 		return errors.New("unsupported database type")
 	}
 
-	if s.Database, err = pgxpool.New(context.Background(), s.Config.DB.Conn); err != nil {
+	if s.database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
 		return err
 	}
 
-	s.GlobalData["forge_title"] = s.Config.General.Title
+	s.globalData["forge_title"] = s.config.General.Title
 
 	return nil
 }

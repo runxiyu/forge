@@ -25,7 +25,7 @@ func (s *Server) serveSSH(listener net.Listener) error {
 	var err error
 	var server *gliderSSH.Server
 
-	if hostKeyBytes, err = os.ReadFile(s.Config.SSH.Key); err != nil {
+	if hostKeyBytes, err = os.ReadFile(s.config.SSH.Key); err != nil {
 		return err
 	}
 
@@ -33,9 +33,9 @@ func (s *Server) serveSSH(listener net.Listener) error {
 		return err
 	}
 
-	s.ServerPubkey = hostKey.PublicKey()
-	s.ServerPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(s.ServerPubkey))
-	s.ServerPubkeyFP = goSSH.FingerprintSHA256(s.ServerPubkey)
+	s.serverPubkey = hostKey.PublicKey()
+	s.serverPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(s.serverPubkey))
+	s.serverPubkeyFP = goSSH.FingerprintSHA256(s.serverPubkey)
 
 	server = &gliderSSH.Server{
 		Handler: func(session gliderSSH.Session) {
@@ -46,7 +46,7 @@ func (s *Server) serveSSH(listener net.Listener) error {
 			}
 
 			slog.Info("incoming ssh", "addr", session.RemoteAddr().String(), "key", clientPubkeyStr, "command", session.RawCommand())
-			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(s.Config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
+			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(s.config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
 

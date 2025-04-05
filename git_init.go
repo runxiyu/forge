@@ -23,7 +23,7 @@ func (s *Server) gitInit(repoPath string) (err error) {
 		return err
 	}
 
-	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", s.Config.Hooks.Execs)
+	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", s.config.Hooks.Execs)
 	gitConf.Raw.SetOption("receive", gitFmtConfig.NoSubsection, "advertisePushOptions", "true")
 
 	if err = repo.SetConfig(gitConf); err != nil {

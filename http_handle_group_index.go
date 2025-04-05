@@ -28,7 +28,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	groupPath = params["group_path"].([]string)
 
 	// The group itself
-	err = s.Database.QueryRow(request.Context(), `
+	err = s.database.QueryRow(request.Context(), `
 		WITH RECURSIVE group_path_cte AS (
 			SELECT
 				id,
@@ -69,7 +69,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 
 	// ACL
 	var count int
-	err = s.Database.QueryRow(request.Context(), `
+	err = s.database.QueryRow(request.Context(), `
 		SELECT COUNT(*)
 		FROM user_group_roles
 		WHERE user_id = $1
@@ -96,7 +96,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		}
 
 		var newRepoID int
-		err := s.Database.QueryRow(
+		err := s.database.QueryRow(
 			request.Context(),
 			`INSERT INTO repos (name, description, group_id, contrib_requirements)
 	 VALUES ($1, $2, $3, $4)
@@ -111,9 +111,9 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			return
 		}
 
-		filePath := filepath.Join(s.Config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
+		filePath := filepath.Join(s.config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
 
-		_, err = s.Database.Exec(
+		_, err = s.database.Exec(
 			request.Context(),
 			`UPDATE repos
 	 SET filesystem_path = $1
@@ -137,7 +137,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 
 	// Repos
 	var rows pgx.Rows
-	rows, err = s.Database.Query(request.Context(), `
+	rows, err = s.database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM repos
 		WHERE group_id = $1
@@ -162,7 +162,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	}
 
 	// Subgroups
-	rows, err = s.Database.Query(request.Context(), `
+	rows, err = s.database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM groups
 		WHERE parent_group = $1

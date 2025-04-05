@@ -21,7 +21,7 @@ import (
 func (s *Server) QueryNameDesc(ctx context.Context, query string, args ...any) (result []NameDesc, err error) {
 	var rows pgx.Rows
 
-	if rows, err = s.Database.Query(ctx, query, args...); err != nil {
+	if rows, err = s.database.Query(ctx, query, args...); err != nil {
 		return nil, err
 	}
 	defer rows.Close()

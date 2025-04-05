@@ -51,7 +51,7 @@ func (s *Server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 	}
 
 	hooksPath := repoConfCore.OptionAll("hooksPath")
-	if len(hooksPath) != 1 || hooksPath[0] != s.Config.Hooks.Execs {
+	if len(hooksPath) != 1 || hooksPath[0] != s.config.Hooks.Execs {
 		return errors.New("repository has hooksPath set to an unexpected value")
 	}
 
@@ -91,7 +91,7 @@ func (s *Server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	s.PackPasses.Store(cookie, packPass{
+	s.packPasses.Store(cookie, packPass{
 		session:      session,
 		pubkey:       pubkey,
 		directAccess: directAccess,
@@ -104,13 +104,13 @@ func (s *Server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		contribReq:   contribReq,
 		userType:     userType,
 	})
-	defer s.PackPasses.Delete(cookie)
+	defer s.packPasses.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
 	// horribly wrong such as a panic occurs.
 
 	proc := exec.CommandContext(session.Context(), "git-receive-pack", repoPath)
 	proc.Env = append(os.Environ(),
-		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.Config.Hooks.Socket,
+		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket,
 		"LINDENII_FORGE_HOOKS_COOKIE="+cookie,
 	)
 	proc.Stdin = session

@@ -14,7 +14,7 @@ import (
 //
 // TODO: Revamp.
 func (s *Server) getRepoInfo(ctx context.Context, groupPath []string, repoName, sshPubkey string) (repoID int, fsPath string, access bool, contribReq, userType string, userID int, err error) {
-	err = s.Database.QueryRow(ctx, `
+	err = s.database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (
 	-- Start: match the first name in the path where parent_group IS NULL
 	SELECT

@@ -15,11 +15,11 @@ import (
 // genSSHRemoteURL generates SSH remote URLs from a given group path and repo
 // name.
 func (s *Server) genSSHRemoteURL(groupPath []string, repoName string) string {
-	return strings.TrimSuffix(s.Config.SSH.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
+	return strings.TrimSuffix(s.config.SSH.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
 }
 
 // genHTTPRemoteURL generates HTTP remote URLs from a given group path and repo
 // name.
 func (s *Server) genHTTPRemoteURL(groupPath []string, repoName string) string {
-	return strings.TrimSuffix(s.Config.HTTP.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
+	return strings.TrimSuffix(s.config.HTTP.Root, "/") + "/" + misc.SegmentsToURL(groupPath) + "/-/repos/" + url.PathEscape(repoName)
 }

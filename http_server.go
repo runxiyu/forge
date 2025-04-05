@@ -21,7 +21,7 @@ import (
 // TODO: This function is way too large.
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var remoteAddr string
-	if s.Config.HTTP.ReverseProxy {
+	if s.config.HTTP.ReverseProxy {
 		remoteAddrs, ok := request.Header["X-Forwarded-For"]
 		if ok && len(remoteAddrs) == 1 {
 			remoteAddr = remoteAddrs[0]
@@ -50,7 +50,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	params["url_segments"] = segments
 	params["dir_mode"] = dirMode
-	params["global"] = s.GlobalData
+	params["global"] = s.globalData
 	var userID int // 0 for none
 	userID, params["username"], err = s.getUserFromRequest(request)
 	params["user_id"] = userID
@@ -87,10 +87,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 		switch segments[1] {
 		case "static":
-			s.StaticHandler.ServeHTTP(writer, request)
+			s.staticHandler.ServeHTTP(writer, request)
 			return
 		case "source":
-			s.SourceHandler.ServeHTTP(writer, request)
+			s.sourceHandler.ServeHTTP(writer, request)
 			return
 		}
 	}
@@ -183,7 +183,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				repoURLRoot = repoURLRoot + url.PathEscape(part) + "/"
 			}
 			params["repo_url_root"] = repoURLRoot
-			params["repo_patch_mailing_list"] = repoURLRoot[1:len(repoURLRoot)-1] + "@" + s.Config.LMTP.Domain
+			params["repo_patch_mailing_list"] = repoURLRoot[1:len(repoURLRoot)-1] + "@" + s.config.LMTP.Domain
 			params["http_clone_url"] = s.genHTTPRemoteURL(groupPath, moduleName)
 			params["ssh_clone_url"] = s.genSSHRemoteURL(groupPath, moduleName)
 

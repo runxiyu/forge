@@ -25,7 +25,7 @@ func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 
 	_, repoPath, _, _, _, _, _ := s.getRepoInfo(req.Context(), groupPath, repoName, "") // TODO: Don't use getRepoInfo
 
-	client, err := git2c.NewClient(s.Config.Git.Socket)
+	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
 		errorPage500(w, params, err.Error())
 		return

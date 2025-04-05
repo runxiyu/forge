@@ -23,7 +23,7 @@ func (s *Server) httpHandleRepoContribIndex(writer http.ResponseWriter, request 
 	var result []idTitleStatus
 	var err error
 
-	if rows, err = s.Database.Query(request.Context(),
+	if rows, err = s.database.Query(request.Context(),
 		"SELECT repo_local_id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
 		params["repo_id"],
 	); err != nil {

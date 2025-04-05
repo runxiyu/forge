@@ -24,7 +24,7 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 
 	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
 
-	if err := s.Database.QueryRow(request.Context(), `
+	if err := s.database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT
@@ -67,7 +67,7 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	writer.WriteHeader(http.StatusOK)
 
 	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
-	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.Config.Hooks.Socket)
+	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
 	}
