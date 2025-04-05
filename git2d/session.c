@@ -52,6 +52,11 @@ session(void *_conn)
 		if (err != 0)
 			goto free_repo;
 		break;
+	case 2:
+		err = cmd2(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
 	case 0:
 		bare_put_uint(&writer, 3);
 		goto free_repo;
