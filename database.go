@@ -15,10 +15,10 @@ import (
 // at a single point. A failure to do so may cause things as serious as
 // privilege escalation.
 
-// QueryNameDesc is a helper function that executes a query and returns a
+// queryNameDesc is a helper function that executes a query and returns a
 // list of nameDesc results. The query must return two string arguments, i.e. a
 // name and a description.
-func (s *Server) QueryNameDesc(ctx context.Context, query string, args ...any) (result []NameDesc, err error) {
+func (s *Server) queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
 	var rows pgx.Rows
 
 	if rows, err = s.database.Query(ctx, query, args...); err != nil {
@@ -31,13 +31,13 @@ func (s *Server) QueryNameDesc(ctx context.Context, query string, args ...any) (
 		if err = rows.Scan(&name, &description); err != nil {
 			return nil, err
 		}
-		result = append(result, NameDesc{name, description})
+		result = append(result, nameDesc{name, description})
 	}
 	return result, rows.Err()
 }
 
-// NameDesc holds a name and a description.
-type NameDesc struct {
+// nameDesc holds a name and a description.
+type nameDesc struct {
 	Name        string
 	Description string
 }

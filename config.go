@@ -13,9 +13,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// config holds the global configuration used by this instance. There is
-// currently no synchronization mechanism, so it must not be modified after
-// request handlers are spawned.
 type Config struct {
 	HTTP struct {
 		Net          string `scfg:"net"`
