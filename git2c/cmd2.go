@@ -38,7 +38,7 @@ func (c *Client) Cmd2(repoPath, pathSpec string) ([]TreeEntry, string, error) {
 			}
 
 			var files []TreeEntry
-			for i := 0; i < int(count); i++ {
+			for range count {
 				typeCode, err := c.reader.ReadUint()
 				if err != nil {
 					return nil, "", fmt.Errorf("error reading entry type: %w", err)
