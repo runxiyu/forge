@@ -43,12 +43,18 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 	defer conn.Close()
 
 	writer := bare.NewWriter(conn)
+	reader := bare.NewReader(conn)
+
 	if err := writer.WriteData([]byte(repoPath)); err != nil {
 		errorPage500(w, params, "sending repo path failed: "+err.Error())
 		return
 	}
 
-	reader := bare.NewReader(conn)
+	if err := writer.WriteUint(1); err != nil {
+		errorPage500(w, params, "sending command failed: "+err.Error())
+		return
+	}
+
 	status, err := reader.ReadUint()
 	if err != nil {
 		errorPage500(w, params, "reading status failed: "+err.Error())

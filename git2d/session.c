@@ -37,10 +37,27 @@ session(void *_conn)
 		goto close;
 	}
 
+	uint64_t cmd = 0;
+	err = bare_get_uint(&reader, &cmd);
+	if (err != BARE_ERROR_NONE) {
+		bare_put_uint(&writer, 2);
+		goto free_repo;
+	}
+	switch (cmd) {
+	case 1:
+		break;
+	case 0:
+		bare_put_uint(&writer, 3);
+		goto free_repo;
+	default:
+		bare_put_uint(&writer, 3);
+		goto free_repo;
+	}
+
 	git_object *obj = NULL;
 	err = git_revparse_single(&obj, repo, "HEAD^{tree}");
 	if (err != 0) {
-		bare_put_uint(&writer, 2);
+		bare_put_uint(&writer, 4);
 		goto free_repo;
 	}
 	git_tree *tree = (git_tree *) obj;
@@ -50,27 +67,27 @@ session(void *_conn)
 	git_tree_entry *entry = NULL;
 	err = git_tree_entry_bypath(&entry, tree, "README.md");
 	if (err != 0) {
-		bare_put_uint(&writer, 3);
+		bare_put_uint(&writer, 5);
 		goto free_tree;
 	}
 
 	git_otype objtype = git_tree_entry_type(entry);
 	if (objtype != GIT_OBJECT_BLOB) {
-		bare_put_uint(&writer, 4);
+		bare_put_uint(&writer, 6);
 		goto free_tree_entry;
 	}
 
 	git_object *obj2 = NULL;
 	err = git_tree_entry_to_object(&obj2, repo, entry);
 	if (err != 0) {
-		bare_put_uint(&writer, 5);
+		bare_put_uint(&writer, 7);
 		goto free_tree_entry;
 	}
 
 	git_blob *blob = (git_blob *) obj2;
 	const void *content = git_blob_rawcontent(blob);
 	if (content == NULL) {
-		bare_put_uint(&writer, 6);
+		bare_put_uint(&writer, 8);
 		goto free_blob;
 	}
 
@@ -81,12 +98,12 @@ session(void *_conn)
 
 	git_revwalk *walker = NULL;
 	if (git_revwalk_new(&walker, repo) != 0) {
-		bare_put_uint(&writer, 7);
+		bare_put_uint(&writer, 9);
 		goto free_blob;
 	}
 
 	if (git_revwalk_push_head(walker) != 0) {
-		bare_put_uint(&writer, 8);
+		bare_put_uint(&writer, 9);
 		goto free_blob;
 	}
 
