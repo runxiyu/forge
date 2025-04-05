@@ -38,7 +38,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 	brWriter := bare.NewWriter(conn)
 	brReader := bare.NewReader(conn)
 
-	if err := brWriter.WriteData([]byte(repoPath)); err != nil {
+	if err := brWriter.WriteData(stringToBytes(repoPath)); err != nil {
 		errorPage500(writer, params, "sending repo path failed: "+err.Error())
 		return
 	}
@@ -46,7 +46,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		errorPage500(writer, params, "sending command failed: "+err.Error())
 		return
 	}
-	if err := brWriter.WriteData([]byte(pathSpec)); err != nil {
+	if err := brWriter.WriteData(stringToBytes(pathSpec)); err != nil {
 		errorPage500(writer, params, "sending path failed: "+err.Error())
 		return
 	}

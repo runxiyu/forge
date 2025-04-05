@@ -35,7 +35,7 @@ func renderReadmeAtTree(tree *object.Tree) (string, template.HTML) {
 		if err != nil {
 			return "Error fetching README", escapeHTML("Unable to fetch contents of " + name + ": " + err.Error())
 		}
-		return renderReadme([]byte(contents), name)
+		return renderReadme(stringToBytes(contents), name)
 	}
 	return "", ""
 }

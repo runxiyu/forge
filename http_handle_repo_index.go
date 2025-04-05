@@ -45,7 +45,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 	writer := bare.NewWriter(conn)
 	reader := bare.NewReader(conn)
 
-	if err := writer.WriteData([]byte(repoPath)); err != nil {
+	if err := writer.WriteData(stringToBytes(repoPath)); err != nil {
 		errorPage500(w, params, "sending repo path failed: "+err.Error())
 		return
 	}
