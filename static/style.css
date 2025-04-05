@@ -120,6 +120,7 @@ a:link, a:visited {
 /* Readme word breaks to avoid overfull hboxes */
 #readme {
 	word-break: break-word;
+	line-height: 1.3;
 }
 
 /* Table styles */
