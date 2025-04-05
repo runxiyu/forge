@@ -16,7 +16,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
-var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM))
+var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM)) //nolint:gochecknoglobals
 
 // renderReadme renders and sanitizes README content from a byte slice and filename.
 func Readme(data []byte, filename string) (string, template.HTML) {

@@ -14,15 +14,17 @@ MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-fo
 
 VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
+EMBED = git2d/git2d hookc/hookc source.tar.gz LICENSE $(wildcard static/*) $(wildcard templates/*)
+EMBED_ = $(EMBED:%=internal/embed/%)
 
-forge: source.tar.gz hookc/hookc git2d/git2d $(SOURCE_FILES)
+forge: $(EMBED_) $(SOURCE_FILES)
 	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "go.lindenii.runxiyu.org/forge.version=$(VERSION)"' -tags 'osusergo netgo static_build' ./cmd/forge
 
 utils/colb:
 
 hookc/hookc:
 
-git2d/git2d: git2d/*.c
+git2d/git2d: $(wildcard git2d/*.c)
 	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
@@ -31,3 +33,7 @@ clean:
 source.tar.gz: $(SOURCE_FILES)
 	rm -f source.tar.gz
 	git ls-files -z | xargs -0 tar -czf source.tar.gz
+
+internal/embed/%: %
+	mkdir -p $(shell dirname $@)
+	cp $^ $@

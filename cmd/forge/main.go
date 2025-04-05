@@ -6,7 +6,7 @@ package main
 import (
 	"flag"
 
-	"go.lindenii.runxiyu.org/forge"
+	"go.lindenii.runxiyu.org/forge/internal/unsorted"
 )
 
 func main() {
@@ -17,7 +17,10 @@ func main() {
 	)
 	flag.Parse()
 
-	s := forge.NewServer(*configPath)
+	s, err := unsorted.NewServer(*configPath)
+	if err != nil {
+		panic(err)
+	}
 
-	s.Run()
+	panic(s.Run())
 }
