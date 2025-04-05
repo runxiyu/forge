@@ -7,13 +7,13 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"syscall"
 	"time"
-
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 func main() {
@@ -25,16 +25,20 @@ func main() {
 	flag.Parse()
 
 	if err := loadConfig(*configPath); err != nil {
-		clog.Fatal(1, "Loading configuration: "+err.Error())
+		slog.Error("loading configuration", "error", err)
+		os.Exit(1)
 	}
 	if err := deployHooks(); err != nil {
-		clog.Fatal(1, "Deploying hooks to filesystem: "+err.Error())
+		slog.Error("deploying hooks", "error", err)
+		os.Exit(1)
 	}
 	if err := loadTemplates(); err != nil {
-		clog.Fatal(1, "Loading templates: "+err.Error())
+		slog.Error("loading templates", "error", err)
+		os.Exit(1)
 	}
 	if err := deployGit2D(); err != nil {
-		clog.Fatal(1, "Deploying git2d: "+err.Error())
+		slog.Error("deploying git2d", "error", err)
+		os.Exit(1)
 	}
 
 	// Launch Git2D
@@ -51,20 +55,24 @@ func main() {
 	{
 		hooksListener, err := net.Listen("unix", config.Hooks.Socket)
 		if errors.Is(err, syscall.EADDRINUSE) {
-			clog.Warn("Removing existing socket " + config.Hooks.Socket)
+			slog.Warn("removing existing socket", "path", config.Hooks.Socket)
 			if err = syscall.Unlink(config.Hooks.Socket); err != nil {
-				clog.Fatal(1, "Removing existing socket: "+err.Error())
+				slog.Error("removing existing socket", "path", config.Hooks.Socket, "error", err)
+				os.Exit(1)
 			}
 			if hooksListener, err = net.Listen("unix", config.Hooks.Socket); err != nil {
-				clog.Fatal(1, "Listening hooks: "+err.Error())
+				slog.Error("listening hooks", "error", err)
+				os.Exit(1)
 			}
 		} else if err != nil {
-			clog.Fatal(1, "Listening hooks: "+err.Error())
+			slog.Error("listening hooks", "error", err)
+			os.Exit(1)
 		}
-		clog.Info("Listening hooks on unix " + config.Hooks.Socket)
+		slog.Info("listening hooks on unix", "path", config.Hooks.Socket)
 		go func() {
 			if err = serveGitHooks(hooksListener); err != nil {
-				clog.Fatal(1, "Serving hooks: "+err.Error())
+				slog.Error("serving hooks", "error", err)
+				os.Exit(1)
 			}
 		}()
 	}
@@ -73,20 +81,24 @@ func main() {
 	{
 		lmtpListener, err := net.Listen("unix", config.LMTP.Socket)
 		if errors.Is(err, syscall.EADDRINUSE) {
-			clog.Warn("Removing existing socket " + config.LMTP.Socket)
+			slog.Warn("removing existing socket", "path", config.LMTP.Socket)
 			if err = syscall.Unlink(config.LMTP.Socket); err != nil {
-				clog.Fatal(1, "Removing existing socket: "+err.Error())
+				slog.Error("removing existing socket", "path", config.LMTP.Socket, "error", err)
+				os.Exit(1)
 			}
 			if lmtpListener, err = net.Listen("unix", config.LMTP.Socket); err != nil {
-				clog.Fatal(1, "Listening LMTP: "+err.Error())
+				slog.Error("listening LMTP", "error", err)
+				os.Exit(1)
 			}
 		} else if err != nil {
-			clog.Fatal(1, "Listening LMTP: "+err.Error())
+			slog.Error("listening LMTP", "error", err)
+			os.Exit(1)
 		}
-		clog.Info("Listening LMTP on unix " + config.LMTP.Socket)
+		slog.Info("listening LMTP on unix", "path", config.LMTP.Socket)
 		go func() {
 			if err = serveLMTP(lmtpListener); err != nil {
-				clog.Fatal(1, "Serving LMTP: "+err.Error())
+				slog.Error("serving LMTP", "error", err)
+				os.Exit(1)
 			}
 		}()
 	}
@@ -95,20 +107,24 @@ func main() {
 	{
 		sshListener, err := net.Listen(config.SSH.Net, config.SSH.Addr)
 		if errors.Is(err, syscall.EADDRINUSE) && config.SSH.Net == "unix" {
-			clog.Warn("Removing existing socket " + config.SSH.Addr)
+			slog.Warn("removing existing socket", "path", config.SSH.Addr)
 			if err = syscall.Unlink(config.SSH.Addr); err != nil {
-				clog.Fatal(1, "Removing existing socket: "+err.Error())
+				slog.Error("removing existing socket", "path", config.SSH.Addr, "error", err)
+				os.Exit(1)
 			}
 			if sshListener, err = net.Listen(config.SSH.Net, config.SSH.Addr); err != nil {
-				clog.Fatal(1, "Listening SSH: "+err.Error())
+				slog.Error("listening SSH", "error", err)
+				os.Exit(1)
 			}
 		} else if err != nil {
-			clog.Fatal(1, "Listening SSH: "+err.Error())
+			slog.Error("listening SSH", "error", err)
+			os.Exit(1)
 		}
-		clog.Info("Listening SSH on " + config.SSH.Net + " " + config.SSH.Addr)
+		slog.Info("listening SSH on", "net", config.SSH.Net, "addr", config.SSH.Addr)
 		go func() {
 			if err = serveSSH(sshListener); err != nil {
-				clog.Fatal(1, "Serving SSH: "+err.Error())
+				slog.Error("serving SSH", "error", err)
+				os.Exit(1)
 			}
 		}()
 	}
@@ -117,15 +133,18 @@ func main() {
 	{
 		httpListener, err := net.Listen(config.HTTP.Net, config.HTTP.Addr)
 		if errors.Is(err, syscall.EADDRINUSE) && config.HTTP.Net == "unix" {
-			clog.Warn("Removing existing socket " + config.HTTP.Addr)
+			slog.Warn("removing existing socket", "path", config.HTTP.Addr)
 			if err = syscall.Unlink(config.HTTP.Addr); err != nil {
-				clog.Fatal(1, "Removing existing socket: "+err.Error())
+				slog.Error("removing existing socket", "path", config.HTTP.Addr, "error", err)
+				os.Exit(1)
 			}
 			if httpListener, err = net.Listen(config.HTTP.Net, config.HTTP.Addr); err != nil {
-				clog.Fatal(1, "Listening HTTP: "+err.Error())
+				slog.Error("listening HTTP", "error", err)
+				os.Exit(1)
 			}
 		} else if err != nil {
-			clog.Fatal(1, "Listening HTTP: "+err.Error())
+			slog.Error("listening HTTP", "error", err)
+			os.Exit(1)
 		}
 		server := http.Server{
 			Handler:      &forgeHTTPRouter{},
@@ -133,10 +152,11 @@ func main() {
 			WriteTimeout: time.Duration(config.HTTP.ReadTimeout) * time.Second,
 			IdleTimeout:  time.Duration(config.HTTP.ReadTimeout) * time.Second,
 		} //exhaustruct:ignore
-		clog.Info("Listening HTTP on " + config.HTTP.Net + " " + config.HTTP.Addr)
+		slog.Info("listening HTTP on", "net", config.HTTP.Net, "addr", config.HTTP.Addr)
 		go func() {
 			if err = server.Serve(httpListener); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				clog.Fatal(1, "Serving HTTP: "+err.Error())
+				slog.Error("serving HTTP", "error", err)
+				os.Exit(1)
 			}
 		}()
 	}

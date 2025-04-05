@@ -5,13 +5,13 @@ package main
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 type forgeHTTPRouter struct{}
@@ -32,7 +32,7 @@ func (router *forgeHTTPRouter) ServeHTTP(writer http.ResponseWriter, request *ht
 	} else {
 		remoteAddr = request.RemoteAddr
 	}
-	clog.Info("Incoming HTTP: " + remoteAddr + " " + request.Method + " " + request.RequestURI)
+	slog.Info("incoming http", "addr", remoteAddr, "method", request.Method, "uri", request.RequestURI)
 
 	var segments []string
 	var err error

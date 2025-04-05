@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"os"
 	"path/filepath"
@@ -24,7 +25,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"go.lindenii.runxiyu.org/forge/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 var (
@@ -253,7 +253,7 @@ func hooksHandler(conn net.Conn) {
 						select {
 						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
-							clog.Error("IRC SendQ exceeded")
+							slog.Error("IRC SendQ exceeded")
 						}
 					} else { // Existing contrib branch
 						var existingMRUser int

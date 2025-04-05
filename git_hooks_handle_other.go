@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"path/filepath"
 	"strconv"
@@ -22,7 +23,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"go.lindenii.runxiyu.org/forge/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
 
 var errGetFD = errors.New("unable to get file descriptor")
@@ -231,7 +231,7 @@ func hooksHandler(conn net.Conn) {
 						select {
 						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
-							clog.Error("IRC SendQ exceeded")
+							slog.Error("IRC SendQ exceeded")
 						}
 					} else { // Existing contrib branch
 						var existingMRUser int

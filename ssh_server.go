@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 	"strings"
@@ -12,7 +13,6 @@ import (
 	gliderSSH "github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/forge/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 	goSSH "golang.org/x/crypto/ssh"
 )
 
@@ -51,7 +51,7 @@ func serveSSH(listener net.Listener) error {
 				clientPubkeyStr = strings.TrimSuffix(misc.BytesToString(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
 			}
 
-			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + clientPubkeyStr + " " + session.RawCommand())
+			slog.Info("incoming ssh", "addr", session.RemoteAddr().String(), "key", clientPubkeyStr, "command", session.RawCommand())
 			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
@@ -94,7 +94,8 @@ func serveSSH(listener net.Listener) error {
 	server.AddHostKey(hostKey)
 
 	if err = server.Serve(listener); err != nil {
-		clog.Fatal(1, "Serving SSH: "+err.Error())
+		slog.Error("error serving SSH", "error", err.Error())
+		os.Exit(1)
 	}
 
 	return nil

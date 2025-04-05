@@ -5,9 +5,9 @@ package main
 
 import (
 	"crypto/tls"
+	"log/slog"
 	"net"
 
-	"go.lindenii.runxiyu.org/lindenii-common/clog"
 	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
@@ -37,7 +37,7 @@ func ircBotSession() error {
 	conn := irc.NewConn(underlyingConn)
 
 	logAndWriteLn := func(s string) (n int, err error) {
-		clog.Debug("IRC tx: " + s)
+		slog.Debug("irc tx", "line", s)
 		return conn.WriteString(s + "\r\n")
 	}
 
@@ -66,7 +66,7 @@ func ircBotSession() error {
 				return
 			}
 
-			clog.Debug("IRC rx: " + line)
+			slog.Debug("irc rx", "line", line)
 
 			switch msg.Command {
 			case "001":
@@ -84,7 +84,7 @@ func ircBotSession() error {
 			case "JOIN":
 				c, ok := msg.Source.(irc.Client)
 				if !ok {
-					clog.Error("IRC server told us a non-client is joining a channel...")
+					slog.Error("unable to convert source of JOIN to client")
 				}
 				if c.Nick != config.IRC.Nick {
 					continue
@@ -104,7 +104,7 @@ func ircBotSession() error {
 				select {
 				case ircSendBuffered <- line:
 				default:
-					clog.Error("unable to requeue IRC message: " + line)
+					slog.Error("unable to requeue message", "line", line)
 				}
 				writeLoopAbort <- struct{}{}
 				return err
@@ -140,6 +140,6 @@ func ircBotLoop() {
 
 	for {
 		err := ircBotSession()
-		clog.Error("IRC error: " + err.Error())
+		slog.Error("irc session error", "error", err)
 	}
 }
