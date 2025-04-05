@@ -70,7 +70,7 @@ WHERE g.depth = cardinality($1::text[])
 type displayTreeEntry struct {
 	Name      string
 	Mode      string
-	Size      int64
+	Size      uint64
 	IsFile    bool
 	IsSubtree bool
 }
@@ -91,9 +91,8 @@ func makeDisplayTree(tree *object.Tree) (displayTree []displayTreeEntry) {
 
 		displayEntry.IsFile = entry.Mode.IsFile()
 
-		if displayEntry.Size, err = tree.Size(entry.Name); err != nil {
-			displayEntry.Size = 0
-		}
+		size, _ := tree.Size(entry.Name)
+		displayEntry.Size = uint64(size) //#nosec G115
 
 		displayEntry.Name = strings.TrimPrefix(entry.Name, "/")
 

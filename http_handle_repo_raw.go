@@ -100,7 +100,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 				files = append(files, displayTreeEntry{
 					Name:      string(name),
 					Mode:      fmt.Sprintf("%06o", mode),
-					Size:      int64(size),
+					Size:      size,
 					IsFile:    typeCode == 2,
 					IsSubtree: typeCode == 1,
 				})
