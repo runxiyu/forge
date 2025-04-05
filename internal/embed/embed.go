@@ -1,3 +1,4 @@
+// Package embed provides embedded filesystems created in build-time.
 package embed
 
 import "embed"

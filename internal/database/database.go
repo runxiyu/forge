@@ -1,3 +1,4 @@
+// Package database provides stubs and wrappers for databases.
 package database
 
 import (
