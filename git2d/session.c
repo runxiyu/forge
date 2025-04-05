@@ -13,7 +13,6 @@ session(void *_conn)
 
 	int err;
 
-	char path[4096] = {0};
 	conn_io_t io = {.fd = conn };
 	struct bare_reader reader = {
 		.buffer = &io,
@@ -25,6 +24,7 @@ session(void *_conn)
 	};
 
 	/* Repo path */
+	char path[4096] = {0};
 	err = bare_get_data(&reader, (uint8_t *) path, sizeof(path) - 1);
 	if (err != BARE_ERROR_NONE) {
 		goto close;
