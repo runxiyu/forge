@@ -32,11 +32,11 @@ func loadTemplates() (err error) {
 	minifier.Add("text/html", &minifierOptions)
 
 	templates = template.New("templates").Funcs(template.FuncMap{
-		"first_line":        FirstLine,
-		"path_escape":       PathEscape,
-		"query_escape":      QueryEscape,
-		"dereference_error": DereferenceOrZero[error],
-		"minus":             Minus,
+		"first_line":        misc.FirstLine,
+		"path_escape":       misc.PathEscape,
+		"query_escape":      misc.QueryEscape,
+		"dereference_error": misc.DereferenceOrZero[error],
+		"minus":             misc.Minus,
 	})
 
 	err = fs.WalkDir(embeddedResourcesFS, "templates", func(path string, d fs.DirEntry, err error) error {
