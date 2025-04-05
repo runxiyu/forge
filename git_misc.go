@@ -247,4 +247,4 @@ func commitToPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch
 	return
 }
 
-var nullTree object.Tree
+var nullTree object.Tree //nolint:gochecknoglobals

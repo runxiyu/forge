@@ -99,7 +99,7 @@ func (f fakeDiffFile) Path() string {
 	return f.path
 }
 
-var nullFakeDiffFile = fakeDiffFile{
+var nullFakeDiffFile = fakeDiffFile{ //nolint:gochecknoglobals
 	hash: plumbing.NewHash("0000000000000000000000000000000000000000"),
 	mode: misc.FirstOrPanic(filemode.New("100644")),
 	path: "",

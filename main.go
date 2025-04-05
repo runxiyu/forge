@@ -36,6 +36,12 @@ func main() {
 		panic(err)
 	}
 	s.staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
+	s.globalData = map[string]any{
+		"server_public_key_string":      &s.serverPubkeyString,
+		"server_public_key_fingerprint": &s.serverPubkeyFP,
+		"forge_version":                 VERSION,
+		// Some other ones are populated after config parsing
+	}
 
 	if err := s.loadConfig(*configPath); err != nil {
 		slog.Error("loading configuration", "error", err)

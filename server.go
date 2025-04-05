@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	goSSH "golang.org/x/crypto/ssh"
 )
 
 type server struct {
@@ -19,4 +20,11 @@ type server struct {
 
 	ircSendBuffered   chan string
 	ircSendDirectChan chan errorBack[string]
+
+	// globalData is passed as "global" when rendering HTML templates.
+	globalData map[string]any
+
+	serverPubkeyString string
+	serverPubkeyFP     string
+	serverPubkey       goSSH.PublicKey
 }

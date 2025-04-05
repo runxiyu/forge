@@ -16,12 +16,6 @@ import (
 	goSSH "golang.org/x/crypto/ssh"
 )
 
-var (
-	serverPubkeyString string
-	serverPubkeyFP     string
-	serverPubkey       goSSH.PublicKey
-)
-
 // serveSSH serves SSH on a [net.Listener]. The listener should generally be a
 // TCP listener, although AF_UNIX SOCK_STREAM listeners may be appropriate in
 // rare cases.
@@ -39,9 +33,9 @@ func (s *server) serveSSH(listener net.Listener) error {
 		return err
 	}
 
-	serverPubkey = hostKey.PublicKey()
-	serverPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(serverPubkey))
-	serverPubkeyFP = goSSH.FingerprintSHA256(serverPubkey)
+	s.serverPubkey = hostKey.PublicKey()
+	s.serverPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(s.serverPubkey))
+	s.serverPubkeyFP = goSSH.FingerprintSHA256(s.serverPubkey)
 
 	server = &gliderSSH.Server{
 		Handler: func(session gliderSSH.Session) {

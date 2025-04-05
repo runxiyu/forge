@@ -50,7 +50,7 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	params["url_segments"] = segments
 	params["dir_mode"] = dirMode
-	params["global"] = globalData
+	params["global"] = s.globalData
 	var userID int // 0 for none
 	userID, params["username"], err = s.getUserFromRequest(request)
 	params["user_id"] = userID

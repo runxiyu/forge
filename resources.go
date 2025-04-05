@@ -20,7 +20,7 @@ var embeddedSourceFS embed.FS
 //go:embed hookc/hookc git2d/git2d
 var embeddedResourcesFS embed.FS
 
-var templates *template.Template
+var templates *template.Template //nolint:gochecknoglobals
 
 // loadTemplates minifies and loads HTML templates.
 func loadTemplates() (err error) {

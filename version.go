@@ -1,3 +1,3 @@
 package main
 
-var VERSION = "unknown"
+var VERSION = "unknown" //nolint:gochecknoglobals

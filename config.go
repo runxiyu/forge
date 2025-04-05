@@ -96,7 +96,7 @@ func (s *server) loadConfig(path string) (err error) {
 		return err
 	}
 
-	globalData["forge_title"] = s.config.General.Title
+	s.globalData["forge_title"] = s.config.General.Title
 
 	return nil
 }
