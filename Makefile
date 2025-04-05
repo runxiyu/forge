@@ -14,7 +14,7 @@ MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-fo
 
 VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
-EMBED = git2d/git2d hookc/hookc source.tar.gz LICENSE $(wildcard static/*) $(wildcard templates/*)
+EMBED = git2d/git2d hookc/hookc source.tar.gz $(wildcard LICENSE*) $(wildcard static/*) $(wildcard templates/*)
 EMBED_ = $(EMBED:%=internal/embed/%)
 
 forge: $(EMBED_) $(SOURCE_FILES)
