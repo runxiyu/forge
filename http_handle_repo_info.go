@@ -16,12 +16,12 @@ import (
 // HTTP protocol.
 //
 // TODO: Reject access from web browsers.
-func httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
+func (s *server) httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	groupPath := params["group_path"].([]string)
 	repoName := params["repo_name"].(string)
 	var repoPath string
 
-	if err := database.QueryRow(request.Context(), `
+	if err := s.database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT

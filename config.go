@@ -92,7 +92,7 @@ func (s *server) loadConfig(path string) (err error) {
 		return errors.New("unsupported database type")
 	}
 
-	if database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
+	if s.database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
 		return err
 	}
 

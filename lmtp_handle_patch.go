@@ -19,7 +19,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/misc"
 )
 
-func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {
+func (s *server) lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {
 	var diffFiles []*gitdiff.File
 	var preamble string
 	if diffFiles, preamble, err = gitdiff.Parse(mbox); err != nil {
@@ -33,7 +33,7 @@ func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, 
 
 	var repo *git.Repository
 	var fsPath string
-	repo, _, _, fsPath, err = openRepo(session.ctx, groupPath, repoName)
+	repo, _, _, fsPath, err = s.openRepo(session.ctx, groupPath, repoName)
 	if err != nil {
 		return fmt.Errorf("failed to open repo: %w", err)
 	}

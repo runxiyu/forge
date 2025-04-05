@@ -35,7 +35,7 @@ func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	username = request.PostFormValue("username")
 	password = request.PostFormValue("password")
 
-	err = database.QueryRow(request.Context(),
+	err = s.database.QueryRow(request.Context(),
 		"SELECT id, COALESCE(password, '') FROM users WHERE username = $1",
 		username,
 	).Scan(&userID, &passwordHash)
@@ -85,7 +85,7 @@ func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 
 	http.SetCookie(writer, &cookie)
 
-	_, err = database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
+	_, err = s.database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
 		errorPage500(writer, params, "Error inserting session: "+err.Error())
 		return

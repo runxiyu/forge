@@ -52,7 +52,7 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	params["dir_mode"] = dirMode
 	params["global"] = globalData
 	var userID int // 0 for none
-	userID, params["username"], err = getUserFromRequest(request)
+	userID, params["username"], err = s.getUserFromRequest(request)
 	params["user_id"] = userID
 	if err != nil && !errors.Is(err, http.ErrNoCookie) && !errors.Is(err, pgx.ErrNoRows) {
 		errorPage500(writer, params, "Error getting user info from request: "+err.Error())
@@ -152,7 +152,7 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			if len(segments) > sepIndex+3 {
 				switch segments[sepIndex+3] {
 				case "info":
-					if err = httpHandleRepoInfo(writer, request, params); err != nil {
+					if err = s.httpHandleRepoInfo(writer, request, params); err != nil {
 						errorPage500(writer, params, err.Error())
 					}
 					return
@@ -173,7 +173,7 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				}
 			}
 
-			if params["repo"], params["repo_description"], params["repo_id"], _, err = openRepo(request.Context(), groupPath, moduleName); err != nil {
+			if params["repo"], params["repo_description"], params["repo_id"], _, err = s.openRepo(request.Context(), groupPath, moduleName); err != nil {
 				errorPage500(writer, params, "Error opening repo: "+err.Error())
 				return
 			}
@@ -256,10 +256,10 @@ func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				}
 				switch len(segments) {
 				case sepIndex + 4:
-					httpHandleRepoContribIndex(writer, request, params)
+					s.httpHandleRepoContribIndex(writer, request, params)
 				case sepIndex + 5:
 					params["mr_id"] = segments[sepIndex+4]
-					httpHandleRepoContribOne(writer, request, params)
+					s.httpHandleRepoContribOne(writer, request, params)
 				default:
 					errorPage400(writer, params, "Too many parameters")
 				}

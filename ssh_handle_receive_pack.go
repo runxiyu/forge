@@ -76,7 +76,7 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 				return errors.New("you need to have an SSH public key to push to this repo")
 			}
 			if userType == "" {
-				userID, err = addUserSSH(session.Context(), pubkey)
+				userID, err = s.addUserSSH(session.Context(), pubkey)
 				if err != nil {
 					return err
 				}

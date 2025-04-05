@@ -177,7 +177,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 		moduleName := segments[sepIndex+2]
 		switch moduleType {
 		case "repos":
-			err = lmtpHandlePatch(session, groupPath, moduleName, &mbox)
+			err = session.s.lmtpHandlePatch(session, groupPath, moduleName, &mbox)
 			if err != nil {
 				slog.Error("error handling patch", "error", err)
 				goto end

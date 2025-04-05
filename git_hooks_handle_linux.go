@@ -233,12 +233,12 @@ func (s *server) hooksHandler(conn net.Conn) {
 						var newMRLocalID int
 
 						if packPass.userID != 0 {
-							err = database.QueryRow(ctx,
+							err = s.database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING repo_local_id",
 								packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
 							).Scan(&newMRLocalID)
 						} else {
-							err = database.QueryRow(ctx,
+							err = s.database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, source_ref, status) VALUES ($1, $2, 'open') RETURNING repo_local_id",
 								packPass.repoID, strings.TrimPrefix(refName, "refs/heads/"),
 							).Scan(&newMRLocalID)
@@ -259,7 +259,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 						var existingMRUser int
 						var isAncestor bool
 
-						err = database.QueryRow(ctx,
+						err = s.database.QueryRow(ctx,
 							"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
 							strings.TrimPrefix(refName, "refs/heads/"), packPass.repoID,
 						).Scan(&existingMRUser)

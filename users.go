@@ -12,10 +12,10 @@ import (
 // addUserSSH adds a new user solely based on their SSH public key.
 //
 // TODO: Audit all users of this function.
-func addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
+func (s *server) addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
 	var txn pgx.Tx
 
-	if txn, err = database.Begin(ctx); err != nil {
+	if txn, err = s.database.Begin(ctx); err != nil {
 		return
 	}
 	defer func() {

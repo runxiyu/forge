@@ -24,7 +24,7 @@ func (s *server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 
 	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
 
-	if err := database.QueryRow(request.Context(), `
+	if err := s.database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT

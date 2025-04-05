@@ -7,7 +7,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // TODO: All database handling logic in all request handlers must be revamped.
@@ -16,18 +15,13 @@ import (
 // at a single point. A failure to do so may cause things as serious as
 // privilege escalation.
 
-// database serves as the primary database handle for this entire application.
-// Transactions or single reads may be used from it. A [pgxpool.Pool] is
-// necessary to safely use pgx concurrently; pgx.Conn, etc. are insufficient.
-var database *pgxpool.Pool
-
 // queryNameDesc is a helper function that executes a query and returns a
 // list of nameDesc results. The query must return two string arguments, i.e. a
 // name and a description.
 func (s *server) queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
 	var rows pgx.Rows
 
-	if rows, err = database.Query(ctx, query, args...); err != nil {
+	if rows, err = s.database.Query(ctx, query, args...); err != nil {
 		return nil, err
 	}
 	defer rows.Close()

@@ -18,12 +18,12 @@ type idTitleStatus struct {
 }
 
 // httpHandleRepoContribIndex provides an index to merge requests of a repo.
-func httpHandleRepoContribIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *server) httpHandleRepoContribIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var rows pgx.Rows
 	var result []idTitleStatus
 	var err error
 
-	if rows, err = database.Query(request.Context(),
+	if rows, err = s.database.Query(request.Context(),
 		"SELECT repo_local_id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
 		params["repo_id"],
 	); err != nil {
