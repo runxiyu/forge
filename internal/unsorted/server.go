@@ -51,7 +51,9 @@ type Server struct {
 }
 
 func NewServer(configPath string) (*Server, error) {
-	s := &Server{}
+	s := &Server{
+		globalData: make(map[string]any),
+	} //exhaustruct:ignore
 
 	if err := s.loadConfig(configPath); err != nil {
 		return s, err
@@ -208,6 +210,7 @@ func (s *Server) Run() error {
 		}()
 	}
 
+	s.ircBot = irc.NewBot(&s.config.IRC)
 	// IRC bot
 	go s.ircBot.ConnectLoop()
 
