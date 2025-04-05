@@ -1,0 +1,25 @@
+linters:
+  enable-all: true
+  disable:
+    - perfsprint
+    - wsl
+    - varnamelen
+    - nlreturn
+    - exhaustruct
+    - wrapcheck
+    - lll
+    - exhaustive
+    - intrange
+    - godox
+    - nestif
+    - err113
+    - staticcheck
+    - errorlint
+    - cyclop
+    - nonamedreturns
+    - funlen
+    - gochecknoglobals
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
