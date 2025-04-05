@@ -130,7 +130,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 		}
 
 	case 3:
-		errorPage500(writer, params, fmt.Sprintf("path not found: %s", pathSpec))
+		errorPage500(writer, params, "path not found: "+pathSpec)
 
 	default:
 		errorPage500(writer, params, fmt.Sprintf("unknown status code: %d", status))

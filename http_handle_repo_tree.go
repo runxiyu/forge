@@ -126,7 +126,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		}
 
 	case 3:
-		errorPage500(writer, params, fmt.Sprintf("path not found: %s", pathSpec))
+		errorPage500(writer, params, "path not found: "+pathSpec)
 		return
 
 	default:
