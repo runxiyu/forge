@@ -11,7 +11,6 @@ import (
 
 	gliderSSH "github.com/gliderlabs/ssh"
 	"github.com/go-git/go-git/v5"
-	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 )
 
 // packPass contains information known when handling incoming SSH connections
@@ -29,9 +28,6 @@ type packPass struct {
 	repoName     string
 	contribReq   string
 }
-
-// packPasses contains hook cookies mapped to their packPass.
-var packPasses = cmap.Map[string, packPass]{}
 
 // sshHandleRecvPack handles attempts to push to repos.
 func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
@@ -95,7 +91,7 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	packPasses.Store(cookie, packPass{
+	s.packPasses.Store(cookie, packPass{
 		session:      session,
 		pubkey:       pubkey,
 		directAccess: directAccess,
@@ -108,7 +104,7 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		contribReq:   contribReq,
 		userType:     userType,
 	})
-	defer packPasses.Delete(cookie)
+	defer s.packPasses.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
 	// horribly wrong such as a panic occurs.
 

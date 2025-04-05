@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 	goSSH "golang.org/x/crypto/ssh"
 )
 
@@ -27,4 +28,7 @@ type server struct {
 	serverPubkeyString string
 	serverPubkeyFP     string
 	serverPubkey       goSSH.PublicKey
+
+	// packPasses contains hook cookies mapped to their packPass.
+	packPasses cmap.Map[string, packPass]
 }

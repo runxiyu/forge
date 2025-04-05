@@ -55,7 +55,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 
 	{
 		var ok bool
-		packPass, ok = packPasses.Load(misc.BytesToString(cookie))
+		packPass, ok = s.packPasses.Load(misc.BytesToString(cookie))
 		if !ok {
 			if _, err = conn.Write([]byte{1}); err != nil {
 				return
