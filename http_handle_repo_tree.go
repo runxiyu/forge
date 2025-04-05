@@ -97,7 +97,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 				}
 
 				files = append(files, displayTreeEntry{
-					Name:      string(name),
+					Name:      bytesToString(name),
 					Mode:      fmt.Sprintf("%06o", mode),
 					Size:      size,
 					IsFile:    typeCode == 2,
@@ -116,7 +116,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 				errorPage500(writer, params, "error reading file content: "+err.Error())
 				return
 			}
-			rendered := renderHighlightedFile(pathSpec, string(content))
+			rendered := renderHighlightedFile(pathSpec, bytesToString(content))
 			params["file_contents"] = rendered
 			renderTemplate(writer, "repo_tree_file", params)
 

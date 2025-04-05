@@ -44,7 +44,7 @@ func renderReadmeAtTree(tree *object.Tree) (string, template.HTML) {
 func renderReadme(data []byte, filename string) (string, template.HTML) {
 	switch strings.ToLower(filename) {
 	case "readme":
-		return "README", template.HTML("<pre>" + html.EscapeString(string(data)) + "</pre>") //#nosec G203
+		return "README", template.HTML("<pre>" + html.EscapeString(bytesToString(data)) + "</pre>") //#nosec G203
 	case "readme.md":
 		var buf bytes.Buffer
 		if err := markdownConverter.Convert(data, &buf); err != nil {
@@ -52,12 +52,12 @@ func renderReadme(data []byte, filename string) (string, template.HTML) {
 		}
 		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(buf.Bytes())) //#nosec G203
 	case "readme.org":
-		htmlStr, err := org.New().Parse(strings.NewReader(string(data)), filename).Write(org.NewHTMLWriter())
+		htmlStr, err := org.New().Parse(strings.NewReader(bytesToString(data)), filename).Write(org.NewHTMLWriter())
 		if err != nil {
 			return "Error fetching README", escapeHTML("Unable to render README: " + err.Error())
 		}
 		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(htmlStr)) //#nosec G203
 	default:
-		return filename, template.HTML("<pre>" + html.EscapeString(string(data)) + "</pre>") //#nosec G203
+		return filename, template.HTML("<pre>" + html.EscapeString(bytesToString(data)) + "</pre>") //#nosec G203
 	}
 }

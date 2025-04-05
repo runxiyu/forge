@@ -91,10 +91,10 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 
 		commits = append(commits, commitDisplay{
 			Hash:    hex.EncodeToString(id),
-			Author:  string(authorName),
-			Email:   string(authorEmail),
-			Date:    string(authorDate),
-			Message: string(title),
+			Author:  bytesToString(authorName),
+			Email:   bytesToString(authorEmail),
+			Date:    bytesToString(authorDate),
+			Message: bytesToString(title),
 		})
 	}
 

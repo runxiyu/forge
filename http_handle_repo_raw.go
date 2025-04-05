@@ -98,7 +98,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 					return
 				}
 				files = append(files, displayTreeEntry{
-					Name:      string(name),
+					Name:      bytesToString(name),
 					Mode:      fmt.Sprintf("%06o", mode),
 					Size:      size,
 					IsFile:    typeCode == 2,
@@ -123,7 +123,7 @@ func httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params
 				return
 			}
 			writer.Header().Set("Content-Type", "application/octet-stream")
-			fmt.Fprint(writer, string(content))
+			fmt.Fprint(writer, bytesToString(content))
 
 		default:
 			errorPage500(writer, params, fmt.Sprintf("unknown object kind: %d", kind))

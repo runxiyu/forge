@@ -76,14 +76,14 @@ func buildTreeRecursive(ctx context.Context, repoPath, baseTree string, updates 
 			if modeEnd < 0 {
 				return errors.New("invalid tree format")
 			}
-			mode := string(data[i : i+modeEnd])
+			mode := bytesToString(data[i : i+modeEnd])
 			i += modeEnd + 1
 
 			nameEnd := bytes.IndexByte(data[i:], 0)
 			if nameEnd < 0 {
 				return errors.New("missing null after filename")
 			}
-			name := string(data[i : i+nameEnd])
+			name := bytesToString(data[i : i+nameEnd])
 			i += nameEnd + 1
 
 			if i+20 > len(data) {
