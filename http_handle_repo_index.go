@@ -4,15 +4,10 @@
 package main
 
 import (
-	"encoding/hex"
-	"errors"
-	"fmt"
-	"io"
-	"net"
 	"net/http"
 	"strings"
 
-	"git.sr.ht/~sircmpwn/go-bare"
+	"go.lindenii.runxiyu.org/forge/git2c"
 )
 
 type commitDisplay struct {
@@ -35,72 +30,22 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 		notes = append(notes, "Path contains newlines; HTTP Git access impossible")
 	}
 
-	conn, err := net.Dial("unix", config.Git.Socket)
+	client, err := git2c.NewClient(config.Git.Socket)
 	if err != nil {
-		errorPage500(w, params, "git2d connection failed: "+err.Error())
+		errorPage500(w, params, err.Error())
 		return
 	}
-	defer conn.Close()
+	defer client.Close()
 
-	writer := bare.NewWriter(conn)
-	reader := bare.NewReader(conn)
-
-	if err := writer.WriteData(stringToBytes(repoPath)); err != nil {
-		errorPage500(w, params, "sending repo path failed: "+err.Error())
-		return
-	}
-
-	if err := writer.WriteUint(1); err != nil {
-		errorPage500(w, params, "sending command failed: "+err.Error())
-		return
-	}
-
-	status, err := reader.ReadUint()
+	commits, readme, err := client.Cmd1(repoPath)
 	if err != nil {
-		errorPage500(w, params, "reading status failed: "+err.Error())
+		errorPage500(w, params, err.Error())
 		return
-	}
-	if status != 0 {
-		errorPage500(w, params, fmt.Sprintf("git2d error: %d", status))
-		return
-	}
-
-	// README
-	readmeRaw, err := reader.ReadData()
-	if err != nil {
-		readmeRaw = nil
-	}
-	readmeFilename, readmeRendered := renderReadme(readmeRaw, "README.md")
-
-	// Commits
-	var commits []commitDisplay
-	for {
-		id, err := reader.ReadData()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			errorPage500(w, params, "error reading commit ID: "+err.Error())
-			return
-		}
-
-		title, _ := reader.ReadData()
-		authorName, _ := reader.ReadData()
-		authorEmail, _ := reader.ReadData()
-		authorDate, _ := reader.ReadData()
-
-		commits = append(commits, commitDisplay{
-			Hash:    hex.EncodeToString(id),
-			Author:  bytesToString(authorName),
-			Email:   bytesToString(authorEmail),
-			Date:    bytesToString(authorDate),
-			Message: bytesToString(title),
-		})
 	}
 
 	params["commits"] = commits
-	params["readme_filename"] = readmeFilename
-	params["readme"] = readmeRendered
+	params["readme_filename"] = readme.Filename
+	_, params["readme"] = renderReadme(readme.Content, readme.Filename)
 	params["notes"] = notes
 
 	renderTemplate(w, "repo_index", params)

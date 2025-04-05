@@ -69,9 +69,7 @@ func loadTemplates() (err error) {
 	return err
 }
 
-var (
-	staticHandler http.Handler
-)
+var staticHandler http.Handler
 
 // This init sets up static handlers. The resulting handlers must be
 // used in the HTTP router, and do nothing unless called from elsewhere.
