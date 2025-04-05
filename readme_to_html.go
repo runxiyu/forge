@@ -9,7 +9,6 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/niklasfasching/go-org/org"
 	"github.com/yuin/goldmark"
@@ -21,23 +20,6 @@ var markdownConverter = goldmark.New(goldmark.WithExtensions(extension.GFM))
 // escapeHTML just escapes a string and wraps it in [template.HTML].
 func escapeHTML(s string) template.HTML {
 	return template.HTML(html.EscapeString(s)) //#nosec G203
-}
-
-// renderReadmeAtTree looks for README files in the supplied Git tree and
-// returns its filename and rendered (and sanitized) HTML.
-func renderReadmeAtTree(tree *object.Tree) (string, template.HTML) {
-	for _, name := range []string{"README", "README.md", "README.org"} {
-		file, err := tree.File(name)
-		if err != nil {
-			continue
-		}
-		contents, err := file.Contents()
-		if err != nil {
-			return "Error fetching README", escapeHTML("Unable to fetch contents of " + name + ": " + err.Error())
-		}
-		return renderReadme(stringToBytes(contents), name)
-	}
-	return "", ""
 }
 
 // renderReadme renders and sanitizes README content from a byte slice and filename.
