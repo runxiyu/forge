@@ -28,14 +28,14 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, err.Error())
+		web.ErrorPage500(s.templates, writer, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	files, content, err := client.Cmd2(repoPath, pathSpec)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, err.Error())
+		web.ErrorPage500(s.templates, writer, params, err.Error())
 		return
 	}
 
@@ -44,12 +44,12 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 		params["files"] = files
 		params["readme_filename"] = "README.md"
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
-		renderTemplate(writer, "repo_tree_dir", params)
+		s.renderTemplate(writer, "repo_tree_dir", params)
 	case content != "":
 		rendered := render.Highlight(pathSpec, content)
 		params["file_contents"] = rendered
-		renderTemplate(writer, "repo_tree_file", params)
+		s.renderTemplate(writer, "repo_tree_file", params)
 	default:
-		web.ErrorPage500(templates, writer, params, "Unknown object type, something is seriously wrong")
+		web.ErrorPage500(s.templates, writer, params, "Unknown object type, something is seriously wrong")
 	}
 }

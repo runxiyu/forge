@@ -40,7 +40,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	params := make(map[string]any)
 
 	if segments, _, err = misc.ParseReqURI(request.RequestURI); err != nil {
-		web.ErrorPage400(templates, writer, params, "Error parsing request URI: "+err.Error())
+		web.ErrorPage400(s.templates, writer, params, "Error parsing request URI: "+err.Error())
 		return
 	}
 	dirMode := false
@@ -56,7 +56,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	userID, params["username"], err = s.getUserFromRequest(request)
 	params["user_id"] = userID
 	if err != nil && !errors.Is(err, http.ErrNoCookie) && !errors.Is(err, pgx.ErrNoRows) {
-		web.ErrorPage500(templates, writer, params, "Error getting user info from request: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting user info from request: "+err.Error())
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	for _, v := range segments {
 		if strings.Contains(v, ":") {
-			web.ErrorPage400Colon(templates, writer, params)
+			web.ErrorPage400Colon(s.templates, writer, params)
 			return
 		}
 	}
@@ -80,7 +80,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	if segments[0] == "-" {
 		if len(segments) < 2 {
-			web.ErrorPage404(templates, writer, params)
+			web.ErrorPage404(s.templates, writer, params)
 			return
 		} else if len(segments) == 2 && misc.RedirectDir(writer, request) {
 			return
@@ -102,10 +102,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			s.httpHandleLogin(writer, request, params)
 			return
 		case "users":
-			httpHandleUsers(writer, request, params)
+			s.httpHandleUsers(writer, request, params)
 			return
 		default:
-			web.ErrorPage404(templates, writer, params)
+			web.ErrorPage404(s.templates, writer, params)
 			return
 		}
 	}
@@ -138,10 +138,10 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		}
 		s.httpHandleGroupIndex(writer, request, params)
 	case len(segments) == sepIndex+1:
-		web.ErrorPage404(templates, writer, params)
+		web.ErrorPage404(s.templates, writer, params)
 		return
 	case len(segments) == sepIndex+2:
-		web.ErrorPage404(templates, writer, params)
+		web.ErrorPage404(s.templates, writer, params)
 		return
 	default:
 		moduleType = segments[sepIndex+1]
@@ -154,12 +154,12 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				switch segments[sepIndex+3] {
 				case "info":
 					if err = s.httpHandleRepoInfo(writer, request, params); err != nil {
-						web.ErrorPage500(templates, writer, params, err.Error())
+						web.ErrorPage500(s.templates, writer, params, err.Error())
 					}
 					return
 				case "git-upload-pack":
 					if err = s.httpHandleUploadPack(writer, request, params); err != nil {
-						web.ErrorPage500(templates, writer, params, err.Error())
+						web.ErrorPage500(s.templates, writer, params, err.Error())
 					}
 					return
 				}
@@ -169,13 +169,13 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				if errors.Is(err, misc.ErrNoRefSpec) {
 					params["ref_type"] = ""
 				} else {
-					web.ErrorPage400(templates, writer, params, "Error querying ref type: "+err.Error())
+					web.ErrorPage400(s.templates, writer, params, "Error querying ref type: "+err.Error())
 					return
 				}
 			}
 
 			if params["repo"], params["repo_description"], params["repo_id"], _, err = s.openRepo(request.Context(), groupPath, moduleName); err != nil {
-				web.ErrorPage500(templates, writer, params, "Error opening repo: "+err.Error())
+				web.ErrorPage500(s.templates, writer, params, "Error opening repo: "+err.Error())
 				return
 			}
 
@@ -200,7 +200,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			switch repoFeature {
 			case "tree":
 				if misc.AnyContain(segments[sepIndex+4:], "/") {
-					web.ErrorPage400(templates, writer, params, "Repo tree paths may not contain slashes in any segments")
+					web.ErrorPage400(s.templates, writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
 				if dirMode {
@@ -220,7 +220,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				return
 			case "raw":
 				if misc.AnyContain(segments[sepIndex+4:], "/") {
-					web.ErrorPage400(templates, writer, params, "Repo tree paths may not contain slashes in any segments")
+					web.ErrorPage400(s.templates, writer, params, "Repo tree paths may not contain slashes in any segments")
 					return
 				}
 				if dirMode {
@@ -234,23 +234,23 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				s.httpHandleRepoRaw(writer, request, params)
 			case "log":
 				if len(segments) > sepIndex+4 {
-					web.ErrorPage400(templates, writer, params, "Too many parameters")
+					web.ErrorPage400(s.templates, writer, params, "Too many parameters")
 					return
 				}
 				if misc.RedirectDir(writer, request) {
 					return
 				}
-				httpHandleRepoLog(writer, request, params)
+				s.httpHandleRepoLog(writer, request, params)
 			case "commit":
 				if len(segments) != sepIndex+5 {
-					web.ErrorPage400(templates, writer, params, "Incorrect number of parameters")
+					web.ErrorPage400(s.templates, writer, params, "Incorrect number of parameters")
 					return
 				}
 				if misc.RedirectNoDir(writer, request) {
 					return
 				}
 				params["commit_id"] = segments[sepIndex+4]
-				httpHandleRepoCommit(writer, request, params)
+				s.httpHandleRepoCommit(writer, request, params)
 			case "contrib":
 				if misc.RedirectDir(writer, request) {
 					return
@@ -262,14 +262,14 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 					params["mr_id"] = segments[sepIndex+4]
 					s.httpHandleRepoContribOne(writer, request, params)
 				default:
-					web.ErrorPage400(templates, writer, params, "Too many parameters")
+					web.ErrorPage400(s.templates, writer, params, "Too many parameters")
 				}
 			default:
-				web.ErrorPage404(templates, writer, params)
+				web.ErrorPage404(s.templates, writer, params)
 				return
 			}
 		default:
-			web.ErrorPage404(templates, writer, params)
+			web.ErrorPage404(s.templates, writer, params)
 			return
 		}
 	}

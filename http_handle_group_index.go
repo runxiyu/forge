@@ -62,10 +62,10 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	).Scan(&groupID, &groupDesc)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		web.ErrorPage404(templates, writer, params)
+		web.ErrorPage404(s.templates, writer, params)
 		return
 	} else if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting group: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting group: "+err.Error())
 		return
 	}
 
@@ -78,14 +78,14 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			AND group_id = $2
 	`, params["user_id"].(int), groupID).Scan(&count)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error checking access: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error checking access: "+err.Error())
 		return
 	}
 	directAccess := (count > 0)
 
 	if request.Method == http.MethodPost {
 		if !directAccess {
-			web.ErrorPage403(templates, writer, params, "You do not have direct access to this group")
+			web.ErrorPage403(s.templates, writer, params, "You do not have direct access to this group")
 			return
 		}
 
@@ -93,7 +93,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		repoDesc := request.FormValue("repo_desc")
 		contribReq := request.FormValue("repo_contrib")
 		if repoName == "" {
-			web.ErrorPage400(templates, writer, params, "Repo name is required")
+			web.ErrorPage400(s.templates, writer, params, "Repo name is required")
 			return
 		}
 
@@ -109,7 +109,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			contribReq,
 		).Scan(&newRepoID)
 		if err != nil {
-			web.ErrorPage500(templates, writer, params, "Error creating repo: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error creating repo: "+err.Error())
 			return
 		}
 
@@ -124,12 +124,12 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			newRepoID,
 		)
 		if err != nil {
-			web.ErrorPage500(templates, writer, params, "Error updating repo path: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error updating repo path: "+err.Error())
 			return
 		}
 
 		if err = s.gitInit(filePath); err != nil {
-			web.ErrorPage500(templates, writer, params, "Error initializing repo: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error initializing repo: "+err.Error())
 			return
 		}
 
@@ -145,7 +145,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		WHERE group_id = $1
 	`, groupID)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting repos: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting repos: "+err.Error())
 		return
 	}
 	defer rows.Close()
@@ -153,13 +153,13 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			web.ErrorPage500(templates, writer, params, "Error getting repos: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error getting repos: "+err.Error())
 			return
 		}
 		repos = append(repos, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting repos: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting repos: "+err.Error())
 		return
 	}
 
@@ -170,7 +170,7 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		WHERE parent_group = $1
 	`, groupID)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting subgroups: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting subgroups: "+err.Error())
 		return
 	}
 	defer rows.Close()
@@ -178,13 +178,13 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	for rows.Next() {
 		var name, description string
 		if err = rows.Scan(&name, &description); err != nil {
-			web.ErrorPage500(templates, writer, params, "Error getting subgroups: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error getting subgroups: "+err.Error())
 			return
 		}
 		subgroups = append(subgroups, nameDesc{name, description})
 	}
 	if err = rows.Err(); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting subgroups: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting subgroups: "+err.Error())
 		return
 	}
 
@@ -193,5 +193,5 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	params["description"] = groupDesc
 	params["direct_access"] = directAccess
 
-	renderTemplate(writer, "group", params)
+	s.renderTemplate(writer, "group", params)
 }

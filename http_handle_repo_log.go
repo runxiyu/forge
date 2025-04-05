@@ -15,7 +15,7 @@ import (
 //
 // TODO: This currently provides all commits in the branch. It should be
 // paginated and cached instead.
-func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var refHash plumbing.Hash
 	var err error
@@ -23,17 +23,17 @@ func httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[s
 	repo = params["repo"].(*git.Repository)
 
 	if refHash, err = getRefHash(repo, params["ref_type"].(string), params["ref_name"].(string)); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting ref hash: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting ref hash: "+err.Error())
 		return
 	}
 
 	logOptions := git.LogOptions{From: refHash} //exhaustruct:ignore
 	commitIter, err := repo.Log(&logOptions)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting recent commits: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting recent commits: "+err.Error())
 		return
 	}
 	params["commits"], params["commits_err"] = commitIterSeqErr(commitIter)
 
-	renderTemplate(writer, "repo_log", params)
+	s.renderTemplate(writer, "repo_log", params)
 }

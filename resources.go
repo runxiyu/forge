@@ -20,10 +20,8 @@ var embeddedSourceFS embed.FS
 //go:embed hookc/hookc git2d/git2d
 var embeddedResourcesFS embed.FS
 
-var templates *template.Template //nolint:gochecknoglobals
-
 // loadTemplates minifies and loads HTML templates.
-func loadTemplates() (err error) {
+func (s *Server) loadTemplates() (err error) {
 	minifier := minify.New()
 	minifierOptions := html.Minifier{
 		TemplateDelims:      [2]string{"{{", "}}"},
@@ -31,7 +29,7 @@ func loadTemplates() (err error) {
 	} //exhaustruct:ignore
 	minifier.Add("text/html", &minifierOptions)
 
-	templates = template.New("templates").Funcs(template.FuncMap{
+	s.templates = template.New("templates").Funcs(template.FuncMap{
 		"first_line":        misc.FirstLine,
 		"path_escape":       misc.PathEscape,
 		"query_escape":      misc.QueryEscape,
@@ -54,7 +52,7 @@ func loadTemplates() (err error) {
 				return err
 			}
 
-			_, err = templates.Parse(misc.BytesToString(minified))
+			_, err = s.templates.Parse(misc.BytesToString(minified))
 			if err != nil {
 				return err
 			}

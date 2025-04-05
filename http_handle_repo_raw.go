@@ -27,14 +27,14 @@ func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, err.Error())
+		web.ErrorPage500(s.templates, writer, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	files, content, err := client.Cmd2(repoPath, pathSpec)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, err.Error())
+		web.ErrorPage500(s.templates, writer, params, err.Error())
 		return
 	}
 
@@ -43,7 +43,7 @@ func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 		params["files"] = files
 		params["readme_filename"] = "README.md"
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
-		renderTemplate(writer, "repo_raw_dir", params)
+		s.renderTemplate(writer, "repo_raw_dir", params)
 	case content != "":
 		if misc.RedirectNoDir(writer, request) {
 			return
@@ -51,6 +51,6 @@ func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 		writer.Header().Set("Content-Type", "application/octet-stream")
 		fmt.Fprint(writer, content)
 	default:
-		web.ErrorPage500(templates, writer, params, "Unknown error fetching repo raw data")
+		web.ErrorPage500(s.templates, writer, params, "Unknown error fetching repo raw data")
 	}
 }

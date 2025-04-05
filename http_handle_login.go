@@ -29,7 +29,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	var cookie http.Cookie
 
 	if request.Method != http.MethodPost {
-		renderTemplate(writer, "login", params)
+		s.renderTemplate(writer, "login", params)
 		return
 	}
 
@@ -43,31 +43,31 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			params["login_error"] = "Unknown username"
-			renderTemplate(writer, "login", params)
+			s.renderTemplate(writer, "login", params)
 			return
 		}
-		web.ErrorPage500(templates, writer, params, "Error querying user information: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error querying user information: "+err.Error())
 		return
 	}
 	if passwordHash == "" {
 		params["login_error"] = "User has no password"
-		renderTemplate(writer, "login", params)
+		s.renderTemplate(writer, "login", params)
 		return
 	}
 
 	if passwordMatches, err = argon2id.ComparePasswordAndHash(password, passwordHash); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error comparing password and hash: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error comparing password and hash: "+err.Error())
 		return
 	}
 
 	if !passwordMatches {
 		params["login_error"] = "Invalid password"
-		renderTemplate(writer, "login", params)
+		s.renderTemplate(writer, "login", params)
 		return
 	}
 
 	if cookieValue, err = randomUrlsafeStr(16); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting random string: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting random string: "+err.Error())
 		return
 	}
 
@@ -88,7 +88,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 
 	_, err = s.database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error inserting session: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error inserting session: "+err.Error())
 		return
 	}
 

@@ -5,6 +5,7 @@ package forge
 
 import (
 	"errors"
+	"html/template"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -40,6 +41,8 @@ type Server struct {
 
 	// packPasses contains hook cookies mapped to their packPass.
 	packPasses cmap.Map[string, packPass]
+
+	templates *template.Template
 }
 
 func (s *Server) Setup() {
@@ -65,7 +68,7 @@ func (s *Server) Run() {
 		slog.Error("deploying hooks", "error", err)
 		os.Exit(1)
 	}
-	if err := loadTemplates(); err != nil {
+	if err := s.loadTemplates(); err != nil {
 		slog.Error("loading templates", "error", err)
 		os.Exit(1)
 	}

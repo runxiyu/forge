@@ -32,7 +32,7 @@ type usableChunk struct {
 	Content   string
 }
 
-func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var commitIDStrSpec, commitIDStrSpecNoSuffix string
 	var commitID plumbing.Hash
@@ -47,13 +47,13 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 	commitIDStrSpecNoSuffix = strings.TrimSuffix(commitIDStrSpec, ".patch")
 	commitID = plumbing.NewHash(commitIDStrSpecNoSuffix)
 	if commitObj, err = repo.CommitObject(commitID); err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting commit object: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting commit object: "+err.Error())
 		return
 	}
 	if commitIDStrSpecNoSuffix != commitIDStrSpec {
 		var patchStr string
 		if patchStr, err = fmtCommitPatch(commitObj); err != nil {
-			web.ErrorPage500(templates, writer, params, "Error formatting patch: "+err.Error())
+			web.ErrorPage500(s.templates, writer, params, "Error formatting patch: "+err.Error())
 			return
 		}
 		fmt.Fprintln(writer, patchStr)
@@ -71,7 +71,7 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 
 	parentCommitHash, patch, err = commitToPatch(commitObj)
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error getting patch from commit: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error getting patch from commit: "+err.Error())
 		return
 	}
 	params["parent_commit_hash"] = parentCommitHash.String()
@@ -79,7 +79,7 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 
 	params["file_patches"] = makeUsableFilePatches(patch)
 
-	renderTemplate(writer, "repo_commit", params)
+	s.renderTemplate(writer, "repo_commit", params)
 }
 
 type fakeDiffFile struct {

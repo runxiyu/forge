@@ -20,14 +20,14 @@ func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		web.ErrorPage500(templates, w, params, err.Error())
+		web.ErrorPage500(s.templates, w, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	commits, readme, err := client.Cmd1(repoPath)
 	if err != nil {
-		web.ErrorPage500(templates, w, params, err.Error())
+		web.ErrorPage500(s.templates, w, params, err.Error())
 		return
 	}
 
@@ -35,7 +35,7 @@ func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 	params["readme_filename"] = readme.Filename
 	_, params["readme"] = render.Readme(readme.Content, readme.Filename)
 
-	renderTemplate(w, "repo_index", params)
+	s.renderTemplate(w, "repo_index", params)
 
 	// TODO: Caching
 }

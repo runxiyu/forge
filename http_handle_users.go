@@ -10,6 +10,6 @@ import (
 )
 
 // httpHandleUsers is a useless stub.
-func httpHandleUsers(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
-	web.ErrorPage501(templates, writer, params)
+func (s *Server) httpHandleUsers(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
+	web.ErrorPage501(s.templates, writer, params)
 }

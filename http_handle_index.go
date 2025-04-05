@@ -19,7 +19,7 @@ func (s *Server) httpHandleIndex(writer http.ResponseWriter, request *http.Reque
 
 	groups, err = s.queryNameDesc(request.Context(), "SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL")
 	if err != nil {
-		web.ErrorPage500(templates, writer, params, "Error querying groups: "+err.Error())
+		web.ErrorPage500(s.templates, writer, params, "Error querying groups: "+err.Error())
 		return
 	}
 	params["groups"] = groups
@@ -28,5 +28,5 @@ func (s *Server) httpHandleIndex(writer http.ResponseWriter, request *http.Reque
 	memstats := runtime.MemStats{} //exhaustruct:ignore
 	runtime.ReadMemStats(&memstats)
 	params["mem"] = humanize.IBytes(memstats.Alloc)
-	renderTemplate(writer, "index", params)
+	s.renderTemplate(writer, "index", params)
 }

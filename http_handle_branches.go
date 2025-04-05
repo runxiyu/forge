@@ -42,5 +42,5 @@ func (s *Server) httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Requ
 	params["ssh_clone_url"] = s.genSSHRemoteURL(groupPath, repoName)
 	params["notes"] = notes
 
-	renderTemplate(writer, "repo_branches", params)
+	s.renderTemplate(writer, "repo_branches", params)
 }
