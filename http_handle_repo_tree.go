@@ -74,7 +74,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 				return
 			}
 			files := make([]displayTreeEntry, 0, count)
-			for i := uint64(0); i < count; i++ {
+			for range count {
 				typeCode, err := brReader.ReadUint()
 				if err != nil {
 					errorPage500(writer, params, "error reading entry type: "+err.Error())
