@@ -35,5 +35,5 @@ source.tar.gz: $(SOURCE_FILES)
 	git ls-files -z | xargs -0 tar -czf source.tar.gz
 
 internal/embed/%: %
-	mkdir -p $(shell dirname $@)
-	cp $^ $@
+	@mkdir -p $(shell dirname $@)
+	@cp $^ $@
