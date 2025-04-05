@@ -9,9 +9,7 @@ import (
 	"strings"
 )
 
-var (
-	errDirEmptyName = errors.New("scfg: directive with empty name")
-)
+var errDirEmptyName = errors.New("scfg: directive with empty name")
 
 // Write writes a parsed configuration to the provided io.Writer.
 func Write(w io.Writer, blk Block) error {
