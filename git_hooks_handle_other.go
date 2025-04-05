@@ -25,11 +25,14 @@ import (
 	"go.lindenii.runxiyu.org/forge/internal/misc"
 )
 
-var errGetFD = errors.New("unable to get file descriptor")
+var (
+	errGetFD    = errors.New("unable to get file descriptor")
+	errGetUcred = errors.New("failed getsockopt")
+)
 
 // hooksHandler handles a connection from hookc via the
 // unix socket.
-func (s *server) hooksHandler(conn net.Conn) {
+func (s *Server) hooksHandler(conn net.Conn) {
 	var ctx context.Context
 	var cancel context.CancelFunc
 	var err error
@@ -42,7 +45,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 	ctx, cancel = context.WithCancel(context.Background())
 	defer cancel()
 
-	// TODO: Validate that the connection is from the right user.
+	// TODO: ucred-like checks
 
 	cookie = make([]byte, 64)
 	if _, err = conn.Read(cookie); err != nil {
@@ -320,7 +323,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 // treats incoming connections as those from git hook handlers by spawning
 // sessions. The listener must be a SOCK_STREAM UNIX domain socket. The
 // function itself blocks.
-func (s *server) serveGitHooks(listener net.Listener) error {
+func (s *Server) serveGitHooks(listener net.Listener) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
