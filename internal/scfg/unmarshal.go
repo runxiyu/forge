@@ -107,11 +107,14 @@ func (dec *Decoder) unmarshalBlock(block Block, v reflect.Value) error {
 			}
 			v.SetMapIndex(reflect.ValueOf(name), mv)
 		}
+
 	case reflect.Struct:
 		si, err := getStructInfo(t)
 		if err != nil {
 			return err
 		}
+
+		seen := make(map[int]bool)
 
 		for name, dirs := range dirsByName {
 			fieldIndex, ok := si.children[name]
@@ -123,7 +126,18 @@ func (dec *Decoder) unmarshalBlock(block Block, v reflect.Value) error {
 			if err := dec.unmarshalDirectiveList(dirs, fv); err != nil {
 				return err
 			}
+			seen[fieldIndex] = true
 		}
+
+		for name, fieldIndex := range si.children {
+			if fieldIndex == si.param {
+				continue
+			}
+			if _, ok := seen[fieldIndex]; !ok {
+				return fmt.Errorf("scfg: missing required directive %q", name)
+			}
+		}
+
 	default:
 		return fmt.Errorf("scfg: unsupported type for unmarshaling blocks: %v", t)
 	}

@@ -69,8 +69,6 @@ type Config struct {
 // it to the global [config] struct. This may race with concurrent reads from
 // [config]; additional synchronization is necessary if the configuration is to
 // be made reloadable.
-//
-// TODO: Error out when there are missing fields
 func (s *Server) LoadConfig(path string) (err error) {
 	var configFile *os.File
 	if configFile, err = os.Open(path); err != nil {
