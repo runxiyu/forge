@@ -61,7 +61,7 @@ type Config struct {
 // it to the global [config] struct. This may race with concurrent reads from
 // [config]; additional synchronization is necessary if the configuration is to
 // be made reloadable.
-func (s *Server) LoadConfig(path string) (err error) {
+func (s *Server) loadConfig(path string) (err error) {
 	var configFile *os.File
 	if configFile, err = os.Open(path); err != nil {
 		return err

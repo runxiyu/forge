@@ -49,14 +49,18 @@ type Server struct {
 	ready bool
 }
 
-func (s *Server) Setup() {
+func (s *Server) NewServer(configPath string) error {
+	if err := s.loadConfig(configPath); err != nil {
+		return err
+	}
+
 	s.sourceHandler = http.StripPrefix(
 		"/-/source/",
 		http.FileServer(http.FS(embeddedSourceFS)),
 	)
 	staticFS, err := fs.Sub(embeddedResourcesFS, "static")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	s.staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
 	s.globalData = map[string]any{
@@ -72,6 +76,8 @@ func (s *Server) Setup() {
 	misc.NoneOrPanic(os.Chmod(filepath.Join(s.config.Hooks.Execs, "pre-receive"), 0o755))
 
 	s.ready = true
+
+	return nil
 }
 
 func (s *Server) Run() error {

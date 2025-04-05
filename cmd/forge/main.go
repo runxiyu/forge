@@ -5,8 +5,6 @@ package main
 
 import (
 	"flag"
-	"log/slog"
-	"os"
 
 	"go.lindenii.runxiyu.org/forge"
 )
@@ -19,14 +17,7 @@ func main() {
 	)
 	flag.Parse()
 
-	s := forge.Server{}
-
-	s.Setup()
-
-	if err := s.LoadConfig(*configPath); err != nil {
-		slog.Error("loading configuration", "error", err)
-		os.Exit(1)
-	}
+	s := forge.NewServer(*configPath)
 
 	s.Run()
 }
