@@ -251,7 +251,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
 
 						select {
-						case ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
+						case s.ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
 							slog.Error("IRC SendQ exceeded")
 						}

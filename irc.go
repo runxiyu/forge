@@ -11,11 +11,6 @@ import (
 	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
-var (
-	ircSendBuffered   chan string
-	ircSendDirectChan chan errorBack[string]
-)
-
 type errorBack[T any] struct {
 	content   T
 	errorBack chan error
@@ -98,18 +93,18 @@ func (s *server) ircBotSession() error {
 		select {
 		case err = <-readLoopError:
 			return err
-		case line := <-ircSendBuffered:
+		case line := <-s.ircSendBuffered:
 			_, err = logAndWriteLn(line)
 			if err != nil {
 				select {
-				case ircSendBuffered <- line:
+				case s.ircSendBuffered <- line:
 				default:
 					slog.Error("unable to requeue message", "line", line)
 				}
 				writeLoopAbort <- struct{}{}
 				return err
 			}
-		case lineErrorBack := <-ircSendDirectChan:
+		case lineErrorBack := <-s.ircSendDirectChan:
 			_, err = logAndWriteLn(lineErrorBack.content)
 			lineErrorBack.errorBack <- err
 			if err != nil {
@@ -122,11 +117,11 @@ func (s *server) ircBotSession() error {
 
 // ircSendDirect sends an IRC message directly to the connection and bypasses
 // the buffering system.
-func ircSendDirect(s string) error {
+func (s *server) ircSendDirect(line string) error {
 	ech := make(chan error, 1)
 
-	ircSendDirectChan <- errorBack[string]{
-		content:   s,
+	s.ircSendDirectChan <- errorBack[string]{
+		content:   line,
 		errorBack: ech,
 	}
 
@@ -135,8 +130,8 @@ func ircSendDirect(s string) error {
 
 // TODO: Delay and warnings?
 func (s *server) ircBotLoop() {
-	ircSendBuffered = make(chan string, s.config.IRC.SendQ)
-	ircSendDirectChan = make(chan errorBack[string])
+	s.ircSendBuffered = make(chan string, s.config.IRC.SendQ)
+	s.ircSendDirectChan = make(chan errorBack[string])
 
 	for {
 		err := s.ircBotSession()

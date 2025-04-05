@@ -16,4 +16,7 @@ type server struct {
 
 	sourceHandler http.Handler
 	staticHandler http.Handler
+
+	ircSendBuffered   chan string
+	ircSendDirectChan chan errorBack[string]
 }
