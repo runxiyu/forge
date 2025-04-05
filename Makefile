@@ -15,14 +15,8 @@ MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-fo
 VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
 
-forge: source.tar.gz hookc/hookc git2d/git2d $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt) $(SOURCE_FILES)
+forge: source.tar.gz hookc/hookc git2d/git2d $(SOURCE_FILES)
 	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "main.VERSION=$(VERSION)"' -tags 'osusergo netgo static_build'
-
-man/%.html: man/%
-	mandoc -Thtml -O style=./mandoc.css $< > $@
-
-man/%.txt: man/% utils/colb
-	mandoc $< | ./utils/colb > $@
 
 utils/colb:
 
@@ -32,7 +26,7 @@ git2d/git2d: git2d/*.c
 	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
-	rm -rf forge vendor man/*.html man/*.txt utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
+	rm -rf forge vendor utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
 
 source.tar.gz: $(SOURCE_FILES)
 	rm -f source.tar.gz

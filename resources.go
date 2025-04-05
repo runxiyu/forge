@@ -22,7 +22,6 @@ var sourceHandler = http.StripPrefix(
 )
 
 //go:embed templates/* static/*
-//go:embed man/*.html man/*.txt man/*.css
 //go:embed hookc/hookc git2d/git2d
 var resourcesFS embed.FS
 
@@ -72,10 +71,9 @@ func loadTemplates() (err error) {
 
 var (
 	staticHandler http.Handler
-	manHandler    http.Handler
 )
 
-// This init sets up static and man handlers. The resulting handlers must be
+// This init sets up static handlers. The resulting handlers must be
 // used in the HTTP router, and do nothing unless called from elsewhere.
 func init() {
 	staticFS, err := fs.Sub(resourcesFS, "static")
@@ -83,9 +81,4 @@ func init() {
 		panic(err)
 	}
 	staticHandler = http.StripPrefix("/-/static/", http.FileServer(http.FS(staticFS)))
-	manFS, err := fs.Sub(resourcesFS, "man")
-	if err != nil {
-		panic(err)
-	}
-	manHandler = http.StripPrefix("/-/man/", http.FileServer(http.FS(manFS)))
 }
