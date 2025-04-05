@@ -13,7 +13,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"go.lindenii.runxiyu.org/lindenii-common/misc"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 // usableFilePatch is a [diff.FilePatch] that is structured in a way more
