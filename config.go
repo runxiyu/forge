@@ -9,8 +9,8 @@ import (
 	"errors"
 	"os"
 
+	"codeberg.org/emersion/go-scfg"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"go.lindenii.runxiyu.org/lindenii-common/scfg"
 )
 
 // config holds the global configuration used by this instance. There is

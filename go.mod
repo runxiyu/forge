@@ -3,6 +3,7 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
+	codeberg.org/emersion/go-scfg v0.1.0
 	git.sr.ht/~sircmpwn/go-bare v0.0.0-20210406120253-ab86bc2846d9
 	github.com/alecthomas/chroma/v2 v2.16.0
 	github.com/alexedwards/argon2id v1.0.0
@@ -11,7 +12,7 @@ require (
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-smtp v0.21.3
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-git/go-git/v5 v5.14.0 // has too many deps :(
+	github.com/go-git/go-git/v5 v5.14.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/niklasfasching/go-org v1.7.0
