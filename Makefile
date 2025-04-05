@@ -1,15 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-.PHONY: clean version.go man source.tar.gz
+.PHONY: clean
 
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 MAN_PAGES = lindenii-forge.5 lindenii-forge-hookc.1 lindenii-forge.1 lindenii-forge-mail.5
 
-forge: source.tar.gz version.go hookc/*.c hookc/hookc git2d/git2d man # TODO
-	go build .
+VERSION = $(shell git describe --tags --always --dirty)
+SOURCE_FILES = $(shell git ls-files)
 
-man: $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt)
+forge: source.tar.gz hookc/hookc git2d/git2d $(MAN_PAGES:%=man/%.html) $(MAN_PAGES:%=man/%.txt) $(SOURCE_FILES)
+	go build -o forge -ldflags="-X 'main.VERSION=$(VERSION)'" .
 
 man/%.html: man/%
 	mandoc -Thtml -O style=./mandoc.css $< > $@
@@ -22,15 +23,12 @@ utils/colb:
 hookc/hookc:
 
 git2d/git2d: git2d/main.c git2d/bare.c git2d/utf8.c
-	$(CC) $(CFLAGS) -o git2d/git2d $^ `pkg-config --cflags --libs libgit2` -lpthread 
-
-version.go:
-	printf 'package main\n\nconst VERSION = "%s"\n' `git describe --tags --always --dirty` > $@
+	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
-	$(RM) forge version.go vendor
+	rm -rf forge vendor man/*.html man/*.txt utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
 
-source.tar.gz:
+source.tar.gz: $(SOURCE_FILES)
 	rm -f source.tar.gz
 	go mod vendor
 	git ls-files -z | xargs -0 tar -czf source.tar.gz vendor
