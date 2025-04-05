@@ -7,10 +7,11 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"log/slog"
 	"os"
 
-	"codeberg.org/emersion/go-scfg"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.lindenii.runxiyu.org/forge/internal/scfg"
 )
 
 type Config struct {
@@ -69,10 +70,7 @@ type Config struct {
 // [config]; additional synchronization is necessary if the configuration is to
 // be made reloadable.
 //
-// TODO: Currently, it returns an error when the user specifies any unknown
-// configuration patterns, but silently ignores fields in the [config] struct
-// that is not present in the user's configuration file. We would prefer the
-// exact opposite behavior.
+// TODO: Error out when there are missing fields
 func (s *Server) LoadConfig(path string) (err error) {
 	var configFile *os.File
 	if configFile, err = os.Open(path); err != nil {
@@ -83,6 +81,9 @@ func (s *Server) LoadConfig(path string) (err error) {
 	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
 	if err = decoder.Decode(&s.config); err != nil {
 		return err
+	}
+	for _, u := range decoder.UnknownDirectives() {
+		slog.Warn("unknown configuration directive", "directive", u)
 	}
 
 	if s.config.DB.Type != "postgres" {

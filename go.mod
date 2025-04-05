@@ -3,11 +3,11 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
-	codeberg.org/emersion/go-scfg v0.1.0
 	git.sr.ht/~sircmpwn/go-bare v0.0.0-20210406120253-ab86bc2846d9
 	github.com/alecthomas/chroma/v2 v2.16.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-smtp v0.21.3
