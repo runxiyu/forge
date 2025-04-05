@@ -13,6 +13,7 @@ import (
 
 	"github.com/alexedwards/argon2id"
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // httpHandleLogin provides the login page for local users.
@@ -45,7 +46,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 			renderTemplate(writer, "login", params)
 			return
 		}
-		errorPage500(writer, params, "Error querying user information: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error querying user information: "+err.Error())
 		return
 	}
 	if passwordHash == "" {
@@ -55,7 +56,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	}
 
 	if passwordMatches, err = argon2id.ComparePasswordAndHash(password, passwordHash); err != nil {
-		errorPage500(writer, params, "Error comparing password and hash: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error comparing password and hash: "+err.Error())
 		return
 	}
 
@@ -66,7 +67,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	}
 
 	if cookieValue, err = randomUrlsafeStr(16); err != nil {
-		errorPage500(writer, params, "Error getting random string: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting random string: "+err.Error())
 		return
 	}
 
@@ -87,7 +88,7 @@ func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 
 	_, err = s.database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
-		errorPage500(writer, params, "Error inserting session: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error inserting session: "+err.Error())
 		return
 	}
 

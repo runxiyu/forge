@@ -5,9 +5,11 @@ package forge
 
 import (
 	"net/http"
+
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // httpHandleUsers is a useless stub.
 func httpHandleUsers(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
-	errorPage501(writer, params)
+	web.ErrorPage501(templates, writer, params)
 }

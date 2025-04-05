@@ -10,6 +10,7 @@ import (
 
 	"go.lindenii.runxiyu.org/forge/internal/git2c"
 	"go.lindenii.runxiyu.org/forge/internal/render"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // httpHandleRepoTree provides a friendly, syntax-highlighted view of
@@ -27,14 +28,14 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		errorPage500(writer, params, err.Error())
+		web.ErrorPage500(templates, writer, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	files, content, err := client.Cmd2(repoPath, pathSpec)
 	if err != nil {
-		errorPage500(writer, params, err.Error())
+		web.ErrorPage500(templates, writer, params, err.Error())
 		return
 	}
 
@@ -49,6 +50,6 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 		params["file_contents"] = rendered
 		renderTemplate(writer, "repo_tree_file", params)
 	default:
-		errorPage500(writer, params, "Unknown object type, something is seriously wrong")
+		web.ErrorPage500(templates, writer, params, "Unknown object type, something is seriously wrong")
 	}
 }

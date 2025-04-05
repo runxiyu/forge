@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // idTitleStatus describes properties of a merge request that needs to be
@@ -27,7 +28,7 @@ func (s *Server) httpHandleRepoContribIndex(writer http.ResponseWriter, request 
 		"SELECT repo_local_id, COALESCE(title, 'Untitled'), status FROM merge_requests WHERE repo_id = $1",
 		params["repo_id"],
 	); err != nil {
-		errorPage500(writer, params, "Error querying merge requests: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error querying merge requests: "+err.Error())
 		return
 	}
 	defer rows.Close()
@@ -36,13 +37,13 @@ func (s *Server) httpHandleRepoContribIndex(writer http.ResponseWriter, request 
 		var mrID int
 		var mrTitle, mrStatus string
 		if err = rows.Scan(&mrID, &mrTitle, &mrStatus); err != nil {
-			errorPage500(writer, params, "Error scanning merge request: "+err.Error())
+			web.ErrorPage500(templates, writer, params, "Error scanning merge request: "+err.Error())
 			return
 		}
 		result = append(result, idTitleStatus{mrID, mrTitle, mrStatus})
 	}
 	if err = rows.Err(); err != nil {
-		errorPage500(writer, params, "Error ranging over merge requests: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error ranging over merge requests: "+err.Error())
 		return
 	}
 	params["merge_requests"] = result

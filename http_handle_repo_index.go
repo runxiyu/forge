@@ -8,6 +8,7 @@ import (
 
 	"go.lindenii.runxiyu.org/forge/internal/git2c"
 	"go.lindenii.runxiyu.org/forge/internal/render"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 type commitDisplay struct {
@@ -27,14 +28,14 @@ func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		errorPage500(w, params, err.Error())
+		web.ErrorPage500(templates, w, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	commits, readme, err := client.Cmd1(repoPath)
 	if err != nil {
-		errorPage500(w, params, err.Error())
+		web.ErrorPage500(templates, w, params, err.Error())
 		return
 	}
 

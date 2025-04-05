@@ -11,6 +11,7 @@ import (
 
 	"go.lindenii.runxiyu.org/forge/internal/git2c"
 	"go.lindenii.runxiyu.org/forge/internal/misc"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // httpHandleRepoRaw serves raw files, or directory listings that point to raw
@@ -26,14 +27,14 @@ func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 
 	client, err := git2c.NewClient(s.config.Git.Socket)
 	if err != nil {
-		errorPage500(writer, params, err.Error())
+		web.ErrorPage500(templates, writer, params, err.Error())
 		return
 	}
 	defer client.Close()
 
 	files, content, err := client.Cmd2(repoPath, pathSpec)
 	if err != nil {
-		errorPage500(writer, params, err.Error())
+		web.ErrorPage500(templates, writer, params, err.Error())
 		return
 	}
 
@@ -50,6 +51,6 @@ func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 		writer.Header().Set("Content-Type", "application/octet-stream")
 		fmt.Fprint(writer, content)
 	default:
-		errorPage500(writer, params, "Unknown error fetching repo raw data")
+		web.ErrorPage500(templates, writer, params, "Unknown error fetching repo raw data")
 	}
 }

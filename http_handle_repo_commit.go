@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/format/diff"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"go.lindenii.runxiyu.org/forge/internal/misc"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // usableFilePatch is a [diff.FilePatch] that is structured in a way more
@@ -46,13 +47,13 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 	commitIDStrSpecNoSuffix = strings.TrimSuffix(commitIDStrSpec, ".patch")
 	commitID = plumbing.NewHash(commitIDStrSpecNoSuffix)
 	if commitObj, err = repo.CommitObject(commitID); err != nil {
-		errorPage500(writer, params, "Error getting commit object: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting commit object: "+err.Error())
 		return
 	}
 	if commitIDStrSpecNoSuffix != commitIDStrSpec {
 		var patchStr string
 		if patchStr, err = fmtCommitPatch(commitObj); err != nil {
-			errorPage500(writer, params, "Error formatting patch: "+err.Error())
+			web.ErrorPage500(templates, writer, params, "Error formatting patch: "+err.Error())
 			return
 		}
 		fmt.Fprintln(writer, patchStr)
@@ -70,7 +71,7 @@ func httpHandleRepoCommit(writer http.ResponseWriter, request *http.Request, par
 
 	parentCommitHash, patch, err = commitToPatch(commitObj)
 	if err != nil {
-		errorPage500(writer, params, "Error getting patch from commit: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting patch from commit: "+err.Error())
 		return
 	}
 	params["parent_commit_hash"] = parentCommitHash.String()

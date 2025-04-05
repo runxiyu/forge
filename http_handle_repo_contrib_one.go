@@ -10,6 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"go.lindenii.runxiyu.org/forge/internal/web"
 )
 
 // httpHandleRepoContribOne provides an interface to each merge request of a
@@ -28,7 +29,7 @@ func (s *Server) httpHandleRepoContribOne(writer http.ResponseWriter, request *h
 	mrIDStr = params["mr_id"].(string)
 	mrIDInt64, err := strconv.ParseInt(mrIDStr, 10, strconv.IntSize)
 	if err != nil {
-		errorPage400(writer, params, "Merge request ID not an integer")
+		web.ErrorPage400(templates, writer, params, "Merge request ID not an integer")
 		return
 	}
 	mrIDInt = int(mrIDInt64)
@@ -37,18 +38,18 @@ func (s *Server) httpHandleRepoContribOne(writer http.ResponseWriter, request *h
 		"SELECT COALESCE(title, ''), status, source_ref, COALESCE(destination_branch, '') FROM merge_requests WHERE repo_id = $1 AND repo_local_id = $2",
 		params["repo_id"], mrIDInt,
 	).Scan(&title, &status, &srcRefStr, &dstBranchStr); err != nil {
-		errorPage500(writer, params, "Error querying merge request: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error querying merge request: "+err.Error())
 		return
 	}
 
 	repo = params["repo"].(*git.Repository)
 
 	if srcRefHash, err = getRefHash(repo, "branch", srcRefStr); err != nil {
-		errorPage500(writer, params, "Error getting source ref hash: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting source ref hash: "+err.Error())
 		return
 	}
 	if srcCommit, err = repo.CommitObject(srcRefHash); err != nil {
-		errorPage500(writer, params, "Error getting source commit: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting source commit: "+err.Error())
 		return
 	}
 	params["source_commit"] = srcCommit
@@ -60,23 +61,23 @@ func (s *Server) httpHandleRepoContribOne(writer http.ResponseWriter, request *h
 		dstBranchHash, err = getRefHash(repo, "branch", dstBranchStr)
 	}
 	if err != nil {
-		errorPage500(writer, params, "Error getting destination branch hash: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting destination branch hash: "+err.Error())
 		return
 	}
 
 	if dstCommit, err = repo.CommitObject(dstBranchHash); err != nil {
-		errorPage500(writer, params, "Error getting destination commit: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting destination commit: "+err.Error())
 		return
 	}
 	params["destination_commit"] = dstCommit
 
 	if mergeBases, err = srcCommit.MergeBase(dstCommit); err != nil {
-		errorPage500(writer, params, "Error getting merge base: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting merge base: "+err.Error())
 		return
 	}
 
 	if len(mergeBases) < 1 {
-		errorPage500(writer, params, "No merge base found for this merge request; these two branches do not share any common history")
+		web.ErrorPage500(templates, writer, params, "No merge base found for this merge request; these two branches do not share any common history")
 		// TODO
 		return
 	}
@@ -86,7 +87,7 @@ func (s *Server) httpHandleRepoContribOne(writer http.ResponseWriter, request *h
 
 	patch, err := mergeBaseCommit.Patch(srcCommit)
 	if err != nil {
-		errorPage500(writer, params, "Error getting patch: "+err.Error())
+		web.ErrorPage500(templates, writer, params, "Error getting patch: "+err.Error())
 		return
 	}
 	params["file_patches"] = makeUsableFilePatches(patch)
