@@ -108,7 +108,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 
 	switch strings.ToLower(email.Header.Get("Auto-Submitted")) {
 	case "auto-generated", "auto-replied":
-		// Disregard automatic emails like OOO repliesession.s.
+		// Disregard automatic emails like OOO replies
 		slog.Info("ignoring automatic message",
 			"from", session.from,
 			"to", strings.Join(session.to, ","),
