@@ -32,4 +32,6 @@ bare_error conn_write(void *buffer, const void *src, uint64_t sz);
 
 void * session(void *_conn);
 
+int cmd1(git_repository *repo, struct bare_writer *writer);
+
 #endif // X_H

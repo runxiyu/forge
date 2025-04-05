@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"log"
 	"net"
 	"net/http"
 	"os/exec"
@@ -39,6 +40,8 @@ func main() {
 	// Launch Git2D
 	go func() {
 		cmd := exec.Command(config.Git.DaemonPath, config.Git.Socket) //#nosec G204
+		cmd.Stderr = log.Writer()
+		cmd.Stdout = log.Writer()
 		if err := cmd.Run(); err != nil {
 			panic(err)
 		}
