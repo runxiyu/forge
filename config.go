@@ -5,12 +5,11 @@ package forge
 
 import (
 	"bufio"
-	"context"
 	"errors"
 	"log/slog"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"go.lindenii.runxiyu.org/forge/internal/database"
 	"go.lindenii.runxiyu.org/forge/internal/scfg"
 )
 
@@ -88,7 +87,7 @@ func (s *Server) LoadConfig(path string) (err error) {
 		return errors.New("unsupported database type")
 	}
 
-	if s.database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
+	if s.database, err = database.Open(s.config.DB.Conn); err != nil {
 		return err
 	}
 
