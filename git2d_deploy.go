@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"io"
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func (s *server) deployGit2D() (err error) {
+func (s *Server) deployGit2D() (err error) {
 	var srcFD fs.File
 	var dstFD *os.File
 
@@ -18,7 +18,7 @@ func (s *server) deployGit2D() (err error) {
 	}
 	defer srcFD.Close()
 
-	if dstFD, err = os.OpenFile(s.config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
+	if dstFD, err = os.OpenFile(s.Config.Git.DaemonPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {
 		return err
 	}
 	defer dstFD.Close()

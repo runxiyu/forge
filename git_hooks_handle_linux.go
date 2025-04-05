@@ -3,7 +3,7 @@
 //
 //go:build linux
 
-package main
+package forge
 
 import (
 	"bytes"
@@ -34,7 +34,7 @@ var (
 
 // hooksHandler handles a connection from hookc via the
 // unix socket.
-func (s *server) hooksHandler(conn net.Conn) {
+func (s *Server) hooksHandler(conn net.Conn) {
 	var ctx context.Context
 	var cancel context.CancelFunc
 	var ucred *syscall.Ucred
@@ -77,7 +77,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 
 	{
 		var ok bool
-		packPass, ok = s.packPasses.Load(misc.BytesToString(cookie))
+		packPass, ok = s.PackPasses.Load(misc.BytesToString(cookie))
 		if !ok {
 			if _, err = conn.Write([]byte{1}); err != nil {
 				return
@@ -233,12 +233,12 @@ func (s *server) hooksHandler(conn net.Conn) {
 						var newMRLocalID int
 
 						if packPass.userID != 0 {
-							err = s.database.QueryRow(ctx,
+							err = s.Database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, creator, source_ref, status) VALUES ($1, $2, $3, 'open') RETURNING repo_local_id",
 								packPass.repoID, packPass.userID, strings.TrimPrefix(refName, "refs/heads/"),
 							).Scan(&newMRLocalID)
 						} else {
-							err = s.database.QueryRow(ctx,
+							err = s.Database.QueryRow(ctx,
 								"INSERT INTO merge_requests (repo_id, source_ref, status) VALUES ($1, $2, 'open') RETURNING repo_local_id",
 								packPass.repoID, strings.TrimPrefix(refName, "refs/heads/"),
 							).Scan(&newMRLocalID)
@@ -251,7 +251,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 						fmt.Fprintln(sshStderr, ansiec.Blue+"Created merge request at", mergeRequestWebURL+ansiec.Reset)
 
 						select {
-						case s.ircSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
+						case s.IrcSendBuffered <- "PRIVMSG #chat :New merge request at " + mergeRequestWebURL:
 						default:
 							slog.Error("IRC SendQ exceeded")
 						}
@@ -259,7 +259,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 						var existingMRUser int
 						var isAncestor bool
 
-						err = s.database.QueryRow(ctx,
+						err = s.Database.QueryRow(ctx,
 							"SELECT COALESCE(creator, 0) FROM merge_requests WHERE source_ref = $1 AND repo_id = $2",
 							strings.TrimPrefix(refName, "refs/heads/"), packPass.repoID,
 						).Scan(&existingMRUser)
@@ -342,7 +342,7 @@ func (s *server) hooksHandler(conn net.Conn) {
 // treats incoming connections as those from git hook handlers by spawning
 // sessions. The listener must be a SOCK_STREAM UNIX domain socket. The
 // function itself blocks.
-func (s *server) serveGitHooks(listener net.Listener) error {
+func (s *Server) serveGitHooks(listener net.Listener) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {

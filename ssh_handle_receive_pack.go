@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ type packPass struct {
 }
 
 // sshHandleRecvPack handles attempts to push to repos.
-func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
+func (s *Server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdentifier string) (err error) {
 	groupPath, repoName, repoID, repoPath, directAccess, contribReq, userType, userID, err := s.getRepoInfo2(session.Context(), repoIdentifier, pubkey)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 	}
 
 	hooksPath := repoConfCore.OptionAll("hooksPath")
-	if len(hooksPath) != 1 || hooksPath[0] != s.config.Hooks.Execs {
+	if len(hooksPath) != 1 || hooksPath[0] != s.Config.Hooks.Execs {
 		return errors.New("repository has hooksPath set to an unexpected value")
 	}
 
@@ -91,7 +91,7 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		fmt.Fprintln(session.Stderr(), "Error while generating cookie:", err)
 	}
 
-	s.packPasses.Store(cookie, packPass{
+	s.PackPasses.Store(cookie, packPass{
 		session:      session,
 		pubkey:       pubkey,
 		directAccess: directAccess,
@@ -104,13 +104,13 @@ func (s *server) sshHandleRecvPack(session gliderSSH.Session, pubkey, repoIdenti
 		contribReq:   contribReq,
 		userType:     userType,
 	})
-	defer s.packPasses.Delete(cookie)
+	defer s.PackPasses.Delete(cookie)
 	// The Delete won't execute until proc.Wait returns unless something
 	// horribly wrong such as a panic occurs.
 
 	proc := exec.CommandContext(session.Context(), "git-receive-pack", repoPath)
 	proc.Env = append(os.Environ(),
-		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket,
+		"LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.Config.Hooks.Socket,
 		"LINDENII_FORGE_HOOKS_COOKIE="+cookie,
 	)
 	proc.Stdin = session

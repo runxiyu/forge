@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"bufio"
@@ -67,7 +67,7 @@ type Config struct {
 	} `scfg:"db"`
 }
 
-// loadConfig loads a configuration file from the specified path and unmarshals
+// LoadConfig loads a configuration file from the specified path and unmarshals
 // it to the global [config] struct. This may race with concurrent reads from
 // [config]; additional synchronization is necessary if the configuration is to
 // be made reloadable.
@@ -76,7 +76,7 @@ type Config struct {
 // configuration patterns, but silently ignores fields in the [config] struct
 // that is not present in the user's configuration file. We would prefer the
 // exact opposite behavior.
-func (s *server) loadConfig(path string) (err error) {
+func (s *Server) LoadConfig(path string) (err error) {
 	var configFile *os.File
 	if configFile, err = os.Open(path); err != nil {
 		return err
@@ -84,19 +84,19 @@ func (s *server) loadConfig(path string) (err error) {
 	defer configFile.Close()
 
 	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
-	if err = decoder.Decode(&s.config); err != nil {
+	if err = decoder.Decode(&s.Config); err != nil {
 		return err
 	}
 
-	if s.config.DB.Type != "postgres" {
+	if s.Config.DB.Type != "postgres" {
 		return errors.New("unsupported database type")
 	}
 
-	if s.database, err = pgxpool.New(context.Background(), s.config.DB.Conn); err != nil {
+	if s.Database, err = pgxpool.New(context.Background(), s.Config.DB.Conn); err != nil {
 		return err
 	}
 
-	s.globalData["forge_title"] = s.config.General.Title
+	s.GlobalData["forge_title"] = s.Config.General.Title
 
 	return nil
 }

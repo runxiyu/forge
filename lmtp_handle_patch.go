@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/misc"
 )
 
-func (s *server) lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {
+func (s *Server) lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {
 	var diffFiles []*gitdiff.File
 	var preamble string
 	if diffFiles, preamble, err = gitdiff.Parse(mbox); err != nil {

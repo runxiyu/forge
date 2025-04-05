@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"context"
@@ -18,10 +18,10 @@ import (
 // queryNameDesc is a helper function that executes a query and returns a
 // list of nameDesc results. The query must return two string arguments, i.e. a
 // name and a description.
-func (s *server) queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
+func (s *Server) queryNameDesc(ctx context.Context, query string, args ...any) (result []nameDesc, err error) {
 	var rows pgx.Rows
 
-	if rows, err = s.database.Query(ctx, query, args...); err != nil {
+	if rows, err = s.Database.Query(ctx, query, args...); err != nil {
 		return nil, err
 	}
 	defer rows.Close()

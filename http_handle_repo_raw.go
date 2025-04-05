@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 
 // httpHandleRepoRaw serves raw files, or directory listings that point to raw
 // files.
-func (s *server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	repoName := params["repo_name"].(string)
 	groupPath := params["group_path"].([]string)
 	rawPathSpec := params["rest"].(string)
@@ -24,7 +24,7 @@ func (s *server) httpHandleRepoRaw(writer http.ResponseWriter, request *http.Req
 
 	_, repoPath, _, _, _, _, _ := s.getRepoInfo(request.Context(), groupPath, repoName, "")
 
-	client, err := git2c.NewClient(s.config.Git.Socket)
+	client, err := git2c.NewClient(s.Config.Git.Socket)
 	if err != nil {
 		errorPage500(writer, params, err.Error())
 		return

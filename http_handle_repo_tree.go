@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"html/template"
@@ -16,7 +16,7 @@ import (
 // individual files, and provides directory views that link to these files.
 //
 // TODO: Do not highlight files that are too large.
-func (s *server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	repoName := params["repo_name"].(string)
 	groupPath := params["group_path"].([]string)
 	rawPathSpec := params["rest"].(string)
@@ -25,7 +25,7 @@ func (s *server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 
 	_, repoPath, _, _, _, _, _ := s.getRepoInfo(request.Context(), groupPath, repoName, "")
 
-	client, err := git2c.NewClient(s.config.Git.Socket)
+	client, err := git2c.NewClient(s.Config.Git.Socket)
 	if err != nil {
 		errorPage500(writer, params, err.Error())
 		return

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"context"
@@ -13,8 +13,8 @@ import (
 // given repo and a provided ssh public key.
 //
 // TODO: Revamp.
-func (s *server) getRepoInfo(ctx context.Context, groupPath []string, repoName, sshPubkey string) (repoID int, fsPath string, access bool, contribReq, userType string, userID int, err error) {
-	err = s.database.QueryRow(ctx, `
+func (s *Server) getRepoInfo(ctx context.Context, groupPath []string, repoName, sshPubkey string) (repoID int, fsPath string, access bool, contribReq, userType string, userID int, err error) {
+	err = s.Database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (
 	-- Start: match the first name in the path where parent_group IS NULL
 	SELECT

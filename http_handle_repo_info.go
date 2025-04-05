@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"fmt"
@@ -16,12 +16,12 @@ import (
 // HTTP protocol.
 //
 // TODO: Reject access from web browsers.
-func (s *server) httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
+func (s *Server) httpHandleRepoInfo(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	groupPath := params["group_path"].([]string)
 	repoName := params["repo_name"].(string)
 	var repoPath string
 
-	if err := s.database.QueryRow(request.Context(), `
+	if err := s.Database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT

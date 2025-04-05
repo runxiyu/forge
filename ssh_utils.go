@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"context"
@@ -18,7 +18,7 @@ var errIllegalSSHRepoPath = errors.New("illegal SSH repo path")
 
 // getRepoInfo2 also fetches repo information... it should be deprecated and
 // implemented in individual handlers.
-func (s *server) getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
+func (s *Server) getRepoInfo2(ctx context.Context, sshPath, sshPubkey string) (groupPath []string, repoName string, repoID int, repoPath string, directAccess bool, contribReq, userType string, userID int, err error) {
 	var segments []string
 	var sepIndex int
 	var moduleType, moduleName string

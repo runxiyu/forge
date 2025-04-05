@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"bufio"
@@ -17,7 +17,7 @@ import (
 
 // fedauth checks whether a user's SSH public key matches the remote username
 // they claim to have on the service. If so, the association is recorded.
-func (s *server) fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
+func (s *Server) fedauth(ctx context.Context, userID int, service, remoteUsername, pubkey string) (bool, error) {
 	var err error
 
 	matched := false
@@ -77,7 +77,7 @@ func (s *server) fedauth(ctx context.Context, userID int, service, remoteUsernam
 	}
 
 	var txn pgx.Tx
-	if txn, err = s.database.Begin(ctx); err != nil {
+	if txn, err = s.Database.Begin(ctx); err != nil {
 		return false, err
 	}
 	defer func() {

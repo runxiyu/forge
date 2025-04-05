@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"context"
@@ -22,8 +22,8 @@ import (
 // TODO: This should be deprecated in favor of doing it in the relevant
 // request/router context in the future, as it cannot cover the nuance of
 // fields needed.
-func (s *server) openRepo(ctx context.Context, groupPath []string, repoName string) (repo *git.Repository, description string, repoID int, fsPath string, err error) {
-	err = s.database.QueryRow(ctx, `
+func (s *Server) openRepo(ctx context.Context, groupPath []string, repoName string) (repo *git.Repository, description string, repoID int, fsPath string, err error) {
+	err = s.Database.QueryRow(ctx, `
 WITH RECURSIVE group_path_cte AS (
 	-- Start: match the first name in the path where parent_group IS NULL
 	SELECT

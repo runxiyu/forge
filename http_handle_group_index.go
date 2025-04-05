@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"errors"
@@ -17,7 +17,7 @@ import (
 // httpHandleGroupIndex provides index pages for groups, which includes a list
 // of its subgroups and repos, as well as a form for group maintainers to
 // create repos.
-func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var groupPath []string
 	var repos []nameDesc
 	var subgroups []nameDesc
@@ -28,7 +28,7 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	groupPath = params["group_path"].([]string)
 
 	// The group itself
-	err = s.database.QueryRow(request.Context(), `
+	err = s.Database.QueryRow(request.Context(), `
 		WITH RECURSIVE group_path_cte AS (
 			SELECT
 				id,
@@ -69,7 +69,7 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 
 	// ACL
 	var count int
-	err = s.database.QueryRow(request.Context(), `
+	err = s.Database.QueryRow(request.Context(), `
 		SELECT COUNT(*)
 		FROM user_group_roles
 		WHERE user_id = $1
@@ -96,7 +96,7 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		}
 
 		var newRepoID int
-		err := s.database.QueryRow(
+		err := s.Database.QueryRow(
 			request.Context(),
 			`INSERT INTO repos (name, description, group_id, contrib_requirements)
 	 VALUES ($1, $2, $3, $4)
@@ -111,9 +111,9 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			return
 		}
 
-		filePath := filepath.Join(s.config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
+		filePath := filepath.Join(s.Config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
 
-		_, err = s.database.Exec(
+		_, err = s.Database.Exec(
 			request.Context(),
 			`UPDATE repos
 	 SET filesystem_path = $1
@@ -137,7 +137,7 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 
 	// Repos
 	var rows pgx.Rows
-	rows, err = s.database.Query(request.Context(), `
+	rows, err = s.Database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM repos
 		WHERE group_id = $1
@@ -162,7 +162,7 @@ func (s *server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 	}
 
 	// Subgroups
-	rows, err = s.database.Query(request.Context(), `
+	rows, err = s.Database.Query(request.Context(), `
 		SELECT name, COALESCE(description, '')
 		FROM groups
 		WHERE parent_group = $1

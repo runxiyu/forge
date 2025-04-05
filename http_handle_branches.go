@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"net/http"
@@ -14,7 +14,7 @@ import (
 )
 
 // httpHandleRepoBranches provides the branches page in repos.
-func (s *server) httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoBranches(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var repoName string
 	var groupPath []string

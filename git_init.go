@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"github.com/go-git/go-git/v5"
@@ -11,7 +11,7 @@ import (
 
 // gitInit initializes a bare git repository with the forge-deployed hooks
 // directory as the hooksPath.
-func (s *server) gitInit(repoPath string) (err error) {
+func (s *Server) gitInit(repoPath string) (err error) {
 	var repo *git.Repository
 	var gitConf *gitConfig.Config
 
@@ -23,7 +23,7 @@ func (s *server) gitInit(repoPath string) (err error) {
 		return err
 	}
 
-	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", s.config.Hooks.Execs)
+	gitConf.Raw.SetOption("core", gitFmtConfig.NoSubsection, "hooksPath", s.Config.Hooks.Execs)
 	gitConf.Raw.SetOption("receive", gitFmtConfig.NoSubsection, "advertisePushOptions", "true")
 
 	if err = repo.SetConfig(gitConf); err != nil {

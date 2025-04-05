@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"context"
@@ -12,10 +12,10 @@ import (
 // addUserSSH adds a new user solely based on their SSH public key.
 //
 // TODO: Audit all users of this function.
-func (s *server) addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
+func (s *Server) addUserSSH(ctx context.Context, pubkey string) (userID int, err error) {
 	var txn pgx.Tx
 
-	if txn, err = s.database.Begin(ctx); err != nil {
+	if txn, err = s.Database.Begin(ctx); err != nil {
 		return
 	}
 	defer func() {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"crypto/rand"
@@ -16,7 +16,7 @@ import (
 )
 
 // httpHandleLogin provides the login page for local users.
-func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleLogin(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var username, password string
 	var userID int
 	var passwordHash string
@@ -35,7 +35,7 @@ func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	username = request.PostFormValue("username")
 	password = request.PostFormValue("password")
 
-	err = s.database.QueryRow(request.Context(),
+	err = s.Database.QueryRow(request.Context(),
 		"SELECT id, COALESCE(password, '') FROM users WHERE username = $1",
 		username,
 	).Scan(&userID, &passwordHash)
@@ -71,7 +71,7 @@ func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 	}
 
 	now = time.Now()
-	expiry = now.Add(time.Duration(s.config.HTTP.CookieExpiry) * time.Second)
+	expiry = now.Add(time.Duration(s.Config.HTTP.CookieExpiry) * time.Second)
 
 	cookie = http.Cookie{
 		Name:     "session",
@@ -85,7 +85,7 @@ func (s *server) httpHandleLogin(writer http.ResponseWriter, request *http.Reque
 
 	http.SetCookie(writer, &cookie)
 
-	_, err = s.database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
+	_, err = s.Database.Exec(request.Context(), "INSERT INTO sessions (user_id, session_id) VALUES ($1, $2)", userID, cookieValue)
 	if err != nil {
 		errorPage500(writer, params, "Error inserting session: "+err.Error())
 		return

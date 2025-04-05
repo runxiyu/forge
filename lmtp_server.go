@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 // SPDX-FileCopyrightText: Copyright (c) 2024 Robin Jarry <robin@jarry.cc>
 
-package main
+package forge
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ type lmtpSession struct {
 	to     []string
 	ctx    context.Context
 	cancel context.CancelFunc
-	s      server
+	s      Server
 }
 
 func (session *lmtpSession) Reset() {
@@ -63,13 +63,13 @@ func (*lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
 	return session, nil
 }
 
-func (s *server) serveLMTP(listener net.Listener) error {
+func (s *Server) serveLMTP(listener net.Listener) error {
 	smtpServer := smtp.NewServer(&lmtpHandler{})
 	smtpServer.LMTP = true
-	smtpServer.Domain = s.config.LMTP.Domain
-	smtpServer.Addr = s.config.LMTP.Socket
-	smtpServer.WriteTimeout = time.Duration(s.config.LMTP.WriteTimeout) * time.Second
-	smtpServer.ReadTimeout = time.Duration(s.config.LMTP.ReadTimeout) * time.Second
+	smtpServer.Domain = s.Config.LMTP.Domain
+	smtpServer.Addr = s.Config.LMTP.Socket
+	smtpServer.WriteTimeout = time.Duration(s.Config.LMTP.WriteTimeout) * time.Second
+	smtpServer.ReadTimeout = time.Duration(s.Config.LMTP.ReadTimeout) * time.Second
 	smtpServer.EnableSMTPUTF8 = true
 	return smtpServer.Serve(listener)
 }
@@ -85,9 +85,9 @@ func (session *lmtpSession) Data(r io.Reader) error {
 		n     int64
 	)
 
-	n, err = io.CopyN(&buf, r, session.s.config.LMTP.MaxSize)
+	n, err = io.CopyN(&buf, r, session.s.Config.LMTP.MaxSize)
 	switch {
-	case n == session.s.config.LMTP.MaxSize:
+	case n == session.s.Config.LMTP.MaxSize:
 		err = errors.New("Message too big.")
 		// drain whatever is left in the pipe
 		_, _ = io.Copy(io.Discard, r)
@@ -133,10 +133,10 @@ func (session *lmtpSession) Data(r io.Reader) error {
 	_ = from
 
 	for _, to := range to {
-		if !strings.HasSuffix(to, "@"+session.s.config.LMTP.Domain) {
+		if !strings.HasSuffix(to, "@"+session.s.Config.LMTP.Domain) {
 			continue
 		}
-		localPart := to[:len(to)-len("@"+session.s.config.LMTP.Domain)]
+		localPart := to[:len(to)-len("@"+session.s.Config.LMTP.Domain)]
 		var segments []string
 		segments, err = misc.PathToSegments(localPart)
 		if err != nil {

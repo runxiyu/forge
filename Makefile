@@ -16,7 +16,7 @@ VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
 
 forge: source.tar.gz hookc/hookc git2d/git2d $(SOURCE_FILES)
-	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "main.VERSION=$(VERSION)"' -tags 'osusergo netgo static_build'
+	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "main.VERSION=$(VERSION)"' -tags 'osusergo netgo static_build' ./cmd/forge
 
 utils/colb:
 

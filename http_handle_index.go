@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ import (
 
 // httpHandleIndex provides the main index page which includes a list of groups
 // and some global information such as SSH keys.
-func (s *server) httpHandleIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
+func (s *Server) httpHandleIndex(writer http.ResponseWriter, request *http.Request, params map[string]any) {
 	var err error
 	var groups []nameDesc
 

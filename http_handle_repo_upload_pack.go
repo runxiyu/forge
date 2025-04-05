@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"io"
@@ -14,7 +14,7 @@ import (
 
 // httpHandleUploadPack handles incoming Git fetch/pull/clone's over the Smart
 // HTTP protocol.
-func (s *server) httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
+func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
 	var groupPath []string
 	var repoName string
 	var repoPath string
@@ -24,7 +24,7 @@ func (s *server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 
 	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
 
-	if err := s.database.QueryRow(request.Context(), `
+	if err := s.Database.QueryRow(request.Context(), `
 	WITH RECURSIVE group_path_cte AS (
 		-- Start: match the first name in the path where parent_group IS NULL
 		SELECT
@@ -67,7 +67,7 @@ func (s *server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	writer.WriteHeader(http.StatusOK)
 
 	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
-	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
+	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.Config.Hooks.Socket)
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
 	}

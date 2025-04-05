@@ -3,7 +3,7 @@
 //
 //go:build !linux
 
-package main
+package forge
 
 import (
 	"bytes"

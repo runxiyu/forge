@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 
-package main
+package forge
 
 import (
 	"fmt"
@@ -19,13 +19,13 @@ import (
 // serveSSH serves SSH on a [net.Listener]. The listener should generally be a
 // TCP listener, although AF_UNIX SOCK_STREAM listeners may be appropriate in
 // rare cases.
-func (s *server) serveSSH(listener net.Listener) error {
+func (s *Server) serveSSH(listener net.Listener) error {
 	var hostKeyBytes []byte
 	var hostKey goSSH.Signer
 	var err error
 	var server *gliderSSH.Server
 
-	if hostKeyBytes, err = os.ReadFile(s.config.SSH.Key); err != nil {
+	if hostKeyBytes, err = os.ReadFile(s.Config.SSH.Key); err != nil {
 		return err
 	}
 
@@ -33,9 +33,9 @@ func (s *server) serveSSH(listener net.Listener) error {
 		return err
 	}
 
-	s.serverPubkey = hostKey.PublicKey()
-	s.serverPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(s.serverPubkey))
-	s.serverPubkeyFP = goSSH.FingerprintSHA256(s.serverPubkey)
+	s.ServerPubkey = hostKey.PublicKey()
+	s.ServerPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(s.ServerPubkey))
+	s.ServerPubkeyFP = goSSH.FingerprintSHA256(s.ServerPubkey)
 
 	server = &gliderSSH.Server{
 		Handler: func(session gliderSSH.Session) {
@@ -46,7 +46,7 @@ func (s *server) serveSSH(listener net.Listener) error {
 			}
 
 			slog.Info("incoming ssh", "addr", session.RemoteAddr().String(), "key", clientPubkeyStr, "command", session.RawCommand())
-			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(s.config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
+			fmt.Fprintln(session.Stderr(), ansiec.Blue+"Lindenii Forge "+VERSION+", source at "+strings.TrimSuffix(s.Config.HTTP.Root, "/")+"/-/source/"+ansiec.Reset+"\r")
 
 			cmd := session.Command()
 
