@@ -58,7 +58,7 @@ func (s *Server) Setup() {
 	s.globalData = map[string]any{
 		"server_public_key_string":      &s.serverPubkeyString,
 		"server_public_key_fingerprint": &s.serverPubkeyFP,
-		"forge_version":                 VERSION,
+		"forge_version":                 version,
 		// Some other ones are populated after config parsing
 	}
 }
