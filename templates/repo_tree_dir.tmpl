@@ -44,6 +44,13 @@
 			</div>
 		</div>
 		<div class="padding-wrapper scroll">
+			{{- if .ref_name -}}
+			<p>
+			<strong>
+			Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+			</strong>
+			</p>
+			{{- end -}}
 			<table id="file-tree" class="wide">
 				<thead>
 					<tr class="title-row">

@@ -51,6 +51,13 @@
 		</div>
 		{{- end -}}
 		<p class="readingwidth"><code>{{- .ssh_clone_url -}}</code></p>
+		{{- if .ref_name -}}
+		<p class="readingwidth">
+		<strong>
+		Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+		</strong>
+		</p>
+		{{- end -}}
 		{{- if .commits -}}
 			<div class="commit-list-small">
 				{{- range .commits -}}

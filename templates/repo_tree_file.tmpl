@@ -45,6 +45,13 @@
 			</div>
 		</div>
 		<div class="padding">
+			{{- if .ref_name -}}
+			<p>
+			<strong>
+			Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+			</strong>
+			</p>
+			{{- end -}}
 			<p>
 				/{{ .path_spec }} (<a href="/{{ template "group_path_plain" .group_path }}/-/repos/{{ .repo_name }}/raw/{{ .path_spec }}{{- template "ref_query" $root -}}">raw</a>)
 			</p>
