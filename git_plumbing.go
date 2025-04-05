@@ -13,6 +13,8 @@ import (
 	"path"
 	"sort"
 	"strings"
+
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 func writeTree(ctx context.Context, repoPath string, entries []treeEntry) (string, error) {
@@ -76,14 +78,14 @@ func buildTreeRecursive(ctx context.Context, repoPath, baseTree string, updates 
 			if modeEnd < 0 {
 				return errors.New("invalid tree format")
 			}
-			mode := bytesToString(data[i : i+modeEnd])
+			mode := misc.BytesToString(data[i : i+modeEnd])
 			i += modeEnd + 1
 
 			nameEnd := bytes.IndexByte(data[i:], 0)
 			if nameEnd < 0 {
 				return errors.New("missing null after filename")
 			}
-			name := bytesToString(data[i : i+nameEnd])
+			name := misc.BytesToString(data[i : i+nameEnd])
 			i += nameEnd + 1
 
 			if i+20 > len(data) {

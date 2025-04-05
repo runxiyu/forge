@@ -11,6 +11,7 @@ import (
 
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 //go:embed LICENSE source.tar.gz
@@ -59,7 +60,7 @@ func loadTemplates() (err error) {
 				return err
 			}
 
-			_, err = templates.Parse(bytesToString(minified))
+			_, err = templates.Parse(misc.BytesToString(minified))
 			if err != nil {
 				return err
 			}

@@ -16,6 +16,7 @@ import (
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 	"github.com/go-git/go-git/v5"
+	"go.lindenii.runxiyu.org/forge/misc"
 )
 
 func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, mbox io.Reader) (err error) {
@@ -63,7 +64,7 @@ func lmtpHandlePatch(session *lmtpSession, groupPath []string, repoName string, 
 			return fmt.Errorf("failed to get contents: %w", err)
 		}
 
-		sourceBuf := bytes.NewReader(stringToBytes(sourceString))
+		sourceBuf := bytes.NewReader(misc.StringToBytes(sourceString))
 		var patchedBuf bytes.Buffer
 		if err := gitdiff.Apply(&patchedBuf, sourceBuf, diffFile); err != nil {
 			return fmt.Errorf("failed to apply patch: %w", err)

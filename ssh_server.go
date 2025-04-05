@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	gliderSSH "github.com/gliderlabs/ssh"
+	"go.lindenii.runxiyu.org/forge/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 	goSSH "golang.org/x/crypto/ssh"
@@ -39,7 +40,7 @@ func serveSSH(listener net.Listener) error {
 	}
 
 	serverPubkey = hostKey.PublicKey()
-	serverPubkeyString = bytesToString(goSSH.MarshalAuthorizedKey(serverPubkey))
+	serverPubkeyString = misc.BytesToString(goSSH.MarshalAuthorizedKey(serverPubkey))
 	serverPubkeyFP = goSSH.FingerprintSHA256(serverPubkey)
 
 	server = &gliderSSH.Server{
@@ -47,7 +48,7 @@ func serveSSH(listener net.Listener) error {
 			clientPubkey := session.PublicKey()
 			var clientPubkeyStr string
 			if clientPubkey != nil {
-				clientPubkeyStr = strings.TrimSuffix(bytesToString(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
+				clientPubkeyStr = strings.TrimSuffix(misc.BytesToString(goSSH.MarshalAuthorizedKey(clientPubkey)), "\n")
 			}
 
 			clog.Info("Incoming SSH: " + session.RemoteAddr().String() + " " + clientPubkeyStr + " " + session.RawCommand())

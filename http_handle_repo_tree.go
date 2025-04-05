@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"go.lindenii.runxiyu.org/forge/git2c"
+	"go.lindenii.runxiyu.org/forge/render"
 )
 
 // httpHandleRepoTree provides a friendly, syntax-highlighted view of
@@ -44,7 +45,7 @@ func httpHandleRepoTree(writer http.ResponseWriter, request *http.Request, param
 		params["readme"] = template.HTML("<p>README rendering here is WIP again</p>") // TODO
 		renderTemplate(writer, "repo_tree_dir", params)
 	case content != "":
-		rendered := renderHighlightedFile(pathSpec, content)
+		rendered := render.Highlight(pathSpec, content)
 		params["file_contents"] = rendered
 		renderTemplate(writer, "repo_tree_file", params)
 	default:

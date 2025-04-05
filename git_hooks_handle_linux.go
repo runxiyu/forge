@@ -22,6 +22,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/forge/misc"
 	"go.lindenii.runxiyu.org/lindenii-common/ansiec"
 	"go.lindenii.runxiyu.org/lindenii-common/clog"
 )
@@ -76,7 +77,7 @@ func hooksHandler(conn net.Conn) {
 
 	{
 		var ok bool
-		packPass, ok = packPasses.Load(bytesToString(cookie))
+		packPass, ok = packPasses.Load(misc.BytesToString(cookie))
 		if !ok {
 			if _, err = conn.Write([]byte{1}); err != nil {
 				return

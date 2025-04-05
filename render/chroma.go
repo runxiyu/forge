@@ -1,4 +1,4 @@
-package main
+package render
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	chromaStyles "github.com/alecthomas/chroma/v2/styles"
 )
 
-func renderHighlightedFile(filename, content string) template.HTML {
+func Highlight(filename, content string) template.HTML {
 	lexer := chromaLexers.Match(filename)
 	if lexer == nil {
 		lexer = chromaLexers.Fallback

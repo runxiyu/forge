@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"go.lindenii.runxiyu.org/forge/git2c"
+	"go.lindenii.runxiyu.org/forge/render"
 )
 
 type commitDisplay struct {
@@ -45,7 +46,7 @@ func httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, params map[st
 
 	params["commits"] = commits
 	params["readme_filename"] = readme.Filename
-	_, params["readme"] = renderReadme(readme.Content, readme.Filename)
+	_, params["readme"] = render.Readme(readme.Content, readme.Filename)
 	params["notes"] = notes
 
 	renderTemplate(w, "repo_index", params)
