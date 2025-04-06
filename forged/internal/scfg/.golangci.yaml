@@ -19,6 +19,7 @@ linters:
     - nonamedreturns
     - funlen
     - gochecknoglobals
+    - tenv
 
 issues:
   max-issues-per-linter: 0
