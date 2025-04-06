@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/niklasfasching/go-org/org"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
@@ -29,12 +28,6 @@ func Readme(data []byte, filename string) (string, template.HTML) {
 			return "Error fetching README", EscapeHTML("Unable to render README: " + err.Error())
 		}
 		return "README.md", template.HTML(bluemonday.UGCPolicy().SanitizeBytes(buf.Bytes())) //#nosec G203
-	case "readme.org":
-		htmlStr, err := org.New().Parse(strings.NewReader(misc.BytesToString(data)), filename).Write(org.NewHTMLWriter())
-		if err != nil {
-			return "Error fetching README", EscapeHTML("Unable to render README: " + err.Error())
-		}
-		return "README.org", template.HTML(bluemonday.UGCPolicy().Sanitize(htmlStr)) //#nosec G203
 	default:
 		return filename, template.HTML("<pre>" + html.EscapeString(misc.BytesToString(data)) + "</pre>") //#nosec G203
 	}
