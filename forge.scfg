@@ -6,7 +6,7 @@ http {
 	# What address to listen on?
 	# Examples for net tcp*: 127.0.0.1:8080 :80
 	# Example for unix: /var/run/lindenii/forge/http.sock
-	addr /var/run/lindenii/forge/http.sock
+	addr :8080
 
 	# How many seconds should cookies be remembered before they are purged?
 	cookie_expiry 604800
