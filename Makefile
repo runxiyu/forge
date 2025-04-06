@@ -17,7 +17,7 @@ EMBED = git2d/git2d hookc/hookc source.tar.gz $(wildcard LICENSE*) $(wildcard fo
 EMBED_ = $(EMBED:%=forged/internal/embed/%)
 
 forge: $(EMBED_) $(SOURCE_FILES)
-	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "go.lindenii.runxiyu.org/forge.version=$(VERSION)"' -tags 'osusergo netgo static_build' ./forged/cmd/forge
+	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "go.lindenii.runxiyu.org/forge/forged/internal/unsorted.version=$(VERSION)"' -tags 'osusergo netgo static_build' ./forged/cmd/forge
 
 utils/colb:
 
