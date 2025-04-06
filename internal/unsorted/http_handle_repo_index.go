@@ -25,7 +25,7 @@ func (s *Server) httpHandleRepoIndex(w http.ResponseWriter, req *http.Request, p
 	}
 	defer client.Close()
 
-	commits, readme, err := client.Cmd1(repoPath)
+	commits, readme, err := client.CmdIndex(repoPath)
 	if err != nil {
 		web.ErrorPage500(s.templates, w, params, err.Error())
 		return

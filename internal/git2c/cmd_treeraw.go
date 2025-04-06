@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-func (c *Client) Cmd2(repoPath, pathSpec string) ([]TreeEntry, string, error) {
+func (c *Client) CmdTreeRaw(repoPath, pathSpec string) ([]TreeEntry, string, error) {
 	if err := c.writer.WriteData([]byte(repoPath)); err != nil {
 		return nil, "", fmt.Errorf("sending repo path failed: %w", err)
 	}

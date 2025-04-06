@@ -6,7 +6,7 @@
 #include "x.h"
 
 int
-cmd2(git_repository *repo, struct bare_reader *reader, struct bare_writer *writer)
+cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer *writer)
 {
 	/* Path */
 	char path[4096] = {0};

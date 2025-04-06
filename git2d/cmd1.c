@@ -6,7 +6,7 @@
 #include "x.h"
 
 int
-cmd1(git_repository *repo, struct bare_writer *writer)
+cmd_index(git_repository *repo, struct bare_writer *writer)
 {
 	/* HEAD tree */
 	git_object *obj = NULL;

@@ -33,7 +33,7 @@ func (s *Server) httpHandleRepoTree(writer http.ResponseWriter, request *http.Re
 	}
 	defer client.Close()
 
-	files, content, err := client.Cmd2(repoPath, pathSpec)
+	files, content, err := client.CmdTreeRaw(repoPath, pathSpec)
 	if err != nil {
 		web.ErrorPage500(s.templates, writer, params, err.Error())
 		return

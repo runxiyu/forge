@@ -48,12 +48,12 @@ session(void *_conn)
 	}
 	switch (cmd) {
 	case 1:
-		err = cmd1(repo, &writer);
+		err = cmd_index(repo, &writer);
 		if (err != 0)
 			goto free_repo;
 		break;
 	case 2:
-		err = cmd2(repo, &reader, &writer);
+		err = cmd_treeraw(repo, &reader, &writer);
 		if (err != 0)
 			goto free_repo;
 		break;

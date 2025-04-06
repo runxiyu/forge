@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-func (c *Client) Cmd1(repoPath string) ([]Commit, *FilenameContents, error) {
+func (c *Client) CmdIndex(repoPath string) ([]Commit, *FilenameContents, error) {
 	if err := c.writer.WriteData([]byte(repoPath)); err != nil {
 		return nil, nil, fmt.Errorf("sending repo path failed: %w", err)
 	}
