@@ -176,7 +176,7 @@ func isDirectiveType(t reflect.Type) bool {
 	}
 
 	textUnmarshalerType := reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
-	if reflect.PtrTo(t).Implements(textUnmarshalerType) {
+	if reflect.PointerTo(t).Implements(textUnmarshalerType) {
 		return false
 	}
 

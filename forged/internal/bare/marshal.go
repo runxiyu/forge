@@ -78,7 +78,7 @@ func getEncoder(t reflect.Type) encodeFunc {
 var marshalableInterface = reflect.TypeOf((*Unmarshalable)(nil)).Elem()
 
 func encoderFunc(t reflect.Type) encodeFunc {
-	if reflect.PtrTo(t).Implements(marshalableInterface) {
+	if reflect.PointerTo(t).Implements(marshalableInterface) {
 		return func(w *Writer, v reflect.Value) error {
 			uv := v.Addr().Interface().(Marshalable)
 			return uv.Marshal(w)

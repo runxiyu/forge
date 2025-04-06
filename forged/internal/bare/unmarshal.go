@@ -61,7 +61,7 @@ func getDecoder(t reflect.Type) decodeFunc {
 var unmarshalableInterface = reflect.TypeOf((*Unmarshalable)(nil)).Elem()
 
 func decoderFunc(t reflect.Type) decodeFunc {
-	if reflect.PtrTo(t).Implements(unmarshalableInterface) {
+	if reflect.PointerTo(t).Implements(unmarshalableInterface) {
 		return func(r *Reader, v reflect.Value) error {
 			uv := v.Addr().Interface().(Unmarshalable)
 			return uv.Unmarshal(r)
