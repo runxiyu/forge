@@ -5,9 +5,7 @@ package unsorted
 
 import (
 	"net/http"
-	"runtime"
 
-	"github.com/dustin/go-humanize"
 	"go.lindenii.runxiyu.org/forge/forged/internal/web"
 )
 
@@ -24,9 +22,5 @@ func (s *Server) httpHandleIndex(writer http.ResponseWriter, request *http.Reque
 	}
 	params["groups"] = groups
 
-	// Memory currently allocated
-	memstats := runtime.MemStats{} //exhaustruct:ignore
-	runtime.ReadMemStats(&memstats)
-	params["mem"] = humanize.IBytes(memstats.Alloc)
 	s.renderTemplate(writer, "index", params)
 }
