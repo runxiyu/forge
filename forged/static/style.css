@@ -593,7 +593,6 @@ td > ul {
 .commit-list-small .pull-right {
 	float: right;
 	font-size: 0.85em;
-	color: var(--light-text-color);
 	margin-left: 1rem;
 }
 
