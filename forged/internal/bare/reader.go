@@ -9,6 +9,8 @@ import (
 	"io"
 	"math"
 	"unicode/utf8"
+
+	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
 )
 
 type byteReader interface {
@@ -150,7 +152,7 @@ func (r *Reader) ReadString() (string, error) {
 	if !utf8.Valid(buf) {
 		return "", ErrInvalidStr
 	}
-	return string(buf), nil
+	return misc.BytesToString(buf), nil
 }
 
 // Reads a fixed amount of arbitrary data, defined by the length of the slice.

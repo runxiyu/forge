@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+
+	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
 )
 
 // A Writer for BARE primitive types.
@@ -85,7 +87,7 @@ func (w *Writer) WriteBool(b bool) error {
 }
 
 func (w *Writer) WriteString(str string) error {
-	return w.WriteData([]byte(str))
+	return w.WriteData(misc.StringToBytes(str))
 }
 
 // Writes a fixed amount of arbitrary data, defined by the length of the slice.
