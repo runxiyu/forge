@@ -36,3 +36,6 @@ source.tar.gz: $(SOURCE_FILES)
 forged/internal/embed/%: %
 	@mkdir -p $(shell dirname $@)
 	@cp $^ $@
+
+forged/internal/embed/.gitignore:
+	@touch $@
