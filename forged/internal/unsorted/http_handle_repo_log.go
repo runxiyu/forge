@@ -15,7 +15,7 @@ import (
 //
 // TODO: This currently provides all commits in the branch. It should be
 // paginated and cached instead.
-func (s *Server) httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, params map[string]any) {
+func (s *Server) httpHandleRepoLog(writer http.ResponseWriter, req *http.Request, params map[string]any) {
 	var repo *git.Repository
 	var refHash plumbing.Hash
 	var err error
@@ -33,7 +33,7 @@ func (s *Server) httpHandleRepoLog(writer http.ResponseWriter, _ *http.Request, 
 		web.ErrorPage500(s.templates, writer, params, "Error getting recent commits: "+err.Error())
 		return
 	}
-	params["commits"], params["commits_err"] = commitIterSeqErr(commitIter)
+	params["commits"], params["commits_err"] = commitIterSeqErr(req.Context(), commitIter)
 
 	s.renderTemplate(writer, "repo_log", params)
 }

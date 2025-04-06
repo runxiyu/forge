@@ -67,7 +67,7 @@ WHERE g.depth = cardinality($1::text[])
 // The pointer to error is guaranteed to be populated with either nil or the
 // error returned by the commit iterator after the returned iterator is
 // finished.
-func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *error) {
+func commitIterSeqErr(ctx context.Context, commitIter object.CommitIter) (iter.Seq[*object.Commit], *error) {
 	var err error
 	return func(yield func(*object.Commit) bool) {
 		for {
@@ -79,6 +79,14 @@ func commitIterSeqErr(commitIter object.CommitIter) (iter.Seq[*object.Commit], *
 				err = err2
 				return
 			}
+
+			select {
+			case <-ctx.Done():
+				err = ctx.Err()
+				return
+			default:
+			}
+
 			if !yield(commit) {
 				return
 			}
