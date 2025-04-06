@@ -123,6 +123,10 @@ a:link, a:visited {
 	line-height: 1.3;
 }
 
+#readme li + li, #readme li:first-child {
+	margin-top: 0.5rem;
+}
+
 /* Table styles */
 table {
 	border: var(--lighter-border-color) solid 1px;
