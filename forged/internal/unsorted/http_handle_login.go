@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/jackc/pgx/v5"
+	"go.lindenii.runxiyu.org/forge/forged/internal/argon2id"
 	"go.lindenii.runxiyu.org/forge/forged/internal/web"
 )
 
