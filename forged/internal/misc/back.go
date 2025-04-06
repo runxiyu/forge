@@ -3,6 +3,8 @@
 
 package misc
 
+// ErrorBack wraps a value and a channel for communicating an associated error.
+// Typically used to get an error response after sending data across a channel.
 type ErrorBack[T any] struct {
 	Content   T
 	ErrorChan chan error

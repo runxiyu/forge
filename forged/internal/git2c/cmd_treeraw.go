@@ -9,6 +9,8 @@ import (
 	"io"
 )
 
+// CmdTreeRaw queries git2d for a tree or blob object at the given path within the repository.
+// It returns either a directory listing or the contents of a file.
 func (c *Client) CmdTreeRaw(repoPath, pathSpec string) ([]TreeEntry, string, error) {
 	if err := c.writer.WriteData([]byte(repoPath)); err != nil {
 		return nil, "", fmt.Errorf("sending repo path failed: %w", err)

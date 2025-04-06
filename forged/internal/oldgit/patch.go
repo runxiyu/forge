@@ -39,4 +39,5 @@ func CommitToPatch(commit *object.Commit) (parentCommitHash plumbing.Hash, patch
 	return
 }
 
+// NullTree is a tree object that is empty and has no hash.
 var NullTree object.Tree //nolint:gochecknoglobals

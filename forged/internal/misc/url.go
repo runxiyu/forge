@@ -60,6 +60,7 @@ func ParseReqURI(requestURI string) (segments []string, params url.Values, err e
 	return
 }
 
+// PathToSegments splits a path into unescaped segments. It handles %2F correctly.
 func PathToSegments(path string) (segments []string, err error) {
 	segments = strings.Split(strings.TrimPrefix(path, "/"), "/")
 

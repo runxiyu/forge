@@ -11,13 +11,15 @@ import (
 	"git.sr.ht/~sircmpwn/go-bare"
 )
 
+// Client represents a connection to the git2d backend daemon.
 type Client struct {
-	SocketPath string
+	socketPath string
 	conn       net.Conn
 	writer     *bare.Writer
 	reader     *bare.Reader
 }
 
+// NewClient establishes a connection to a git2d socket and returns a new Client.
 func NewClient(socketPath string) (*Client, error) {
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
@@ -28,13 +30,14 @@ func NewClient(socketPath string) (*Client, error) {
 	reader := bare.NewReader(conn)
 
 	return &Client{
-		SocketPath: socketPath,
+		socketPath: socketPath,
 		conn:       conn,
 		writer:     writer,
 		reader:     reader,
 	}, nil
 }
 
+// Close terminates the underlying socket connection.
 func (c *Client) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()

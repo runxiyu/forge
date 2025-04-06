@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+// DeployBinary copies the contents of a binary file to the target destination path.
+// The destination file is created with executable permissions.
 func DeployBinary(src fs.File, dst string) (err error) {
 	var dstFile *os.File
 	if dstFile, err = os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755); err != nil {

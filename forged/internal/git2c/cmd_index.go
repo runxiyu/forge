@@ -10,6 +10,8 @@ import (
 	"io"
 )
 
+// CmdIndex requests a repository index from git2d and returns the list of commits
+// and the contents of a README file if available.
 func (c *Client) CmdIndex(repoPath string) ([]Commit, *FilenameContents, error) {
 	if err := c.writer.WriteData([]byte(repoPath)); err != nil {
 		return nil, nil, fmt.Errorf("sending repo path failed: %w", err)

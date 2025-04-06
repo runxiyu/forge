@@ -3,6 +3,7 @@
 
 package git2c
 
+// Commit represents a single commit object retrieved from the git2d daemon.
 type Commit struct {
 	Hash    string
 	Author  string
@@ -11,11 +12,13 @@ type Commit struct {
 	Message string
 }
 
+// FilenameContents holds the filename and byte contents of a file, such as a README.
 type FilenameContents struct {
 	Filename string
 	Content  []byte
 }
 
+// TreeEntry represents a file or directory entry within a Git tree object.
 type TreeEntry struct {
 	Name      string
 	Mode      string

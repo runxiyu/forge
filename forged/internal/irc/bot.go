@@ -13,6 +13,8 @@ import (
 	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
+// Config contains IRC connection and identity settings for the bot.
+// This should usually be a part of the primary config struct.
 type Config struct {
 	Net   string `scfg:"net"`
 	Addr  string `scfg:"addr"`
@@ -23,12 +25,14 @@ type Config struct {
 	Gecos string `scfg:"gecos"`
 }
 
+// Bot represents an IRC bot client that handles events and allows for sending messages.
 type Bot struct {
 	config            *Config
 	ircSendBuffered   chan string
 	ircSendDirectChan chan misc.ErrorBack[string]
 }
 
+// NewBot creates a new Bot instance using the provided configuration.
 func NewBot(c *Config) (b *Bot) {
 	b = &Bot{
 		config: c,
@@ -36,6 +40,8 @@ func NewBot(c *Config) (b *Bot) {
 	return
 }
 
+// Connect establishes a new IRC session and starts handling incoming and outgoing messages.
+// This method blocks until an error occurs or the connection is closed.
 func (b *Bot) Connect() error {
 	var err error
 	var underlyingConn net.Conn
@@ -148,6 +154,8 @@ func (b *Bot) SendDirect(line string) error {
 	return <-ech
 }
 
+// Send queues a message to be sent asynchronously via the buffered send queue.
+// If the queue is full, the message is dropped and an error is logged.
 func (b *Bot) Send(line string) {
 	select {
 	case b.ircSendBuffered <- line:
@@ -156,7 +164,8 @@ func (b *Bot) Send(line string) {
 	}
 }
 
-// TODO: Delay and warnings?
+// ConnectLoop continuously attempts to maintain an IRC session.
+// If the connection drops, it automatically retries with no delay.
 func (b *Bot) ConnectLoop() {
 	b.ircSendBuffered = make(chan string, b.config.SendQ)
 	b.ircSendDirectChan = make(chan misc.ErrorBack[string])

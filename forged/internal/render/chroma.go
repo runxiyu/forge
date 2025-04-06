@@ -12,6 +12,9 @@ import (
 	chromaStyles "github.com/alecthomas/chroma/v2/styles"
 )
 
+// Highlight returns HTML with syntax highlighting for the given file content,
+// using Chroma. The lexer is selected based on the filename.
+// If tokenization or formatting fails, a fallback <pre> block is returned with the error.
 func Highlight(filename, content string) template.HTML {
 	lexer := chromaLexers.Match(filename)
 	if lexer == nil {
