@@ -3,7 +3,6 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
-	git.sr.ht/~sircmpwn/go-bare v0.0.0-20210406120253-ab86bc2846d9
 	github.com/alecthomas/chroma/v2 v2.16.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/bluekeyes/go-gitdiff v0.8.1

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net"
 
-	"git.sr.ht/~sircmpwn/go-bare"
+	"go.lindenii.runxiyu.org/forge/forged/internal/bare"
 )
 
 // Client represents a connection to the git2d backend daemon.
