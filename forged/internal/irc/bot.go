@@ -10,7 +10,6 @@ import (
 	"net"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
-	irc "go.lindenii.runxiyu.org/lindenii-irc"
 )
 
 // Config contains IRC connection and identity settings for the bot.
@@ -55,7 +54,7 @@ func (b *Bot) Connect() error {
 	}
 	defer underlyingConn.Close()
 
-	conn := irc.NewConn(underlyingConn)
+	conn := NewConn(underlyingConn)
 
 	logAndWriteLn := func(s string) (n int, err error) {
 		slog.Debug("irc tx", "line", s)
@@ -103,7 +102,7 @@ func (b *Bot) Connect() error {
 					return
 				}
 			case "JOIN":
-				c, ok := msg.Source.(irc.Client)
+				c, ok := msg.Source.(Client)
 				if !ok {
 					slog.Error("unable to convert source of JOIN to client")
 				}
