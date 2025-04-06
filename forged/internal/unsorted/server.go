@@ -55,10 +55,6 @@ func NewServer(configPath string) (*Server, error) {
 		globalData: make(map[string]any),
 	} //exhaustruct:ignore
 
-	if err := s.loadConfig(configPath); err != nil {
-		return s, err
-	}
-
 	s.sourceHandler = http.StripPrefix(
 		"/-/source/",
 		http.FileServer(http.FS(embed.Source)),
@@ -73,6 +69,10 @@ func NewServer(configPath string) (*Server, error) {
 		"server_public_key_fingerprint": &s.serverPubkeyFP,
 		"forge_version":                 version,
 		// Some other ones are populated after config parsing
+	}
+
+	if err := s.loadConfig(configPath); err != nil {
+		return s, err
 	}
 
 	misc.NoneOrPanic(s.loadTemplates())
