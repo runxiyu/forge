@@ -13,7 +13,7 @@ CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 
 VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
-EMBED = git2d/git2d hookc/hookc source.tar.gz $(wildcard LICENSE*) $(wildcard static/*) $(wildcard templates/*)
+EMBED = git2d/git2d hookc/hookc source.tar.gz $(wildcard LICENSE*) $(wildcard forged/static/*) $(wildcard forged/templates/*)
 EMBED_ = $(EMBED:%=forged/internal/embed/%)
 
 forge: $(EMBED_) $(SOURCE_FILES)

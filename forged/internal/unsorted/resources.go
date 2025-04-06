@@ -30,7 +30,7 @@ func (s *Server) loadTemplates() (err error) {
 		"minus":             misc.Minus,
 	})
 
-	err = fs.WalkDir(embed.Resources, "templates", func(path string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(embed.Resources, "forged/templates", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

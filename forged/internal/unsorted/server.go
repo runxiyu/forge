@@ -63,7 +63,7 @@ func NewServer(configPath string) (*Server, error) {
 		"/-/source/",
 		http.FileServer(http.FS(embed.Source)),
 	)
-	staticFS, err := fs.Sub(embed.Resources, "static")
+	staticFS, err := fs.Sub(embed.Resources, "forged/static")
 	if err != nil {
 		return s, err
 	}
