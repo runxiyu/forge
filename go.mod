@@ -13,7 +13,6 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.22.4
 	github.com/yuin/goldmark v1.7.8
-	go.lindenii.runxiyu.org/lindenii-common v0.0.0-20250321131425-dda3538a9cd4
 	golang.org/x/crypto v0.36.0
 )
 

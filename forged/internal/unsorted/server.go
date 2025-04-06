@@ -17,11 +17,11 @@ import (
 	"syscall"
 	"time"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/cmap"
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
 	"go.lindenii.runxiyu.org/forge/forged/internal/embed"
 	"go.lindenii.runxiyu.org/forge/forged/internal/irc"
 	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
-	"go.lindenii.runxiyu.org/lindenii-common/cmap"
 	goSSH "golang.org/x/crypto/ssh"
 )
 
