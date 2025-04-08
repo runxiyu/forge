@@ -510,7 +510,7 @@ td > ul {
 	align-self: flex-end;
 }
 .nav-tabs-standalone > li > a {
-	padding: 0 1rem;
+	padding: 0 0.75rem;
 }
 
 .nav-item a.active {
