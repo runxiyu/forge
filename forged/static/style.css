@@ -614,3 +614,10 @@ td > ul {
 	font-weight: bold;
 	margin-top: 1rem;
 }
+
+
+.breakable {
+	word-break: break-word;
+	/* overflow-wrap: break-word;
+	overflow: hidden; */
+}
