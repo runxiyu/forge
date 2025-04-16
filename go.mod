@@ -8,21 +8,21 @@ require (
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-smtp v0.21.3
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-git/go-git/v5 v5.14.0
+	github.com/go-git/go-git/v5 v5.16.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/tdewolff/minify/v2 v2.23.0
-	github.com/yuin/goldmark v1.7.8
+	github.com/tdewolff/minify/v2 v2.23.1
+	github.com/yuin/goldmark v1.7.10
 	golang.org/x/crypto v0.37.0
 )
 
 require (
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.1.6 // indirect
+	github.com/ProtonMail/go-crypto v1.2.0 // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/cloudflare/circl v1.6.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
@@ -39,10 +39,10 @@ require (
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
-	github.com/tdewolff/parse/v2 v2.7.22 // indirect
+	github.com/tdewolff/parse/v2 v2.7.23 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
