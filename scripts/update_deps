@@ -5,5 +5,5 @@
 
 set -eux
 
-go get -t -u
-go mod tidy
+go get -t -u -x -v ./...
+go mod tidy -x -v
