@@ -12,7 +12,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer
 	char path[4096] = {0};
 	int err = bare_get_data(reader, (uint8_t *)path, sizeof(path) - 1);
 	if (err != BARE_ERROR_NONE) {
-		bare_put_uint(writer, 10);
+		bare_put_uint(writer, 11);
 		return -1;
 	}
 	path[sizeof(path) - 1] = '\0';
@@ -21,7 +21,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer
 	git_object *head_obj = NULL;
 	err = git_revparse_single(&head_obj, repo, "HEAD^{tree}");
 	if (err != 0) {
-		bare_put_uint(writer, 11);
+		bare_put_uint(writer, 4);
 		return -1;
 	}
 	git_tree *tree = (git_tree *)head_obj;
@@ -50,7 +50,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer
 		} else {
 			err = git_tree_entry_to_object(&tree_obj, repo, entry);
 			if (err != 0) {
-				bare_put_uint(writer, 3);
+				bare_put_uint(writer, 7);
 				goto cleanup;
 			}
 		}
@@ -95,13 +95,13 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer
 		git_object *blob_obj = NULL;
 		err = git_tree_entry_to_object(&blob_obj, repo, entry);
 		if (err != 0) {
-			bare_put_uint(writer, 3);
+			bare_put_uint(writer, 7);
 			goto cleanup;
 		}
 		git_blob *blob = (git_blob *)blob_obj;
 		const void *content = git_blob_rawcontent(blob);
 		if (content == NULL) {
-			bare_put_uint(writer, 3);
+			bare_put_uint(writer, 8);
 			git_blob_free(blob);
 			goto cleanup;
 		}
@@ -111,7 +111,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer
 		git_blob_free(blob);
 	} else {
 		/* Unknown */
-		bare_put_uint(writer, 3);
+		bare_put_uint(writer, -1);
 	}
 
 cleanup:

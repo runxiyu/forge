@@ -9,6 +9,7 @@ int
 cmd_index(git_repository *repo, struct bare_writer *writer)
 {
 	/* HEAD tree */
+
 	git_object *obj = NULL;
 	int err = git_revparse_single(&obj, repo, "HEAD^{tree}");
 	if (err != 0) {
@@ -54,6 +55,8 @@ cmd_index(git_repository *repo, struct bare_writer *writer)
 	bare_put_data(writer, content, git_blob_rawsize(blob));
 
 	/* Commits */
+
+	/* TODO BUG: This might be a different commit from the displayed README due to races */
 
 	git_revwalk *walker = NULL;
 	if (git_revwalk_new(&walker, repo) != 0) {
