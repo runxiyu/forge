@@ -55,6 +55,10 @@ type Config struct {
 		Type string `scfg:"type"`
 		Conn string `scfg:"conn"`
 	} `scfg:"db"`
+	Pprof struct {
+		Net  string `scfg:"net"`
+		Addr string `scfg:"addr"`
+	} `scfg:"pprof"`
 }
 
 // LoadConfig loads a configuration file from the specified path and unmarshals

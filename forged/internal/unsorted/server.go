@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -205,6 +206,23 @@ func (s *Server) Run() error {
 		go func() {
 			if err = server.Serve(httpListener); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				slog.Error("serving HTTP", "error", err)
+				os.Exit(1)
+			}
+		}()
+	}
+
+	// Pprof listener
+	{
+		pprofListener, err := net.Listen(s.config.Pprof.Net, s.config.Pprof.Addr)
+		if err != nil {
+			slog.Error("listening pprof", "error", err)
+			os.Exit(1)
+		}
+
+		slog.Info("listening pprof on", "net", s.config.Pprof.Net, "addr", s.config.Pprof.Addr)
+		go func() {
+			if err := http.Serve(pprofListener, nil); err != nil {
+				slog.Error("serving pprof", "error", err)
 				os.Exit(1)
 			}
 		}()

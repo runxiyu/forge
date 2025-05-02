@@ -98,3 +98,11 @@ lmtp {
 	read_timeout 300
 	write_timeout 300
 }
+
+pprof {
+	# What network to listen on for pprof?
+	net tcp
+
+	# What address to listen on?
+	addr localhost:28471
+}
