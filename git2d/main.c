@@ -42,7 +42,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	listen(sock, 0);
+	listen(sock, 128);
 
 	for (;;) {
 		int *conn = malloc(sizeof(int));
