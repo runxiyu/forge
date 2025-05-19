@@ -3,16 +3,16 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
-	github.com/alecthomas/chroma/v2 v2.17.2
+	github.com/alecthomas/chroma/v2 v2.18.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-smtp v0.22.0
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.16.0
-	github.com/jackc/pgx/v5 v5.7.4
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.23.5
-	github.com/yuin/goldmark v1.7.11
+	github.com/yuin/goldmark v1.7.12
 	golang.org/x/crypto v0.38.0
 )
 
