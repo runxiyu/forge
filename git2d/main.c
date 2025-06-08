@@ -59,7 +59,9 @@ main(int argc, char **argv)
 
 		pthread_t thread;
 
-		pthread_create(&thread, NULL, session, (void *)conn);
+		if (pthread_create(&thread, NULL, session, (void *)conn) != 0) {
+			warn("pthread_create");
+		}
 	}
 
 	close(sock);
