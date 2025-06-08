@@ -46,8 +46,10 @@ main(int argc, char **argv)
 
 	for (;;) {
 		int *conn = malloc(sizeof(int));
-		if (conn == NULL)
-			err(1, "malloc");
+		if (conn == NULL) {
+			warn("malloc");
+			continue;
+		}
 
 		*conn = accept(sock, 0, 0);
 		if (*conn == -1) {
