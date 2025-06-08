@@ -50,8 +50,10 @@ main(int argc, char **argv)
 			err(1, "malloc");
 
 		*conn = accept(sock, 0, 0);
-		if (*conn == -1)
-			err(1, "accept");
+		if (*conn == -1) {
+			warn("accept");
+			continue;
+		}
 
 		pthread_t thread;
 
