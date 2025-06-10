@@ -53,6 +53,7 @@ main(int argc, char **argv)
 
 		*conn = accept(sock, 0, 0);
 		if (*conn == -1) {
+			free(conn);
 			warn("accept");
 			continue;
 		}
@@ -60,6 +61,8 @@ main(int argc, char **argv)
 		pthread_t thread;
 
 		if (pthread_create(&thread, NULL, session, (void *)conn) != 0) {
+			close(*conn);
+			free(conn);
 			warn("pthread_create");
 		}
 	}
