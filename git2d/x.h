@@ -3,6 +3,9 @@
  * SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
  */
 
+#ifndef X_H
+#define X_H
+
 #include <err.h>
 #include <errno.h>
 #include <git2.h>
@@ -18,9 +21,6 @@
 #include <unistd.h>
 
 #include "bare.h"
-
-#ifndef X_H
-#define X_H
 
 typedef struct {
 	int fd;
