@@ -5,8 +5,7 @@
 
 #include "x.h"
 
-void *
-session(void *_conn)
+void *session(void *_conn)
 {
 	int conn = *(int *)_conn;
 	free((int *)_conn);
@@ -24,7 +23,7 @@ session(void *_conn)
 	};
 
 	/* Repo path */
-	char path[4096] = {0};
+	char path[4096] = { 0 };
 	err = bare_get_data(&reader, (uint8_t *) path, sizeof(path) - 1);
 	if (err != BARE_ERROR_NONE) {
 		goto close;
@@ -33,7 +32,11 @@ session(void *_conn)
 
 	/* Open repo */
 	git_repository *repo = NULL;
-	err = git_repository_open_ext(&repo, path, GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
+	err =
+	    git_repository_open_ext(&repo, path,
+				    GIT_REPOSITORY_OPEN_NO_SEARCH |
+				    GIT_REPOSITORY_OPEN_BARE |
+				    GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
 	if (err != 0) {
 		bare_put_uint(&writer, 1);
 		goto close;
@@ -65,12 +68,11 @@ session(void *_conn)
 		goto free_repo;
 	}
 
-free_repo:
+ free_repo:
 	git_repository_free(repo);
 
-close:
+ close:
 	close(conn);
 
 	return NULL;
 }
-

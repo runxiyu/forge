@@ -10,8 +10,7 @@
 
 #include "x.h"
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	if (argc != 2) {
 		errx(1, "provide one argument: the socket path");
@@ -35,7 +34,9 @@ main(int argc, char **argv)
 	if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un))) {
 		if (errno == EADDRINUSE) {
 			unlink(argv[1]);
-			if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)))
+			if (bind
+			    (sock, (struct sockaddr *)&addr,
+			     sizeof(struct sockaddr_un)))
 				err(1, "bind");
 		} else {
 			err(1, "bind");

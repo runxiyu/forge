@@ -5,8 +5,7 @@
 
 #include "x.h"
 
-int
-cmd_index(git_repository *repo, struct bare_writer *writer)
+int cmd_index(git_repository *repo, struct bare_writer *writer)
 {
 	/* HEAD tree */
 
@@ -91,15 +90,18 @@ cmd_index(git_repository *repo, struct bare_writer *writer)
 
 		/* Title */
 		size_t msg_len = msg ? strlen(msg) : 0;
-		bare_put_data(writer, (const uint8_t *)(msg ? msg : ""), msg_len);
+		bare_put_data(writer, (const uint8_t *)(msg ? msg : ""),
+			      msg_len);
 
 		/* Author's name */
 		const char *author_name = author ? author->name : "";
-		bare_put_data(writer, (const uint8_t *)author_name, strlen(author_name));
+		bare_put_data(writer, (const uint8_t *)author_name,
+			      strlen(author_name));
 
 		/* Author's email */
 		const char *author_email = author ? author->email : "";
-		bare_put_data(writer, (const uint8_t *)author_email, strlen(author_email));
+		bare_put_data(writer, (const uint8_t *)author_email,
+			      strlen(author_email));
 
 		/* Author's date */
 		/* TODO: Pass the integer instead of a string */
@@ -107,10 +109,12 @@ cmd_index(git_repository *repo, struct bare_writer *writer)
 		char timebuf[64];
 		struct tm *tm = localtime(&time);
 		if (tm)
-			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm);
+			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S",
+				 tm);
 		else
 			strcpy(timebuf, "unknown");
-		bare_put_data(writer, (const uint8_t *)timebuf, strlen(timebuf));
+		bare_put_data(writer, (const uint8_t *)timebuf,
+			      strlen(timebuf));
 
 		git_commit_free(commit);
 		count++;
