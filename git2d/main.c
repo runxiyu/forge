@@ -45,6 +45,14 @@ int main(int argc, char **argv)
 
 	listen(sock, 128);
 
+	pthread_attr_t pthread_attr;
+
+	if (pthread_attr_init(&pthread_attr) != 0)
+		err(1, "pthread_attr_init");
+
+	if (pthread_attr_setdetachstate(&pthread_attr, PTHREAD_CREATE_DETACHED) != 0)
+		err(1, "pthread_attr_setdetachstate");
+
 	for (;;) {
 		int *conn = malloc(sizeof(int));
 		if (conn == NULL) {
@@ -61,7 +69,7 @@ int main(int argc, char **argv)
 
 		pthread_t thread;
 
-		if (pthread_create(&thread, NULL, session, (void *)conn) != 0) {
+		if (pthread_create (&thread, &pthread_attr, session, (void *)conn) != 0) {
 			close(*conn);
 			free(conn);
 			warn("pthread_create");
