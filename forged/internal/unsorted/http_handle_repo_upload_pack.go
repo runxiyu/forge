@@ -5,7 +5,6 @@ package unsorted
 
 import (
 	"bytes"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -20,8 +19,6 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	var groupPath []string
 	var repoName string
 	var repoPath string
-	var stdout io.ReadCloser
-	var stdin io.WriteCloser
 	var cmd *exec.Cmd
 
 	groupPath, repoName = params["group_path"].([]string), params["repo_name"].(string)
@@ -70,40 +67,14 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 
 	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
 	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
-	if stdout, err = cmd.StdoutPipe(); err != nil {
-		return err
-	}
-	defer func() {
-		_ = stdout.Close()
-	}()
 
 	var stderrBuf bytes.Buffer
 	cmd.Stderr = &stderrBuf
 
-	if stdin, err = cmd.StdinPipe(); err != nil {
-		return err
-	}
-	defer func() {
-		_ = stdin.Close()
-	}()
+	cmd.Stdout = writer
+	cmd.Stdin = request.Body
 
-	if err = cmd.Start(); err != nil {
-		return err
-	}
-
-	if _, err = io.Copy(stdin, request.Body); err != nil {
-		return err
-	}
-
-	if err = stdin.Close(); err != nil {
-		return err
-	}
-
-	if _, err = io.Copy(writer, stdout); err != nil {
-		return err
-	}
-
-	if err = cmd.Wait(); err != nil {
+	if err = cmd.Run(); err != nil {
 		log.Println(stderrBuf.String())
 		return err
 	}
