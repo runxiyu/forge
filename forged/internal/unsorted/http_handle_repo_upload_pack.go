@@ -5,10 +5,15 @@ package unsorted
 
 import (
 	"bytes"
+	"compress/gzip"
+	"compress/zlib"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -16,6 +21,18 @@ import (
 // httpHandleUploadPack handles incoming Git fetch/pull/clone's over the Smart
 // HTTP protocol.
 func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.Request, params map[string]any) (err error) {
+	if ct := request.Header.Get("Content-Type"); !strings.HasPrefix(ct, "application/x-git-upload-pack-request") {
+		http.Error(writer, "bad content-type", http.StatusUnsupportedMediaType)
+		return nil
+	}
+
+	decoded, err := decodeBody(request)
+	if err != nil {
+		http.Error(writer, "cannot decode request body", http.StatusBadRequest)
+		return err
+	}
+	defer decoded.Close()
+
 	var groupPath []string
 	var repoName string
 	var repoPath string
@@ -61,18 +78,21 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	}
 
 	writer.Header().Set("Content-Type", "application/x-git-upload-pack-result")
-	writer.Header().Set("Connection", "Keep-Alive")
-	writer.Header().Set("Transfer-Encoding", "chunked")
-	writer.WriteHeader(http.StatusOK)
+	// writer.Header().Set("Connection", "Keep-Alive")
+	// writer.Header().Set("Transfer-Encoding", "chunked")
 
-	cmd = exec.Command("git", "upload-pack", "--stateless-rpc", repoPath)
+	cmd = exec.CommandContext(request.Context(), "git", "upload-pack", "--stateless-rpc", repoPath)
 	cmd.Env = append(os.Environ(), "LINDENII_FORGE_HOOKS_SOCKET_PATH="+s.config.Hooks.Socket)
 
 	var stderrBuf bytes.Buffer
 	cmd.Stderr = &stderrBuf
 
 	cmd.Stdout = writer
-	cmd.Stdin = request.Body
+	cmd.Stdin = decoded
+
+	if gp := request.Header.Get("Git-Protocol"); gp != "" {
+		cmd.Env = append(cmd.Env, "GIT_PROTOCOL="+gp)
+	}
 
 	if err = cmd.Run(); err != nil {
 		log.Println(stderrBuf.String())
@@ -80,4 +100,21 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	}
 
 	return nil
+}
+
+func decodeBody(r *http.Request) (io.ReadCloser, error) {
+	switch ce := strings.ToLower(strings.TrimSpace(r.Header.Get("Content-Encoding"))); ce {
+	case "", "identity":
+		return r.Body, nil
+	case "gzip":
+		zr, err := gzip.NewReader(r.Body)
+		if err != nil { return nil, err }
+		return zr, nil
+	case "deflate":
+		zr, err := zlib.NewReader(r.Body)
+		if err != nil { return nil, err }
+		return zr, nil
+	default:
+		return nil, fmt.Errorf("unsupported Content-Encoding: %q", ce)
+	}
 }
