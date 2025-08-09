@@ -4,7 +4,9 @@
 package unsorted
 
 import (
+	"bytes"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -71,10 +73,12 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
 	}
-	cmd.Stderr = cmd.Stdout
 	defer func() {
 		_ = stdout.Close()
 	}()
+
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = &stderrBuf
 
 	if stdin, err = cmd.StdinPipe(); err != nil {
 		return err
@@ -100,6 +104,7 @@ func (s *Server) httpHandleUploadPack(writer http.ResponseWriter, request *http.
 	}
 
 	if err = cmd.Wait(); err != nil {
+		log.Println(stderrBuf.String())
 		return err
 	}
 
