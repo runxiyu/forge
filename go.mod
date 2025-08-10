@@ -3,17 +3,17 @@ module go.lindenii.runxiyu.org/forge
 go 1.24.1
 
 require (
-	github.com/alecthomas/chroma/v2 v2.18.0
+	github.com/alecthomas/chroma/v2 v2.20.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/emersion/go-message v0.18.2
-	github.com/emersion/go-smtp v0.22.0
+	github.com/emersion/go-smtp v0.24.0
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-git/go-git/v5 v5.16.1
+	github.com/go-git/go-git/v5 v5.16.2
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/tdewolff/minify/v2 v2.23.8
-	github.com/yuin/goldmark v1.7.12
-	golang.org/x/crypto v0.39.0
+	github.com/tdewolff/minify/v2 v2.23.11
+	github.com/yuin/goldmark v1.7.13
+	golang.org/x/crypto v0.41.0
 )
 
 require (
@@ -36,15 +36,15 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/pjbgf/sha1cd v0.3.2 // indirect
+	github.com/pjbgf/sha1cd v0.4.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
-	github.com/tdewolff/parse/v2 v2.8.1 // indirect
+	github.com/tdewolff/parse/v2 v2.8.2-0.20250806174018-50048bb39781 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
