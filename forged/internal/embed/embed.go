@@ -6,10 +6,10 @@ package embed
 
 import "embed"
 
-// Source contains the licenses and source tarballs collected at build time.
+// Source contains the licenses collected at build time.
 // It is intended to be served to the user.
 //
-//go:embed LICENSE* source.tar.gz
+//go:embed LICENSE*
 var Source embed.FS
 
 // Resources contains the templates and static files used by the web interface,

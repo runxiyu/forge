@@ -13,7 +13,7 @@ CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 
 VERSION = $(shell git describe --tags --always --dirty)
 SOURCE_FILES = $(shell git ls-files)
-EMBED = git2d/git2d hookc/hookc source.tar.gz $(wildcard LICENSE*) $(wildcard forged/static/*) $(wildcard forged/templates/*)
+EMBED = git2d/git2d hookc/hookc $(wildcard LICENSE*) $(wildcard forged/static/*) $(wildcard forged/templates/*)
 EMBED_ = $(EMBED:%=forged/internal/embed/%)
 
 forge: $(EMBED_) $(SOURCE_FILES)
@@ -27,11 +27,7 @@ git2d/git2d: $(wildcard git2d/*.c)
 	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
-	rm -rf forge utils/colb hookc/hookc git2d/git2d source.tar.gz */*.o
-
-source.tar.gz: $(SOURCE_FILES)
-	rm -f source.tar.gz
-	git ls-files -z | xargs -0 tar -czf source.tar.gz
+	rm -rf forge utils/colb hookc/hookc git2d/git2d */*.o
 
 forged/internal/embed/%: %
 	@mkdir -p $(shell dirname $@)
