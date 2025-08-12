@@ -4,47 +4,10 @@
 package misc
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"strings"
 )
-
-var (
-	ErrDupRefSpec = errors.New("duplicate ref spec")
-	ErrNoRefSpec  = errors.New("no ref spec")
-)
-
-// getParamRefTypeName looks at the query parameters in an HTTP request and
-// returns its ref name and type, if any.
-func GetParamRefTypeName(request *http.Request) (retRefType, retRefName string, err error) {
-	rawQuery := request.URL.RawQuery
-	queryValues, err := url.ParseQuery(rawQuery)
-	if err != nil {
-		return
-	}
-	done := false
-	for _, refType := range []string{"commit", "branch", "tag"} {
-		refName, ok := queryValues[refType]
-		if ok {
-			if done {
-				err = ErrDupRefSpec
-				return
-			}
-			done = true
-			if len(refName) != 1 {
-				err = ErrDupRefSpec
-				return
-			}
-			retRefName = refName[0]
-			retRefType = refType
-		}
-	}
-	if !done {
-		err = ErrNoRefSpec
-	}
-	return
-}
 
 // ParseReqURI parses an HTTP request URL, and returns a slice of path segments
 // and the query parameters. It handles %2F correctly.
