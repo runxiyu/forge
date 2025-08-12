@@ -19,15 +19,13 @@ EMBED_ = $(EMBED:%=forged/internal/embed/%)
 forge: $(EMBED_) $(SOURCE_FILES)
 	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "go.lindenii.runxiyu.org/forge/forged/internal/unsorted.version=$(VERSION)"' -tags 'osusergo netgo static_build' ./forged
 
-utils/colb:
-
 hookc/hookc:
 
 git2d/git2d: $(wildcard git2d/*.c)
 	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
 clean:
-	rm -rf forge utils/colb hookc/hookc git2d/git2d */*.o
+	rm -rf forge hookc/hookc git2d/git2d */*.o
 
 forged/internal/embed/%: %
 	@mkdir -p $(shell dirname $@)
