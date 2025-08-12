@@ -11,50 +11,52 @@
 	</head>
 	<body class="index">
 		{{- template "header" . -}}
-		<div class="padding-wrapper">
-			<table class="wide">
-				<thead>
-					<tr>
-						<th colspan="2" class="title-row">Groups</th>
-					</tr>
-					<tr>
-						<th scope="col">Name</th>
-						<th scope="col">Description</th>
-					</tr>
-				</thead>
-				<tbody>
-					{{- range .groups -}}
+		<main>
+			<div class="padding-wrapper">
+				<table class="wide">
+					<thead>
 						<tr>
-							<td>
-								<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
-							</td>
-							<td>
-								{{- .Description -}}
-							</td>
+							<th colspan="2" class="title-row">Groups</th>
 						</tr>
-					{{- end -}}
-				</tbody>
-			</table>
-			<table class="wide">
-				<thead>
-					<tr>
-						<th colspan="2" class="title-row">
-							Info
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">SSH public key</th>
-						<td><code class="breakable">{{- .global.server_public_key_string -}}</code></td>
-					</tr>
-					<tr>
-						<th scope="row">SSH fingerprint</th>
-						<td><code class="breakable">{{- .global.server_public_key_fingerprint -}}</code></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+						<tr>
+							<th scope="col">Name</th>
+							<th scope="col">Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{- range .groups -}}
+							<tr>
+								<td>
+									<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
+								</td>
+								<td>
+									{{- .Description -}}
+								</td>
+							</tr>
+						{{- end -}}
+					</tbody>
+				</table>
+				<table class="wide">
+					<thead>
+						<tr>
+							<th colspan="2" class="title-row">
+								Info
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">SSH public key</th>
+							<td><code class="breakable">{{- .global.server_public_key_string -}}</code></td>
+						</tr>
+						<tr>
+							<th scope="row">SSH fingerprint</th>
+							<td><code class="breakable">{{- .global.server_public_key_fingerprint -}}</code></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

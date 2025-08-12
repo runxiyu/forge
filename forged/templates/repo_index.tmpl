@@ -12,80 +12,82 @@
 	</head>
 	<body class="repo-index">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link active" href="./{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link active" href="./{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		{{- if .notes -}}
-		<div id="notes">Notes</div>
-			<ul>
-				{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}
-			</ul>
-		</div>
-		{{- end -}}
-		<p class="readingwidth"><code>{{- .ssh_clone_url -}}</code></p>
-		{{- if .ref_name -}}
-		<p class="readingwidth">
-		<strong>
-		Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
-		</strong>
-		</p>
-		{{- end -}}
-		{{- if .commits -}}
-			<div class="commit-list-small">
-				{{- range .commits -}}
-					<div class="event">
-						<div>
-							<a href="commit/{{- .Hash -}}" title="{{- .Hash -}}" rel="nofollow">
-								{{- .Hash | printf "%.8s" -}}
-							</a>
-							&nbsp;&mdash;&nbsp;<a href="mailto:{{- .Email -}}">{{- .Author -}}</a>
-							<small class="pull-right">
-								<span title="{{- .Date -}}">{{- .Date -}}</span>
-							</small>
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
+			</div>
+			{{- if .notes -}}
+			<div id="notes">Notes</div>
+				<ul>
+					{{- range .notes -}}<li>{{- . -}}</li>{{- end -}}
+				</ul>
+			</div>
+			{{- end -}}
+			<p class="readingwidth"><code>{{- .ssh_clone_url -}}</code></p>
+			{{- if .ref_name -}}
+			<p class="readingwidth">
+			<strong>
+			Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+			</strong>
+			</p>
+			{{- end -}}
+			{{- if .commits -}}
+				<div class="commit-list-small">
+					{{- range .commits -}}
+						<div class="event">
+							<div>
+								<a href="commit/{{- .Hash -}}" title="{{- .Hash -}}" rel="nofollow">
+									{{- .Hash | printf "%.8s" -}}
+								</a>
+								&nbsp;&mdash;&nbsp;<a href="mailto:{{- .Email -}}">{{- .Author -}}</a>
+								<small class="pull-right">
+									<span title="{{- .Date -}}">{{- .Date -}}</span>
+								</small>
+							</div>
+							<pre class="commit">{{- .Message | first_line -}}</pre>
 						</div>
-						<pre class="commit">{{- .Message | first_line -}}</pre>
-					</div>
-				{{- end -}}
-				{{- if dereference_error .commits_err -}}
-					<div class="commit-error">
-						Error while obtaining commit log: {{ .commits_err }}
-					</div>
-				{{- end -}}
-			</div>
-		{{- end -}}
-		{{- if .readme -}}
-			<div class="padding-wrapper" id="readme">
-				{{- .readme -}}
-			</div>
-		{{- end -}}
+					{{- end -}}
+					{{- if dereference_error .commits_err -}}
+						<div class="commit-error">
+							Error while obtaining commit log: {{ .commits_err }}
+						</div>
+					{{- end -}}
+				</div>
+			{{- end -}}
+			{{- if .readme -}}
+				<div class="padding-wrapper" id="readme">
+					{{- .readme -}}
+				</div>
+			{{- end -}}
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

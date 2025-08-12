@@ -12,103 +12,105 @@
 	</head>
 	<body class="repo-commit">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		<div class="padding-wrapper scroll">
-			<div class="key-val-grid-wrapper">
-				<section id="commit-info" class="key-val-grid">
-					<div class="title-row">Commit info</div>
-					<div class="row-label">ID</div>
-					<div class="row-value">{{- .commit_id -}}</div>
-					<div class="row-label">Author</div>
-					<div class="row-value">
-						<span>{{- .commit_object.Author.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Author.Email -}}">{{- .commit_object.Author.Email -}}</a>&gt;</span>
-					</div>
-					<div class="row-label">Author date</div>
-					<div class="row-value">{{- .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
-					<div class="row-label">Committer</div>
-					<div class="row-value">
-						<span>{{- .commit_object.Committer.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Committer.Email -}}">{{- .commit_object.Committer.Email -}}</a>&gt;</span>
-					</div>
-					<div class="row-label">Committer date</div>
-					<div class="row-value">{{- .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
-					<div class="row-label">Actions</div>
-					<div class="row-value">
-						<a href="{{- .commit_object.Hash -}}.patch">Get patch</a>
-					</div>
-				</section>
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
 			</div>
-		</div>
-
-		<div class="padding-wrapper scroll" id="this-commit-message">
-			<pre>{{- .commit_object.Message -}}</pre>
-		</div>
-		<div class="padding-wrapper">
-			{{- $parent_commit_hash := .parent_commit_hash -}}
-			{{- $commit_object := .commit_object -}}
-			{{- range .file_patches -}}
-				<div class="file-patch toggle-on-wrapper">
-					<input type="checkbox" id="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-toggle toggle-on-toggle">
-					<label for="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-header toggle-on-header">
-						<div>
-							{{- if eq .From.Path "" -}}
-								--- /dev/null
-							{{- else -}}
-								--- a/<a href="../tree/{{- .From.Path -}}?commit={{- $parent_commit_hash -}}">{{- .From.Path -}}</a> {{ .From.Mode -}}
-							{{- end -}}
-							<br />
-							{{- if eq .To.Path "" -}}
-								+++ /dev/null
-							{{- else -}}
-								+++ b/<a href="../tree/{{- .To.Path -}}?commit={{- $commit_object.Hash -}}">{{- .To.Path -}}</a> {{ .To.Mode -}}
+			<div class="padding-wrapper scroll">
+				<div class="key-val-grid-wrapper">
+					<section id="commit-info" class="key-val-grid">
+						<div class="title-row">Commit info</div>
+						<div class="row-label">ID</div>
+						<div class="row-value">{{- .commit_id -}}</div>
+						<div class="row-label">Author</div>
+						<div class="row-value">
+							<span>{{- .commit_object.Author.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Author.Email -}}">{{- .commit_object.Author.Email -}}</a>&gt;</span>
+						</div>
+						<div class="row-label">Author date</div>
+						<div class="row-value">{{- .commit_object.Author.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
+						<div class="row-label">Committer</div>
+						<div class="row-value">
+							<span>{{- .commit_object.Committer.Name -}}</span> <span>&lt;<a href="mailto:{{- .commit_object.Committer.Email -}}">{{- .commit_object.Committer.Email -}}</a>&gt;</span>
+						</div>
+						<div class="row-label">Committer date</div>
+						<div class="row-value">{{- .commit_object.Committer.When.Format "Mon, 02 Jan 2006 15:04:05 -0700" -}}</div>
+						<div class="row-label">Actions</div>
+						<div class="row-value">
+							<a href="{{- .commit_object.Hash -}}.patch">Get patch</a>
+						</div>
+					</section>
+				</div>
+			</div>
+	
+			<div class="padding-wrapper scroll" id="this-commit-message">
+				<pre>{{- .commit_object.Message -}}</pre>
+			</div>
+			<div class="padding-wrapper">
+				{{- $parent_commit_hash := .parent_commit_hash -}}
+				{{- $commit_object := .commit_object -}}
+				{{- range .file_patches -}}
+					<div class="file-patch toggle-on-wrapper">
+						<input type="checkbox" id="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-toggle toggle-on-toggle">
+						<label for="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-header toggle-on-header">
+							<div>
+								{{- if eq .From.Path "" -}}
+									--- /dev/null
+								{{- else -}}
+									--- a/<a href="../tree/{{- .From.Path -}}?commit={{- $parent_commit_hash -}}">{{- .From.Path -}}</a> {{ .From.Mode -}}
+								{{- end -}}
+								<br />
+								{{- if eq .To.Path "" -}}
+									+++ /dev/null
+								{{- else -}}
+									+++ b/<a href="../tree/{{- .To.Path -}}?commit={{- $commit_object.Hash -}}">{{- .To.Path -}}</a> {{ .To.Mode -}}
+								{{- end -}}
+							</div>
+						</label>
+						<div class="file-content toggle-on-content scroll">
+							{{- range .Chunks -}}
+								{{- if eq .Operation 0 -}}
+									<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
+								{{- else if eq .Operation 1 -}}
+									<pre class="chunk chunk-addition">{{ .Content }}</pre>
+								{{- else if eq .Operation 2 -}}
+									<pre class="chunk chunk-deletion">{{ .Content }}</pre>
+								{{- else -}}
+									<pre class="chunk chunk-unknown">{{ .Content }}</pre>
+								{{- end -}}
 							{{- end -}}
 						</div>
-					</label>
-					<div class="file-content toggle-on-content scroll">
-						{{- range .Chunks -}}
-							{{- if eq .Operation 0 -}}
-								<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
-							{{- else if eq .Operation 1 -}}
-								<pre class="chunk chunk-addition">{{ .Content }}</pre>
-							{{- else if eq .Operation 2 -}}
-								<pre class="chunk chunk-deletion">{{ .Content }}</pre>
-							{{- else -}}
-								<pre class="chunk chunk-unknown">{{ .Content }}</pre>
-							{{- end -}}
-						{{- end -}}
 					</div>
-				</div>
-			{{- end -}}
-		</div>
+				{{- end -}}
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

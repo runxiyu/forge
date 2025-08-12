@@ -86,10 +86,8 @@ html, code, pre {
 
 /* Footer styles */
 footer {
-	margin-top: 1rem;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 1rem;
 	display: block;
 	padding: 0 5px;
 	width: fit-content;
@@ -102,6 +100,21 @@ footer a:link, footer a:visited {
 
 .padding {
 	padding: 0 1rem;
+}
+
+/* Sticky footer */
+body {
+	position: relative;
+	min-height: 100vh;
+}
+main {
+	padding-bottom: 2.5rem;
+}
+footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 2rem;
 }
 
 /* Link styles */

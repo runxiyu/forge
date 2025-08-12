@@ -12,68 +12,70 @@
 	</head>
 	<body class="repo-contrib-index">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="../contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="../contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		<div class="padding-wrapper">
-			<h2>How to submit a merge request</h2>
-			<pre>git clone {{ .ssh_clone_url }}
-cd {{ .repo_name }}
-git checkout -b contrib/name_of_your_contribution
-# edit and commit stuff
-git push -u origin HEAD</pre>
-			<p>Pushes that update branches in other namespaces, or pushes to existing contribution branches belonging to other SSH keys, will be automatically
-rejected, unless you are an authenticated maintainer. Otherwise, a merge request is automatically opened, and the maintainers are notified via IRC.</p>
-			<p>Alternatively, you may <a href="https://git-send-email.io">email patches</a> to <a href="mailto:{{ .repo_patch_mailing_list }}">{{ .repo_patch_mailing_list }}</a>.</p>
-		</div>
-		<div class="padding-wrapper">
-			<table id="recent-merge_requests" class="wide">
-				<thead>
-					<tr>
-						<th scope="col">ID</th>
-						<th scope="col">Title</th>
-						<th scope="col">Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					{{- range .merge_requests -}}
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
+			</div>
+			<div class="padding-wrapper">
+				<h2>How to submit a merge request</h2>
+				<pre>git clone {{ .ssh_clone_url }}
+	cd {{ .repo_name }}
+	git checkout -b contrib/name_of_your_contribution
+	# edit and commit stuff
+	git push -u origin HEAD</pre>
+				<p>Pushes that update branches in other namespaces, or pushes to existing contribution branches belonging to other SSH keys, will be automatically
+	rejected, unless you are an authenticated maintainer. Otherwise, a merge request is automatically opened, and the maintainers are notified via IRC.</p>
+				<p>Alternatively, you may <a href="https://git-send-email.io">email patches</a> to <a href="mailto:{{ .repo_patch_mailing_list }}">{{ .repo_patch_mailing_list }}</a>.</p>
+			</div>
+			<div class="padding-wrapper">
+				<table id="recent-merge_requests" class="wide">
+					<thead>
 						<tr>
-							<td class="merge_request-id">{{- .ID -}}</td>
-							<td class="merge_request-title"><a href="{{- .ID -}}/">{{- .Title -}}</a></td>
-							<td class="merge_request-status">{{- .Status -}}</td>
+							<th scope="col">ID</th>
+							<th scope="col">Title</th>
+							<th scope="col">Status</th>
 						</tr>
-					{{- end -}}
-				</tbody>
-			</table>
-		</div>
+					</thead>
+					<tbody>
+						{{- range .merge_requests -}}
+							<tr>
+								<td class="merge_request-id">{{- .ID -}}</td>
+								<td class="merge_request-title"><a href="{{- .ID -}}/">{{- .Title -}}</a></td>
+								<td class="merge_request-status">{{- .Status -}}</td>
+							</tr>
+						{{- end -}}
+					</tbody>
+				</table>
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

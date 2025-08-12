@@ -11,10 +11,12 @@
 	</head>
 	<body class="451">
 		{{- template "header" . -}}
-		<div class="padding-wrapper complete-error-page">
-			<h1>451 Unavailable For Legal Reasons</h1>
-			<p>{{- .complete_error_msg -}}</p>
-		</div>
+		<main>
+			<div class="padding-wrapper complete-error-page">
+				<h1>451 Unavailable For Legal Reasons</h1>
+				<p>{{- .complete_error_msg -}}</p>
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

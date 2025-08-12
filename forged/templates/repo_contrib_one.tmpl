@@ -12,109 +12,111 @@
 	</head>
 	<body class="repo-contrib-one">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="../contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="../contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		<div class="padding-wrapper">
-			<table id="mr-info-table">
-				<thead>
-					<tr class="title-row">
-						<th colspan="2">Merge request info</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">ID</th>
-						<td>{{- .mr_id -}}</td>
-					</tr>
-					<tr>
-						<th scope="row">Status</th>
-						<td>{{- .mr_status -}}</td>
-					</tr>
-					<tr>
-						<th scope="row">Title</th>
-						<td>{{- .mr_title -}}</td>
-					</tr>
-					<tr>
-						<th scope="row">Source ref</th>
-						<td>{{- .mr_source_ref -}}</td>
-					</tr>
-					<tr>
-						<th scope="row">Destination branch</th>
-						<td>{{- .mr_destination_branch -}}</td>
-					</tr>
-					<tr>
-						<th scope="row">Merge base</th>
-						<td>{{- .merge_base.Hash.String -}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="padding-wrapper">
-			{{- $merge_base := .merge_base -}}
-			{{- $source_commit := .source_commit -}}
-			{{- range .file_patches -}}
-				<div class="file-patch toggle-on-wrapper">
-					<input type="checkbox" id="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-toggle toggle-on-toggle">
-					<label for="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-header toggle-on-header">
-						<div>
-							{{- if eq .From.Path "" -}}
-								--- /dev/null
-							{{- else -}}
-								--- a/<a href="../../tree/{{- .From.Path -}}?commit={{- $merge_base.Hash -}}">{{- .From.Path -}}</a> {{ .From.Mode -}}
-							{{- end -}}
-							<br />
-							{{- if eq .To.Path "" -}}
-								+++ /dev/null
-							{{- else -}}
-								+++ b/<a href="../../tree/{{- .To.Path -}}?commit={{- $source_commit.Hash -}}">{{- .To.Path -}}</a> {{ .To.Mode -}}
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
+			</div>
+			<div class="padding-wrapper">
+				<table id="mr-info-table">
+					<thead>
+						<tr class="title-row">
+							<th colspan="2">Merge request info</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">ID</th>
+							<td>{{- .mr_id -}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Status</th>
+							<td>{{- .mr_status -}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Title</th>
+							<td>{{- .mr_title -}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Source ref</th>
+							<td>{{- .mr_source_ref -}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Destination branch</th>
+							<td>{{- .mr_destination_branch -}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Merge base</th>
+							<td>{{- .merge_base.Hash.String -}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="padding-wrapper">
+				{{- $merge_base := .merge_base -}}
+				{{- $source_commit := .source_commit -}}
+				{{- range .file_patches -}}
+					<div class="file-patch toggle-on-wrapper">
+						<input type="checkbox" id="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-toggle toggle-on-toggle">
+						<label for="toggle-{{- .From.Hash -}}{{- .To.Hash -}}" class="file-header toggle-on-header">
+							<div>
+								{{- if eq .From.Path "" -}}
+									--- /dev/null
+								{{- else -}}
+									--- a/<a href="../../tree/{{- .From.Path -}}?commit={{- $merge_base.Hash -}}">{{- .From.Path -}}</a> {{ .From.Mode -}}
+								{{- end -}}
+								<br />
+								{{- if eq .To.Path "" -}}
+									+++ /dev/null
+								{{- else -}}
+									+++ b/<a href="../../tree/{{- .To.Path -}}?commit={{- $source_commit.Hash -}}">{{- .To.Path -}}</a> {{ .To.Mode -}}
+								{{- end -}}
+							</div>
+						</label>
+						<div class="file-content toggle-on-content scroll">
+							{{- range .Chunks -}}
+								{{- if eq .Operation 0 -}}
+									<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
+								{{- else if eq .Operation 1 -}}
+									<pre class="chunk chunk-addition">{{ .Content }}</pre>
+								{{- else if eq .Operation 2 -}}
+									<pre class="chunk chunk-deletion">{{ .Content }}</pre>
+								{{- else -}}
+									<pre class="chunk chunk-unknown">{{ .Content }}</pre>
+								{{- end -}}
 							{{- end -}}
 						</div>
-					</label>
-					<div class="file-content toggle-on-content scroll">
-						{{- range .Chunks -}}
-							{{- if eq .Operation 0 -}}
-								<pre class="chunk chunk-unchanged">{{ .Content }}</pre>
-							{{- else if eq .Operation 1 -}}
-								<pre class="chunk chunk-addition">{{ .Content }}</pre>
-							{{- else if eq .Operation 2 -}}
-								<pre class="chunk chunk-deletion">{{ .Content }}</pre>
-							{{- else -}}
-								<pre class="chunk chunk-unknown">{{ .Content }}</pre>
-							{{- end -}}
-						{{- end -}}
 					</div>
-				</div>
-			{{- end -}}
-		</div>
+				{{- end -}}
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

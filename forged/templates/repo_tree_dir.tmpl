@@ -12,79 +12,81 @@
 	</head>
 	<body class="repo-tree-dir">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="{{- .repo_url_root -}}tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="{{- .repo_url_root -}}settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="{{- .repo_url_root -}}tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{- .repo_url_root -}}settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		<div class="padding-wrapper scroll">
-			{{- if .ref_name -}}
-			<p>
-			<strong>
-			Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
-			</strong>
-			</p>
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
+			</div>
+			<div class="padding-wrapper scroll">
+				{{- if .ref_name -}}
+				<p>
+				<strong>
+				Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+				</strong>
+				</p>
+				{{- end -}}
+				<table id="file-tree" class="wide">
+					<thead>
+						<tr class="title-row">
+							<th colspan="3">
+								/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end -}}
+							</th>
+							<tr>
+								<th scope="col">Mode</th>
+								<th scope="col">Filename</th>
+								<th scope="col">Size</th>
+							</tr>
+						</tr>
+					</thead>
+					<tbody>
+						{{- $path_spec := .path_spec -}}
+						{{- range .files -}}
+							<tr>
+								<td class="file-mode">{{- .Mode -}}</td>
+								<td class="file-name"><a href="{{- .Name -}}{{- if not .IsFile -}}/{{- end -}}{{- template "ref_query" $root -}}">{{- .Name -}}</a>{{- if not .IsFile -}}/{{- end -}}</td>
+								<td class="file-size">{{- .Size -}}</td>
+							</tr>
+						{{- end -}}
+					</tbody>
+				</table>
+			</div>
+			<div class="padding-wrapper">
+				<div id="refs">
+				</div>
+			</div>
+			{{- if .readme -}}
+			<div class="padding-wrapper" id="readme">
+				{{- .readme -}}
+			</div>
 			{{- end -}}
-			<table id="file-tree" class="wide">
-				<thead>
-					<tr class="title-row">
-						<th colspan="3">
-							/{{ .path_spec }}{{ if ne .path_spec "" }}/{{ end }}{{ if .ref_name }} on {{ .ref_name }}{{ end -}}
-						</th>
-						<tr>
-							<th scope="col">Mode</th>
-							<th scope="col">Filename</th>
-							<th scope="col">Size</th>
-						</tr>
-					</tr>
-				</thead>
-				<tbody>
-					{{- $path_spec := .path_spec -}}
-					{{- range .files -}}
-						<tr>
-							<td class="file-mode">{{- .Mode -}}</td>
-							<td class="file-name"><a href="{{- .Name -}}{{- if not .IsFile -}}/{{- end -}}{{- template "ref_query" $root -}}">{{- .Name -}}</a>{{- if not .IsFile -}}/{{- end -}}</td>
-							<td class="file-size">{{- .Size -}}</td>
-						</tr>
-					{{- end -}}
-				</tbody>
-			</table>
-		</div>
-		<div class="padding-wrapper">
-			<div id="refs">
-			</div>
-		</div>
-		{{- if .readme -}}
-		<div class="padding-wrapper" id="readme">
-			{{- .readme -}}
-		</div>
-		{{- end -}}
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

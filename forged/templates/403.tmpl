@@ -11,10 +11,12 @@
 	</head>
 	<body class="403">
 		{{- template "header" . -}}
-		<div class="padding-wrapper complete-error-page">
-			<h1>403 Forbidden</h1>
-			<p>{{- .complete_error_msg -}}</p>
-		</div>
+		<main>
+			<div class="padding-wrapper complete-error-page">
+				<h1>403 Forbidden</h1>
+				<p>{{- .complete_error_msg -}}</p>
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>

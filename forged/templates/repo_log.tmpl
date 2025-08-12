@@ -12,76 +12,78 @@
 	</head>
 	<body class="repo-log">
 		{{- template "header" . -}}
-		<div class="repo-header">
-			<h2>{{- .repo_name -}}</h2>
-			<ul class="nav-tabs-standalone">
-				<li class="nav-item">
-					<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="../log/{{- template "ref_query" $root -}}">Log</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../branches/">Branches</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../tags/">Tags</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../contrib/">Merge requests</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="../settings/">Settings</a>
-				</li>
-			</ul>
-		</div>
-		<div class="repo-header-extension">
-			<div class="repo-header-extension-content">
-				{{- .repo_description -}}
+		<main>
+			<div class="repo-header">
+				<h2>{{- .repo_name -}}</h2>
+				<ul class="nav-tabs-standalone">
+					<li class="nav-item">
+						<a class="nav-link" href="../{{- template "ref_query" $root -}}">Summary</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tree/{{- template "ref_query" $root -}}">Tree</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="../log/{{- template "ref_query" $root -}}">Log</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../branches/">Branches</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../tags/">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../contrib/">Merge requests</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="../settings/">Settings</a>
+					</li>
+				</ul>
 			</div>
-		</div>
-		<div class="scroll">
-			{{- if .ref_name -}}
-			<p>
-			<strong>
-			Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
-			</strong>
-			</p>
-			{{- end -}}
-			<table id="commits" class="wide">
-				<thead>
-					<tr class="title-row">
-						<th colspan="4">Commits {{ if .ref_name }} on {{ .ref_name }}{{ end -}}</th>
-					</tr>
-					<tr>
-						<th scope="col">ID</th>
-						<th scope="col">Title</th>
-						<th scope="col">Author</th>
-						<th scope="col">Author date</th>
-					</tr>
-				</thead>
-				<tbody>
-					{{- range .commits -}}
-						<tr>
-							<td class="commit-id"><a href="../commit/{{- .Hash -}}">{{- .Hash -}}</a></td>
-							<td class="commit-title">{{- .Message | first_line -}}</td>
-							<td class="commit-author">
-								<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
-							</td>
-							<td class="commit-time">
-								{{- .Author.When.Format "2006-01-02 15:04:05 -0700" -}}
-							</td>
+			<div class="repo-header-extension">
+				<div class="repo-header-extension-content">
+					{{- .repo_description -}}
+				</div>
+			</div>
+			<div class="scroll">
+				{{- if .ref_name -}}
+				<p>
+				<strong>
+				Warning: Due to various recent migrations, viewing non-HEAD refs may be broken.
+				</strong>
+				</p>
+				{{- end -}}
+				<table id="commits" class="wide">
+					<thead>
+						<tr class="title-row">
+							<th colspan="4">Commits {{ if .ref_name }} on {{ .ref_name }}{{ end -}}</th>
 						</tr>
-					{{- end -}}
-					{{- if dereference_error .commits_err -}}
-						Error while obtaining commit log: {{ .commits_err }}
-					{{- end -}}
-				</tbody>
-			</table>
-		</div>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">Title</th>
+							<th scope="col">Author</th>
+							<th scope="col">Author date</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{- range .commits -}}
+							<tr>
+								<td class="commit-id"><a href="../commit/{{- .Hash -}}">{{- .Hash -}}</a></td>
+								<td class="commit-title">{{- .Message | first_line -}}</td>
+								<td class="commit-author">
+									<a class="email-name" href="mailto:{{- .Author.Email -}}">{{- .Author.Name -}}</a>
+								</td>
+								<td class="commit-time">
+									{{- .Author.When.Format "2006-01-02 15:04:05 -0700" -}}
+								</td>
+							</tr>
+						{{- end -}}
+						{{- if dereference_error .commits_err -}}
+							Error while obtaining commit log: {{ .commits_err }}
+						{{- end -}}
+					</tbody>
+				</table>
+			</div>
+		</main>
 		<footer>
 			{{- template "footer" . -}}
 		</footer>
