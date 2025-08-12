@@ -1,7 +1,8 @@
+version: "2"
+
 linters:
-  enable-all: true
+  default: all
   disable:
-    - tenv
     - depguard
     - err113           # dynamically defined errors are fine for our purposes
     - forcetypeassert  # type assertion failures are usually programming errors
@@ -14,7 +15,6 @@ linters:
     - nonamedreturns   # i like named returns
     - wrapcheck        # wrapping all errors is just not necessary
     - varnamelen       # "from" and "to" are very valid
-    - stylecheck
     - containedctx
     - godot
     - dogsled
