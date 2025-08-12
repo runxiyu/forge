@@ -39,7 +39,7 @@ CREATE TABLE mailing_list_emails (
 CREATE TABLE users (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username TEXT UNIQUE,
-	type TEXT NOT NULL CHECK (type IN ('pubkey_only', 'federated', 'registered')),
+	type TEXT NOT NULL CHECK (type IN ('pubkey_only', 'federated', 'registered', 'admin')),
 	password TEXT
 );
 
