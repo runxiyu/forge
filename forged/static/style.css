@@ -304,6 +304,7 @@ th.tdinput input[type=password] {
 td.tdinput select {
 	position: absolute;
 	background-color: var(--background-color);
+	color: var(--text-color);
 	border: none;
 	/*
 	width: 100%;
