@@ -29,25 +29,30 @@ void *session(void *_conn)
 		goto close;
 	}
 	path[sizeof(path) - 1] = '\0';
-
-	/* Open repo */
-	git_repository *repo = NULL;
-	err =
-	    git_repository_open_ext(&repo, path,
-				    GIT_REPOSITORY_OPEN_NO_SEARCH |
-				    GIT_REPOSITORY_OPEN_BARE |
-				    GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
-	if (err != 0) {
-		bare_put_uint(&writer, 1);
-		goto close;
-	}
+	fprintf(stderr, "session: path='%s'\n", path);
 
 	/* Command */
 	uint64_t cmd = 0;
 	err = bare_get_uint(&reader, &cmd);
 	if (err != BARE_ERROR_NONE) {
 		bare_put_uint(&writer, 2);
-		goto free_repo;
+		goto close;
+	}
+	fprintf(stderr, "session: cmd=%llu\n", (unsigned long long)cmd);
+
+	/* Repo init does not require opening an existing repo so let's just do it here */
+	if (cmd == 15) {
+		fprintf(stderr, "session: handling init for '%s'\n", path);
+		if (cmd_init_repo(path, &reader, &writer) != 0) {
+		}
+		goto close;
+	}
+
+	git_repository *repo = NULL;
+	err = git_repository_open_ext(&repo, path, GIT_REPOSITORY_OPEN_NO_SEARCH | GIT_REPOSITORY_OPEN_BARE | GIT_REPOSITORY_OPEN_NO_DOTGIT, NULL);
+	if (err != 0) {
+		bare_put_uint(&writer, 1);
+		goto close;
 	}
 	switch (cmd) {
 	case 1:
@@ -57,6 +62,66 @@ void *session(void *_conn)
 		break;
 	case 2:
 		err = cmd_treeraw(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 3:
+		err = cmd_resolve_ref(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 4:
+		err = cmd_list_branches(repo, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 5:
+		err = cmd_format_patch(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+case 6:
+	err = cmd_commit_info(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 7:
+		err = cmd_merge_base(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 8:
+		err = cmd_log(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 9:
+		err = cmd_tree_list_by_oid(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 10:
+		err = cmd_write_tree(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 11:
+		err = cmd_blob_write(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 12:
+		err = cmd_commit_tree_oid(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 13:
+		err = cmd_commit_create(repo, &reader, &writer);
+		if (err != 0)
+			goto free_repo;
+		break;
+	case 14:
+		err = cmd_update_ref(repo, &reader, &writer);
 		if (err != 0)
 			goto free_repo;
 		break;

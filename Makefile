@@ -7,29 +7,25 @@
 # some other build system).
 #
 
-.PHONY: clean
+.PHONY: clean all
 
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 
-VERSION = $(shell git describe --tags --always --dirty)
-SOURCE_FILES = $(shell git ls-files)
-EMBED = git2d/git2d hookc/hookc $(wildcard LICENSE*) $(wildcard forged/static/*) $(wildcard forged/templates/*)
-EMBED_ = $(EMBED:%=forged/internal/embed/%)
+all: dist/forged dist/git2d dist/hookc
 
-forge: $(EMBED_) $(SOURCE_FILES)
-	CGO_ENABLED=0 go build -o forge -ldflags '-extldflags "-f no-PIC -static" -X "go.lindenii.runxiyu.org/forge/forged/internal/unsorted.version=$(VERSION)"' -tags 'osusergo netgo static_build' ./forged
+dist/forged: $(shell git ls-files forged)
+	mkdir -p dist
+	sqlc -f forged/sqlc.yaml generate
+	CGO_ENABLED=0 go build -o dist/forged -ldflags '-extldflags "-f no-PIC -static"' -tags 'osusergo netgo static_build' ./forged
 
-hookc/hookc:
+dist/git2d: $(wildcard git2d/*.c)
+	mkdir -p dist
+	$(CC) $(CFLAGS) -o dist/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
 
-git2d/git2d: $(wildcard git2d/*.c)
-	$(CC) $(CFLAGS) -o git2d/git2d $^ $(shell pkg-config --cflags --libs libgit2) -lpthread
+dist/hookc: $(wildcard hookc/*.c)
+	mkdir -p dist
+	$(CC) $(CFLAGS) -o dist/hookc $^
 
 clean:
-	rm -rf forge hookc/hookc git2d/git2d */*.o
+	rm -rf dist
 
-forged/internal/embed/%: %
-	@mkdir -p $(shell dirname $@)
-	@cp $^ $@
-
-forged/internal/embed/.gitignore:
-	@touch $@

@@ -7,7 +7,7 @@
 <html lang="en">
 	<head>
 		{{- template "head_common" . -}}
-		<title>Index &ndash; {{ .global.forge_title -}}</title>
+		<title>Index &ndash; {{ .BaseData.Global.ForgeTitle -}}</title>
 	</head>
 	<body class="index">
 		{{- template "header" . -}}
@@ -24,7 +24,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{{- range .groups -}}
+						{{- range .Groups -}}
 							<tr>
 								<td>
 									<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
@@ -47,11 +47,11 @@
 					<tbody>
 						<tr>
 							<th scope="row">SSH public key</th>
-							<td><code class="breakable">{{- .global.server_public_key_string -}}</code></td>
+							<td><code class="breakable">{{- .BaseData.Global.SSHPubkey -}}</code></td>
 						</tr>
 						<tr>
 							<th scope="row">SSH fingerprint</th>
-							<td><code class="breakable">{{- .global.server_public_key_fingerprint -}}</code></td>
+							<td><code class="breakable">{{- .BaseData.Global.SSHFingerprint -}}</code></td>
 						</tr>
 					</tbody>
 				</table>

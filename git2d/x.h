@@ -9,6 +9,7 @@
 #include <err.h>
 #include <errno.h>
 #include <git2.h>
+#include <git2/buffer.h>
 #include <pthread.h>
 #include <signal.h>
 #include <sys/socket.h>
@@ -26,13 +27,29 @@ typedef struct {
 	int fd;
 } conn_io_t;
 
-
 bare_error conn_read(void *buffer, void *dst, uint64_t sz);
 bare_error conn_write(void *buffer, const void *src, uint64_t sz);
 
-void * session(void *_conn);
+void *session(void *_conn);
 
-int cmd_index(git_repository *repo, struct bare_writer *writer);
-int cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_index(git_repository * repo, struct bare_writer *writer);
+int cmd_treeraw(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
 
-#endif // X_H
+int cmd_resolve_ref(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_list_branches(git_repository * repo, struct bare_writer *writer);
+int cmd_format_patch(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_merge_base(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_log(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+
+int cmd_tree_list_by_oid(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_write_tree(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_blob_write(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+
+int cmd_commit_tree_oid(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_commit_create(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_update_ref(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+int cmd_commit_info(git_repository * repo, struct bare_reader *reader, struct bare_writer *writer);
+
+int cmd_init_repo(const char *path, struct bare_reader *reader, struct bare_writer *writer);
+
+#endif				// X_H

@@ -34,9 +34,7 @@ int main(int argc, char **argv)
 	if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un))) {
 		if (errno == EADDRINUSE) {
 			unlink(argv[1]);
-			if (bind
-			    (sock, (struct sockaddr *)&addr,
-			     sizeof(struct sockaddr_un)))
+			if (bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)))
 				err(1, "bind");
 		} else {
 			err(1, "bind");
@@ -50,7 +48,8 @@ int main(int argc, char **argv)
 	if (pthread_attr_init(&pthread_attr) != 0)
 		err(1, "pthread_attr_init");
 
-	if (pthread_attr_setdetachstate(&pthread_attr, PTHREAD_CREATE_DETACHED) != 0)
+	if (pthread_attr_setdetachstate(&pthread_attr, PTHREAD_CREATE_DETACHED)
+	    != 0)
 		err(1, "pthread_attr_setdetachstate");
 
 	for (;;) {
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
 
 		pthread_t thread;
 
-		if (pthread_create (&thread, &pthread_attr, session, (void *)conn) != 0) {
+		if (pthread_create(&thread, &pthread_attr, session, (void *)conn) != 0) {
 			close(*conn);
 			free(conn);
 			warn("pthread_create");

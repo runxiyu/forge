@@ -1,4 +1,1 @@
-/forge
-/source.tar.gz
-*.c.BAK
-*.o
+/dist

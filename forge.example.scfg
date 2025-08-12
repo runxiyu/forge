@@ -1,0 +1,110 @@
+web {
+	# What network transport should we listen on?
+	# Examples: tcp tcp4 tcp6 unix
+	net tcp
+
+	# What address to listen on?
+	# Examples for net tcp*: 127.0.0.1:8080 :80
+	# Example for unix: /var/run/lindenii/forge/http.sock
+	addr :8080
+
+	# How many seconds should cookies be remembered before they are purged?
+	cookie_expiry 604800
+
+	# What is the canonical URL of the web root?
+	root https://forge.example.org
+
+	# General HTTP server context timeout settings. It's recommended to
+	# set them slightly higher than usual as Git operations over large
+	# repos may take a long time.
+	read_timeout 120
+	write_timeout 1800
+	idle_timeout 120
+	max_header_bytes 20000
+
+	# Are we running behind a reverse proxy? If so, we will trust
+	# X-Forwarded-For headers.
+	reverse_proxy true
+
+	templates_path /usr/share/lindenii/forge/templates
+	static_path /usr/share/lindenii/forge/static
+
+	shutdown_timeout 10
+}
+
+irc {
+	tls true
+	net tcp
+	addr irc.runxiyu.org:6697
+	sendq 6000
+	nick forge-test
+	user forge
+	gecos "Lindenii Forge Test"
+}
+
+git {
+	# Where should newly-created Git repositories be stored?
+	repo_dir /var/lib/lindenii/forge/repos
+
+	# Where is git2d listening on?
+	socket /var/run/lindenii/forge/git2d.sock
+}
+
+ssh {
+	# What network transport should we listen on?
+	# This should be "tcp" in almost all cases.
+	net tcp
+
+	# What address to listen on?
+	addr :22
+
+	# What is the path to the SSH host key? Generate it with ssh-keygen.
+	# The key must have an empty password.
+	key /etc/lindenii/ssh_host_ed25519_key
+
+	# What is the canonical SSH URL?
+	root ssh://forge.example.org
+
+	shutdown_timeout 10
+}
+
+general {
+	title "Test Forge"
+}
+
+db {
+	# What is the connection string?
+	conn postgresql:///lindenii-forge?host=/var/run/postgresql
+}
+
+hooks {
+	# On which UNIX domain socket should we listen for hook callbacks on?
+	socket /var/run/lindenii/forge/hooks.sock
+
+	# Where should hook executables be put?
+	execs /usr/libexec/lindenii/forge/hooks
+}
+
+lmtp {
+	# On which UNIX domain socket should we listen for LMTP on?
+	socket /var/run/lindenii/forge/lmtp.sock
+
+	# What's the maximum acceptable message size?
+	max_size 1000000
+
+	# What is our domainpart?
+	domain forge.example.org
+
+	# General timeouts
+	read_timeout 300
+	write_timeout 300
+	shutdown_timeout 10
+}
+
+pprof {
+	# What network to listen on for pprof?
+	net tcp
+
+	# What address to listen on?
+	addr localhost:28471
+}

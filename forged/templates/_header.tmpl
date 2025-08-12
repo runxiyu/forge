@@ -5,15 +5,15 @@
 {{- define "header" -}}
 <header id="main-header">
 	<div id="main-header-forge-title">
-		<a href="/">{{- .global.forge_title -}}</a>
+		<a href="/">{{- .BaseData.Global.ForgeTitle -}}</a>
 	</div>
 	<nav id="breadcrumb-nav">
 		{{- $path := "" -}}
-		{{- $url_segments := .url_segments -}}
-		{{- $dir_mode := .dir_mode -}}
-		{{- $ref_type := .ref_type -}}
-		{{- $ref := .ref_name -}}
-		{{- $separator_index := .separator_index -}}
+		{{- $url_segments := .BaseData.URLSegments -}}
+		{{- $dir_mode := .BaseData.DirMode -}}
+		{{- $ref_type := .BaseData.RefType -}}
+		{{- $ref := .BaseData.RefName -}}
+		{{- $separator_index := .BaseData.SeparatorIndex -}}
 		{{- if eq $separator_index -1 -}}
 			{{- $separator_index = len $url_segments -}}
 		{{- end -}}
@@ -25,8 +25,8 @@
 		{{- end -}}
 	</nav>
 	<div id="main-header-user">
-		{{- if ne .user_id_string "" -}}
-			<a href="/-/users/{{- .user_id_string -}}">{{- .username -}}</a>
+		{{- if ne .BaseData.UserID "" -}}
+			<a href="/-/users/{{- .BaseData.UserID -}}/">{{- .BaseData.Username -}}</a>
 		{{- else -}}
 			<a href="/-/login/">Login</a>
 		{{- end -}}

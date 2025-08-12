@@ -3,7 +3,7 @@
 	SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "group_view" -}}
-{{- if .subgroups -}}
+{{- if .Subgroups -}}
 	<table class="wide">
 		<thead>
 			<tr>
@@ -15,7 +15,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{{- range .subgroups -}}
+			{{- range .Subgroups -}}
 				<tr>
 					<td>
 						<a href="{{- .Name | path_escape -}}/">{{- .Name -}}</a>
@@ -28,7 +28,7 @@
 		</tbody>
 	</table>
 {{- end -}}
-{{- if .repos -}}
+{{- if .Repos -}}
 <table class="wide">
 	<thead>
 		<tr>
@@ -40,7 +40,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{{- range .repos -}}
+		{{- range .Repos -}}
 			<tr>
 				<td>
 					<a href="-/repos/{{- .Name | path_escape -}}/">{{- .Name -}}</a>

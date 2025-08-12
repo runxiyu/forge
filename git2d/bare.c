@@ -169,13 +169,7 @@ bare_error bare_get_u64(struct bare_reader *ctx, uint64_t *x)
 
 	if (err == BARE_ERROR_NONE) {
 		*x = (uint64_t) ((uint8_t *) x)[0]
-		    | (uint64_t) ((uint8_t *) x)[1] << 8
-		    | (uint64_t) ((uint8_t *) x)[2] << 16
-		    | (uint64_t) ((uint8_t *) x)[3] << 24
-		    | (uint64_t) ((uint8_t *) x)[4] << 32
-		    | (uint64_t) ((uint8_t *) x)[5] << 40
-		    | (uint64_t) ((uint8_t *) x)[6] << 48
-		    | (uint64_t) ((uint8_t *) x)[7] << 56;
+		    | (uint64_t) ((uint8_t *) x)[1] << 8 | (uint64_t) ((uint8_t *) x)[2] << 16 | (uint64_t) ((uint8_t *) x)[3] << 24 | (uint64_t) ((uint8_t *) x)[4] << 32 | (uint64_t) ((uint8_t *) x)[5] << 40 | (uint64_t) ((uint8_t *) x)[6] << 48 | (uint64_t) ((uint8_t *) x)[7] << 56;
 	}
 
 	return err;
@@ -257,20 +251,17 @@ bare_error bare_get_bool(struct bare_reader *ctx, bool *x)
 	return bare_get_u8(ctx, (uint8_t *) x);
 }
 
-bare_error
-bare_put_fixed_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
+bare_error bare_put_fixed_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
 {
 	return ctx->write(ctx->buffer, (void *)src, sz);
 }
 
-bare_error
-bare_get_fixed_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz)
+bare_error bare_get_fixed_data(struct bare_reader *ctx, uint8_t *dst, uint64_t sz)
 {
 	return ctx->read(ctx->buffer, dst, sz);
 }
 
-bare_error
-bare_put_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
+bare_error bare_put_data(struct bare_writer *ctx, const uint8_t *src, uint64_t sz)
 {
 	bare_error err = BARE_ERROR_NONE;
 

@@ -5,9 +5,7 @@
 
 #include "x.h"
 
-int
-cmd_treeraw(git_repository *repo, struct bare_reader *reader,
-	    struct bare_writer *writer)
+int cmd_treeraw(git_repository *repo, struct bare_reader *reader, struct bare_writer *writer)
 {
 	/* Path */
 	char path[4096] = { 0 };
@@ -62,8 +60,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader,
 		bare_put_uint(writer, 1);
 		bare_put_uint(writer, count);
 		for (size_t i = 0; i < count; i++) {
-			const git_tree_entry *subentry =
-			    git_tree_entry_byindex(subtree, i);
+			const git_tree_entry *subentry = git_tree_entry_byindex(subtree, i);
 			const char *name = git_tree_entry_name(subentry);
 			git_otype type = git_tree_entry_type(subentry);
 			uint32_t mode = git_tree_entry_filemode(subentry);
@@ -77,8 +74,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader,
 				entry_type = 2;
 
 				git_object *subobj = NULL;
-				if (git_tree_entry_to_object
-				    (&subobj, repo, subentry) == 0) {
+				if (git_tree_entry_to_object(&subobj, repo, subentry) == 0) {
 					git_blob *b = (git_blob *) subobj;
 					size = git_blob_rawsize(b);
 					git_blob_free(b);
@@ -88,8 +84,7 @@ cmd_treeraw(git_repository *repo, struct bare_reader *reader,
 			bare_put_uint(writer, entry_type);
 			bare_put_uint(writer, mode);
 			bare_put_uint(writer, size);
-			bare_put_data(writer, (const uint8_t *)name,
-				      strlen(name));
+			bare_put_data(writer, (const uint8_t *)name, strlen(name));
 		}
 		if (entry != NULL) {
 			git_tree_free(subtree);
