@@ -15,8 +15,6 @@
 			<h1>400 Bad Request</h1>
 			<p>We recently switched URL schemes. Previously &ldquo;<code>:</code>&rdquo; was used as our URL group separator, but because OpenSMTPD does not implement local-part address quoting properly, we&rsquo;re unable to include &ldquo;<code>:</code>&rdquo; in URLs properly, hence we use &ldquo;<code>-</code>&rdquo; now.</p>
 			<p>As a precaution in case visitors get confused, this page was set up. <strong>You should probably replace the &ldquo;<code>:</code>&rdquo;s with &ldquo;<code>-</code>&rdquo;s in the URL bar.</strong> If there are colons in the URL that <em>is not</em> the group separator&mdash;that&rsquo;s an edge case that we&rsquo;ll fix later.</p>
-			<hr />
-			<address>Lindenii Forge</address>
 		</div>
 		<footer>
 			{{- template "footer" . -}}
