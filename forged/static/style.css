@@ -42,7 +42,7 @@ html {
 		--light-text-color: hsl(0, 0%, 78%);
 		--darker-border-color: hsl(0, 0%, 35%);
 		--lighter-border-color: hsl(0, 0%, 25%);
-		--text-decoration-color: hsl(0, 0%, 30%);
+		--text-decoration-color: hsl(0, 0%, 50%);
 		--darker-box-background-color: hsl(0, 0%, 20%);
 		--lighter-box-background-color: hsl(0, 0%, 15%);
 	}
