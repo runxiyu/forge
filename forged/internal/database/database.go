@@ -23,3 +23,8 @@ func Open(connString string) (Database, error) {
 	db, err := pgxpool.New(context.Background(), connString)
 	return Database{db}, err
 }
+
+type Config struct {
+	Type string `scfg:"type"`
+	Conn string `scfg:"conn"`
+}
