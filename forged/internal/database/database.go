@@ -19,8 +19,8 @@ type Database struct {
 // Open opens a new database connection pool using the provided connection
 // string. It returns a Database instance and an error if any occurs.
 // It is run indefinitely in the background.
-func Open(connString string) (Database, error) {
-	db, err := pgxpool.New(context.Background(), connString)
+func Open(ctx context.Context, config Config) (Database, error) {
+	db, err := pgxpool.New(ctx, config.Conn)
 	return Database{db}, err
 }
 

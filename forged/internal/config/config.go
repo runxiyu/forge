@@ -1,8 +1,14 @@
 package config
 
 import (
+	"bufio"
+	"log/slog"
+	"os"
+
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
+	"go.lindenii.runxiyu.org/forge/forged/internal/hooki"
 	"go.lindenii.runxiyu.org/forge/forged/internal/irc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/scfg"
 )
 
 type Config struct {
@@ -16,11 +22,8 @@ type Config struct {
 		IdleTimeout  uint32 `scfg:"idle_timeout"`
 		ReverseProxy bool   `scfg:"reverse_proxy"`
 	} `scfg:"http"`
-	Hooks struct {
-		Socket string `scfg:"socket"`
-		Execs  string `scfg:"execs"`
-	} `scfg:"hooks"`
-	LMTP struct {
+	Hooks hooki.Config `scfg:"hooks"`
+	LMTP  struct {
 		Socket       string `scfg:"socket"`
 		Domain       string `scfg:"domain"`
 		MaxSize      int64  `scfg:"max_size"`
@@ -42,9 +45,28 @@ type Config struct {
 	General struct {
 		Title string `scfg:"title"`
 	} `scfg:"general"`
-	DB database.Config `scfg:"db"`
+	DB    database.Config `scfg:"db"`
 	Pprof struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`
 	} `scfg:"pprof"`
+}
+
+func Open(path string) (config Config, err error) {
+	var configFile *os.File
+
+	if configFile, err = os.Open(path); err != nil {
+		return config, err
+	}
+	defer configFile.Close()
+
+	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
+	if err = decoder.Decode(&config); err != nil {
+		return config, err
+	}
+	for _, u := range decoder.UnknownDirectives() {
+		slog.Warn("unknown configuration directive", "directive", u)
+	}
+
+	return config, err
 }
