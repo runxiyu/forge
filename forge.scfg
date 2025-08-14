@@ -37,14 +37,22 @@ irc {
 }
 
 git {
-	# Where should newly-created Git repositories be stored?
-	repo_dir /var/lib/lindenii/forge/repos
+        # Where should newly-created Git repositories be stored?
+        repo_dir /var/lib/lindenii/forge/repos
 
-	# Where should git2d listen on?
-	socket /var/run/lindenii/forge/git2d.sock
+        # Where should git2d listen on?
+        socket /var/run/lindenii/forge/git2d.sock
+}
 
-	# Where should we put git2d?
-	daemon_path /usr/libexec/lindenii/forge/git2d
+resources {
+       # Where are license files stored?
+       licenses /usr/share/licenses/forge
+
+       # Where are static assets served from?
+       static forged/static
+
+       # Where are HTML templates located?
+       templates forged/templates
 }
 
 ssh {
