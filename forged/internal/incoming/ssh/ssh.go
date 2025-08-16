@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	gliderssh "github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
@@ -12,27 +13,30 @@ import (
 )
 
 type Config struct {
-	Net  string `scfg:"net"`
-	Addr string `scfg:"addr"`
-	Key  string `scfg:"key"`
-	Root string `scfg:"root"`
+	Net             string `scfg:"net"`
+	Addr            string `scfg:"addr"`
+	Key             string `scfg:"key"`
+	Root            string `scfg:"root"`
+	ShutdownTimeout uint32 `scfg:"shutdown_timeout"`
 }
 
 type Server struct {
-	gliderServer *gliderssh.Server
-	privkey      gossh.Signer
-	pubkeyString string
-	pubkeyFP     string
-	net          string
-	addr         string
-	root         string
+	gliderServer    *gliderssh.Server
+	privkey         gossh.Signer
+	pubkeyString    string
+	pubkeyFP        string
+	net             string
+	addr            string
+	root            string
+	shutdownTimeout uint32
 }
 
 func New(config Config) (server *Server, err error) {
 	server = &Server{
-		net:  config.Net,
-		addr: config.Addr,
-		root: config.Root,
+		net:             config.Net,
+		addr:            config.Addr,
+		root:            config.Root,
+		shutdownTimeout: config.ShutdownTimeout,
 	}
 
 	var privkeyBytes []byte
@@ -63,9 +67,10 @@ func (server *Server) Run(ctx context.Context) (err error) {
 
 	go func() {
 		<-ctx.Done()
-		_ = server.gliderServer.Close()
-		_ = listener.Close() // unnecessary?
-		// TODO: Log the error
+		shCtx, cancel := context.WithTimeout(context.Background(), time.Duration(server.shutdownTimeout)*time.Second)
+		defer cancel()
+		_ = server.gliderServer.Shutdown(shCtx)
+		_ = listener.Close()
 	}()
 
 	if err = server.gliderServer.Serve(listener); err != nil {
