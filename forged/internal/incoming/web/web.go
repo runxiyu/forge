@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -48,8 +49,19 @@ func New(config Config) (server *Server) {
 	}
 }
 
-func (server *Server) Run() (err error) {
+func (server *Server) Run(ctx context.Context) (err error) {
 	listener, err := misc.Listen(server.net, server.addr)
+	defer func() {
+		_ = listener.Close()
+	}()
+
+	go func() {
+		<-ctx.Done()
+		_ = server.httpServer.Close()
+		_ = listener.Close() // unnecessary?
+		// TODO: Log the error
+	}()
+
 	if err = server.httpServer.Serve(listener); err != nil {
 		return fmt.Errorf("serve web: %w", err)
 	}

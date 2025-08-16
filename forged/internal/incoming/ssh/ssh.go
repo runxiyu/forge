@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -53,8 +54,19 @@ func New(config Config) (server *Server, err error) {
 	return
 }
 
-func (server *Server) Run() (err error) {
+func (server *Server) Run(ctx context.Context) (err error) {
 	listener, err := misc.Listen(server.net, server.addr)
+	defer func() {
+		_ = listener.Close()
+	}()
+
+	go func() {
+		<-ctx.Done()
+		_ = server.gliderServer.Close()
+		_ = listener.Close() // unnecessary?
+		// TODO: Log the error
+	}()
+
 	if err = server.gliderServer.Serve(listener); err != nil {
 		return fmt.Errorf("serve SSH: %w", err)
 	}

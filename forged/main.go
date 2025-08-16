@@ -19,10 +19,10 @@ func main() {
 	)
 	flag.Parse()
 
-	s, err := server.New(context.Background(), *configPath)
+	s, err := server.New(*configPath)
 	if err != nil {
 		panic(err)
 	}
 
-	panic(s.Run())
+	panic(s.Run(context.Background()))
 }

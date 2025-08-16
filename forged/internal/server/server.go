@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/config"
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
@@ -29,17 +28,12 @@ type Server struct {
 	}
 }
 
-func New(ctx context.Context, configPath string) (server *Server, err error) {
+func New(configPath string) (server *Server, err error) {
 	server = &Server{}
 
 	server.config, err = config.Open(configPath)
 	if err != nil {
 		return server, fmt.Errorf("open config: %w", err)
-	}
-
-	server.database, err = database.Open(ctx, server.config.DB)
-	if err != nil {
-		return server, fmt.Errorf("open database: %w", err)
 	}
 
 	server.hookServer = hooks.New(server.config.Hooks)
@@ -53,33 +47,45 @@ func New(ctx context.Context, configPath string) (server *Server, err error) {
 	return server, nil
 }
 
-func (s *Server) Run() error {
+func (server *Server) Run(ctx context.Context) (err error) {
 	// TODO: Not running git2d because it should be run separately.
 	// This needs to be documented somewhere, hence a TODO here for now.
 
+	subCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	server.database, err = database.Open(subCtx, server.config.DB)
+	if err != nil {
+		return fmt.Errorf("open database: %w", err)
+	}
+
+	errCh := make(chan error)
+
 	go func() {
-		if err := s.hookServer.Run(); err != nil {
-			log.Fatalf("run hook server: %v", err)
-		}
+		err := server.hookServer.Run(subCtx)
+		errCh <- err
 	}()
 
 	go func() {
-		if err := s.lmtpServer.Run(); err != nil {
-			log.Fatalf("run LMTP server: %v", err)
-		}
+		err := server.lmtpServer.Run(subCtx)
+		errCh <- err
 	}()
 
 	go func() {
-		if err := s.webServer.Run(); err != nil {
-			log.Fatalf("run web server: %v", err)
-		}
+		err := server.webServer.Run(subCtx)
+		errCh <- err
 	}()
 
 	go func() {
-		if err := s.sshServer.Run(); err != nil {
-			log.Fatalf("run SSH server: %v", err)
-		}
+		err := server.sshServer.Run(subCtx)
+		errCh <- err
 	}()
+
+	select {
+	case err := <-errCh:
+		return fmt.Errorf("server error: %w", err)
+	case <-ctx.Done():
+	}
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package lmtp
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -33,11 +34,20 @@ func New(config Config) (server *Server) {
 	}
 }
 
-func (server *Server) Run() error {
+func (server *Server) Run(ctx context.Context) error {
 	listener, _, err := misc.ListenUnixSocket(server.socket)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for LMTP: %w", err)
 	}
+	defer func() {
+		_ = listener.Close()
+	}()
+
+	go func() {
+		<-ctx.Done()
+		_ = listener.Close()
+		// TODO: Log the error
+	}()
 
 	for {
 		conn, err := listener.Accept()
