@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"log"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/config"
@@ -15,10 +14,9 @@ import (
 type Server struct {
 	config config.Config
 
-	database  database.Database
-	hookPool  hooki.Pool
-	lmtpPool  lmtp.Pool
-	templates *template.Template
+	database database.Database
+	hookPool hooki.Pool
+	lmtpPool lmtp.Pool
 }
 
 func New(ctx context.Context, configPath string) (server *Server, err error) {
