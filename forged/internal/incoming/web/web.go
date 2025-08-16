@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -53,21 +54,26 @@ func New(config Config) (server *Server) {
 }
 
 func (server *Server) Run(ctx context.Context) (err error) {
+	server.httpServer.BaseContext = func(_ net.Listener) context.Context { return ctx }
+
 	listener, err := misc.Listen(server.net, server.addr)
+	if err != nil {
+		return fmt.Errorf("listen for web: %w", err)
+	}
 	defer func() {
 		_ = listener.Close()
 	}()
 
-	go func() {
-		<-ctx.Done()
-		shCtx, cancel := context.WithTimeout(context.Background(), time.Duration(server.shutdownTimeout)*time.Second)
+	stop := context.AfterFunc(ctx, func() {
+		shCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), time.Duration(server.shutdownTimeout)*time.Second)
 		defer cancel()
 		_ = server.httpServer.Shutdown(shCtx)
 		_ = listener.Close()
-	}()
+	})
+	defer stop()
 
 	if err = server.httpServer.Serve(listener); err != nil {
-		if err == http.ErrServerClosed {
+		if err == http.ErrServerClosed || ctx.Err() != nil {
 			return nil
 		}
 		return fmt.Errorf("serve web: %w", err)

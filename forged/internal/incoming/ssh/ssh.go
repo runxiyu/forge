@@ -61,20 +61,23 @@ func New(config Config) (server *Server, err error) {
 
 func (server *Server) Run(ctx context.Context) (err error) {
 	listener, err := misc.Listen(server.net, server.addr)
+	if err != nil {
+		return fmt.Errorf("listen for SSH: %w", err)
+	}
 	defer func() {
 		_ = listener.Close()
 	}()
 
-	go func() {
-		<-ctx.Done()
-		shCtx, cancel := context.WithTimeout(context.Background(), time.Duration(server.shutdownTimeout)*time.Second)
+	stop := context.AfterFunc(ctx, func() {
+		shCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), time.Duration(server.shutdownTimeout)*time.Second)
 		defer cancel()
 		_ = server.gliderServer.Shutdown(shCtx)
 		_ = listener.Close()
-	}()
+	})
+	defer stop()
 
 	if err = server.gliderServer.Serve(listener); err != nil {
-		if errors.Is(err, gliderssh.ErrServerClosed) {
+		if errors.Is(err, gliderssh.ErrServerClosed) || ctx.Err() != nil {
 			return nil
 		}
 		return fmt.Errorf("serve SSH: %w", err)

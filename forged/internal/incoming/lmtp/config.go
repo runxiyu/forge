@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"time"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
@@ -44,25 +45,29 @@ func (server *Server) Run(ctx context.Context) error {
 		_ = listener.Close()
 	}()
 
-	go func() {
-		<-ctx.Done()
+	stop := context.AfterFunc(ctx, func() {
 		_ = listener.Close()
-		// TODO: Log the error
-	}()
+	})
+	defer stop()
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			if errors.Is(err, net.ErrClosed) {
+			if errors.Is(err, net.ErrClosed) || ctx.Err() != nil {
 				return nil
 			}
 			return fmt.Errorf("accept conn: %w", err)
 		}
 
-		go server.handleConn(conn)
+		go server.handleConn(ctx, conn)
 	}
 }
 
-func (server *Server) handleConn(conn net.Conn) {
-	panic("TODO: handle LMTP connection")
+func (server *Server) handleConn(ctx context.Context, conn net.Conn) {
+	defer conn.Close()
+	unblock := context.AfterFunc(ctx, func() {
+		_ = conn.SetDeadline(time.Now())
+		_ = conn.Close()
+	})
+	defer unblock()
 }

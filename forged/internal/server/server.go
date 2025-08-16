@@ -10,6 +10,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/lmtp"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/ssh"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web"
+	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
@@ -51,57 +52,22 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	// TODO: Not running git2d because it should be run separately.
 	// This needs to be documented somewhere, hence a TODO here for now.
 
-	subCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	g, gctx := errgroup.WithContext(ctx)
 
-	server.database, err = database.Open(subCtx, server.config.DB)
+	server.database, err = database.Open(gctx, server.config.DB)
 	if err != nil {
 		return fmt.Errorf("open database: %w", err)
 	}
+	defer server.database.Close()
 
-	errCh := make(chan error)
+	g.Go(func() error { return server.hookServer.Run(gctx) })
+	g.Go(func() error { return server.lmtpServer.Run(gctx) })
+	g.Go(func() error { return server.webServer.Run(gctx) })
+	g.Go(func() error { return server.sshServer.Run(gctx) })
 
-	go func() {
-		if err := server.hookServer.Run(subCtx); err != nil {
-			select {
-			case errCh <- err:
-			default:
-			}
-		}
-	}()
-
-	go func() {
-		if err := server.lmtpServer.Run(subCtx); err != nil {
-			select {
-			case errCh <- err:
-			default:
-			}
-		}
-	}()
-
-	go func() {
-		if err := server.webServer.Run(subCtx); err != nil {
-			select {
-			case errCh <- err:
-			default:
-			}
-		}
-	}()
-
-	go func() {
-		if err := server.sshServer.Run(subCtx); err != nil {
-			select {
-			case errCh <- err:
-			default:
-			}
-		}
-	}()
-
-	select {
-	case err := <-errCh:
+	if err := g.Wait(); err != nil {
 		return fmt.Errorf("server error: %w", err)
-	case <-ctx.Done():
 	}
 
-	return nil
+	return ctx.Err()
 }
