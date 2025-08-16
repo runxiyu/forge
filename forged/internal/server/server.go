@@ -63,22 +63,46 @@ func (server *Server) Run(ctx context.Context) (err error) {
 
 	go func() {
 		err := server.hookServer.Run(subCtx)
-		errCh <- err
+		if err == nil {
+			panic("hook server should never return nil error")
+		}
+		select {
+		case errCh <- err:
+		default:
+		}
 	}()
 
 	go func() {
 		err := server.lmtpServer.Run(subCtx)
-		errCh <- err
+		if err == nil {
+			panic("lmtp server should never return nil error")
+		}
+		select {
+		case errCh <- err:
+		default:
+		}
 	}()
 
 	go func() {
 		err := server.webServer.Run(subCtx)
-		errCh <- err
+		if err == nil {
+			panic("web server should never return nil error")
+		}
+		select {
+		case errCh <- err:
+		default:
+		}
 	}()
 
 	go func() {
 		err := server.sshServer.Run(subCtx)
-		errCh <- err
+		if err == nil {
+			panic("ssh server should never return nil error")
+		}
+		select {
+		case errCh <- err:
+		default:
+		}
 	}()
 
 	select {
