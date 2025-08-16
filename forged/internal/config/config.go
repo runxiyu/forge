@@ -5,47 +5,30 @@ import (
 	"log/slog"
 	"os"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/scfg"
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
-	"go.lindenii.runxiyu.org/forge/forged/internal/hooki"
-	"go.lindenii.runxiyu.org/forge/forged/internal/irc"
-	"go.lindenii.runxiyu.org/forge/forged/internal/scfg"
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/hooks"
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/lmtp"
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/ssh"
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web"
+	"go.lindenii.runxiyu.org/forge/forged/internal/ipc/irc"
 )
 
 type Config struct {
-	HTTP struct {
-		Net          string `scfg:"net"`
-		Addr         string `scfg:"addr"`
-		CookieExpiry int    `scfg:"cookie_expiry"`
-		Root         string `scfg:"root"`
-		ReadTimeout  uint32 `scfg:"read_timeout"`
-		WriteTimeout uint32 `scfg:"write_timeout"`
-		IdleTimeout  uint32 `scfg:"idle_timeout"`
-		ReverseProxy bool   `scfg:"reverse_proxy"`
-	} `scfg:"http"`
-	Hooks hooki.Config `scfg:"hooks"`
-	LMTP  struct {
-		Socket       string `scfg:"socket"`
-		Domain       string `scfg:"domain"`
-		MaxSize      int64  `scfg:"max_size"`
-		WriteTimeout uint32 `scfg:"write_timeout"`
-		ReadTimeout  uint32 `scfg:"read_timeout"`
-	} `scfg:"lmtp"`
-	Git struct {
+	DB    database.Config `scfg:"db"`
+	Web   web.Config      `scfg:"web"`
+	Hooks hooks.Config    `scfg:"hooks"`
+	LMTP  lmtp.Config     `scfg:"lmtp"`
+	SSH   ssh.Config      `scfg:"ssh"`
+	IRC   irc.Config      `scfg:"irc"`
+	Git   struct {
 		RepoDir    string `scfg:"repo_dir"`
 		Socket     string `scfg:"socket"`
 		DaemonPath string `scfg:"daemon_path"`
 	} `scfg:"git"`
-	SSH struct {
-		Net  string `scfg:"net"`
-		Addr string `scfg:"addr"`
-		Key  string `scfg:"key"`
-		Root string `scfg:"root"`
-	} `scfg:"ssh"`
-	IRC     irc.Config `scfg:"irc"`
 	General struct {
 		Title string `scfg:"title"`
 	} `scfg:"general"`
-	DB    database.Config `scfg:"db"`
 	Pprof struct {
 		Net  string `scfg:"net"`
 		Addr string `scfg:"addr"`

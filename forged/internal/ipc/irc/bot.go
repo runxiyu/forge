@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"net"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
 // Config contains IRC connection and identity settings for the bot.

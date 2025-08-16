@@ -1,15 +1,15 @@
-package hooki
+package hooks
 
 import (
 	"fmt"
 	"net"
 
 	"github.com/gliderlabs/ssh"
-	"go.lindenii.runxiyu.org/forge/forged/internal/cmap"
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/cmap"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
-type Pool struct {
+type Server struct {
 	hookMap         cmap.Map[string, hookInfo]
 	socketPath      string
 	executablesPath string
@@ -33,13 +33,14 @@ type hookInfo struct {
 	contribReq   string
 }
 
-func New(config Config) (pool Pool) {
-	pool.socketPath = config.Socket
-	pool.executablesPath = config.Execs
-	return
+func New(config Config) (pool *Server) {
+	return &Server{
+		socketPath:      config.Socket,
+		executablesPath: config.Execs,
+	}
 }
 
-func (pool *Pool) Run() error {
+func (pool *Server) Run() error {
 	listener, _, err := misc.ListenUnixSocket(pool.socketPath)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for hooks: %w", err)
@@ -55,6 +56,6 @@ func (pool *Pool) Run() error {
 	}
 }
 
-func (pool *Pool) handleConn(conn net.Conn) {
+func (pool *Server) handleConn(conn net.Conn) {
 	panic("TODO: handle hook connection")
 }

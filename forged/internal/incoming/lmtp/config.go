@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
-type Pool struct {
+type Server struct {
 	socket       string
 	domain       string
 	maxSize      int64
@@ -23,16 +23,17 @@ type Config struct {
 	ReadTimeout  uint32 `scfg:"read_timeout"`
 }
 
-func New(config Config) (pool Pool) {
-	pool.socket = config.Socket
-	pool.domain = config.Domain
-	pool.maxSize = config.MaxSize
-	pool.writeTimeout = config.WriteTimeout
-	pool.readTimeout = config.ReadTimeout
-	return pool
+func New(config Config) (pool *Server) {
+	return &Server{
+		socket:       config.Socket,
+		domain:       config.Domain,
+		maxSize:      config.MaxSize,
+		writeTimeout: config.WriteTimeout,
+		readTimeout:  config.ReadTimeout,
+	}
 }
 
-func (pool *Pool) Run() error {
+func (pool *Server) Run() error {
 	listener, _, err := misc.ListenUnixSocket(pool.socket)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for LMTP: %w", err)
@@ -48,6 +49,6 @@ func (pool *Pool) Run() error {
 	}
 }
 
-func (pool *Pool) handleConn(conn net.Conn) {
+func (pool *Server) handleConn(conn net.Conn) {
 	panic("TODO: handle LMTP connection")
 }

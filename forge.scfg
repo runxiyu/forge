@@ -1,4 +1,4 @@
-http {
+web {
 	# What network transport should we listen on?
 	# Examples: tcp tcp4 tcp6 unix
 	net tcp

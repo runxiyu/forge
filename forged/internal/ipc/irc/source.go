@@ -6,7 +6,7 @@ package irc
 import (
 	"bytes"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
 type Source interface {

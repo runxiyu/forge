@@ -2,41 +2,41 @@ version: "2"
 
 linters:
   default: all
-  disable:
-    - depguard
-    - err113           # dynamically defined errors are fine for our purposes
-    - forcetypeassert  # type assertion failures are usually programming errors
-    - gochecknoinits   # we use inits sparingly for good reasons
-    - godox            # they're just used as markers for where needs improvements
-    - ireturn          # doesn't work well with how we use generics
-    - lll              # long lines are acceptable
-    - mnd              # it's a bit ridiculous to replace all of them
-    - nakedret         # patterns should be consistent
-    - nonamedreturns   # i like named returns
-    - wrapcheck        # wrapping all errors is just not necessary
-    - varnamelen       # "from" and "to" are very valid
-    - containedctx
-    - godot
-    - dogsled
-    - maintidx    # e
-    - nestif      # e
-    - gocognit    # e
-    - gocyclo     # e
-    - dupl        # e
-    - cyclop      # e
-    - goconst     # e
-    - funlen      # e
-    - wsl         # e
-    - nlreturn    # e
-    - unused      # e
-    - exhaustruct # e
-
-linters-settings:
-  revive:
-    rules:
-      - name: error-strings
-        disabled: true
-
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
+#  disable:
+#    - depguard
+#    - err113           # dynamically defined errors are fine for our purposes
+#    - forcetypeassert  # type assertion failures are usually programming errors
+#    - gochecknoinits   # we use inits sparingly for good reasons
+#    - godox            # they're just used as markers for where needs improvements
+#    - ireturn          # doesn't work well with how we use generics
+#    - lll              # long lines are acceptable
+#    - mnd              # it's a bit ridiculous to replace all of them
+#    - nakedret         # patterns should be consistent
+#    - nonamedreturns   # i like named returns
+#    - wrapcheck        # wrapping all errors is just not necessary
+#    - varnamelen       # "from" and "to" are very valid
+#    - containedctx
+#    - godot
+#    - dogsled
+#    - maintidx    # e
+#    - nestif      # e
+#    - gocognit    # e
+#    - gocyclo     # e
+#    - dupl        # e
+#    - cyclop      # e
+#    - goconst     # e
+#    - funlen      # e
+#    - wsl         # e
+#    - nlreturn    # e
+#    - unused      # e
+#    - exhaustruct # e
+# 
+# linters-settings:
+#   revive:
+#     rules:
+#       - name: error-strings
+#         disabled: true
+# 
+# issues:
+#   max-issues-per-linter: 0
+#   max-same-issues: 0
