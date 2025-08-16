@@ -10,14 +10,12 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
 	"go.lindenii.runxiyu.org/forge/forged/internal/hooki"
 	"go.lindenii.runxiyu.org/forge/forged/internal/lmtp"
-	"go.lindenii.runxiyu.org/forge/forged/internal/store"
 )
 
 type Server struct {
 	config config.Config
 
 	database  database.Database
-	stores    *store.Set
 	hookPool  hooki.Pool
 	lmtpPool  lmtp.Pool
 	templates *template.Template
