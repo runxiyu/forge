@@ -37,17 +37,18 @@ func New(ctx context.Context, configPath string) (server *Server, err error) {
 		return server, fmt.Errorf("open config: %w", err)
 	}
 
-	// TODO: Should this belong here, or in Run()?
 	server.database, err = database.Open(ctx, server.config.DB)
 	if err != nil {
 		return server, fmt.Errorf("open database: %w", err)
 	}
 
 	server.hookServer = hooks.New(server.config.Hooks)
-
 	server.lmtpServer = lmtp.New(server.config.LMTP)
-
-	// TODO: Add HTTP and SSH servers
+	server.webServer = web.New(server.config.Web)
+	server.sshServer, err = ssh.New(server.config.SSH)
+	if err != nil {
+		return server, fmt.Errorf("create SSH server: %w", err)
+	}
 
 	return server, nil
 }
@@ -58,13 +59,25 @@ func (s *Server) Run() error {
 
 	go func() {
 		if err := s.hookServer.Run(); err != nil {
-			log.Fatalf("run hook pool: %v", err)
+			log.Fatalf("run hook server: %v", err)
 		}
 	}()
 
 	go func() {
 		if err := s.lmtpServer.Run(); err != nil {
-			log.Fatalf("run LMTP pool: %v", err)
+			log.Fatalf("run LMTP server: %v", err)
+		}
+	}()
+
+	go func() {
+		if err := s.webServer.Run(); err != nil {
+			log.Fatalf("run web server: %v", err)
+		}
+	}()
+
+	go func() {
+		if err := s.sshServer.Run(); err != nil {
+			log.Fatalf("run SSH server: %v", err)
 		}
 	}()
 

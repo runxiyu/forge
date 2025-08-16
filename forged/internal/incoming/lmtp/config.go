@@ -23,7 +23,7 @@ type Config struct {
 	ReadTimeout  uint32 `scfg:"read_timeout"`
 }
 
-func New(config Config) (pool *Server) {
+func New(config Config) (server *Server) {
 	return &Server{
 		socket:       config.Socket,
 		domain:       config.Domain,
@@ -33,8 +33,8 @@ func New(config Config) (pool *Server) {
 	}
 }
 
-func (pool *Server) Run() error {
-	listener, _, err := misc.ListenUnixSocket(pool.socket)
+func (server *Server) Run() error {
+	listener, _, err := misc.ListenUnixSocket(server.socket)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for LMTP: %w", err)
 	}
@@ -45,10 +45,10 @@ func (pool *Server) Run() error {
 			return fmt.Errorf("accept conn: %w", err)
 		}
 
-		go pool.handleConn(conn)
+		go server.handleConn(conn)
 	}
 }
 
-func (pool *Server) handleConn(conn net.Conn) {
+func (server *Server) handleConn(conn net.Conn) {
 	panic("TODO: handle LMTP connection")
 }

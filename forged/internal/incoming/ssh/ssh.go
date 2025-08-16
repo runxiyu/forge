@@ -1,10 +1,66 @@
 package ssh
 
-type Server struct{}
+import (
+	"fmt"
+	"os"
+
+	gliderssh "github.com/gliderlabs/ssh"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	gossh "golang.org/x/crypto/ssh"
+)
 
 type Config struct {
 	Net  string `scfg:"net"`
 	Addr string `scfg:"addr"`
 	Key  string `scfg:"key"`
 	Root string `scfg:"root"`
+}
+
+type Server struct {
+	gliderServer *gliderssh.Server
+	privkey      gossh.Signer
+	pubkeyString string
+	pubkeyFP     string
+	net          string
+	addr         string
+	root         string
+}
+
+func New(config Config) (server *Server, err error) {
+	server = &Server{
+		net:  config.Net,
+		addr: config.Addr,
+		root: config.Root,
+	}
+
+	var privkeyBytes []byte
+	if privkeyBytes, err = os.ReadFile(config.Key); err != nil {
+		return server, fmt.Errorf("read SSH private key: %w", err)
+	}
+	if server.privkey, err = gossh.ParsePrivateKey(privkeyBytes); err != nil {
+		return server, fmt.Errorf("parse SSH private key: %w", err)
+	}
+	server.pubkeyString = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
+	server.pubkeyFP = gossh.FingerprintSHA256(server.privkey.PublicKey())
+
+	server.gliderServer = &gliderssh.Server{
+		Handler:                    handle,
+		PublicKeyHandler:           func(ctx gliderssh.Context, key gliderssh.PublicKey) bool { return true },
+		KeyboardInteractiveHandler: func(ctx gliderssh.Context, challenge gossh.KeyboardInteractiveChallenge) bool { return true },
+	}
+	server.gliderServer.AddHostKey(server.privkey)
+
+	return
+}
+
+func (server *Server) Run() (err error) {
+	listener, err := misc.Listen(server.net, server.addr)
+	if err = server.gliderServer.Serve(listener); err != nil {
+		return fmt.Errorf("serve SSH: %w", err)
+	}
+	panic("unreachable")
+}
+
+func handle(session gliderssh.Session) {
+	panic("SSH server handler not implemented yet")
 }
