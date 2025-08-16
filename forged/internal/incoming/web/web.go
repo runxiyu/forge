@@ -63,6 +63,9 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	}()
 
 	if err = server.httpServer.Serve(listener); err != nil {
+		if err == http.ErrServerClosed {
+			return nil
+		}
 		return fmt.Errorf("serve web: %w", err)
 	}
 	panic("unreachable")

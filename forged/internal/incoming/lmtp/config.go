@@ -2,6 +2,7 @@ package lmtp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 
@@ -52,6 +53,9 @@ func (server *Server) Run(ctx context.Context) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				return nil
+			}
 			return fmt.Errorf("accept conn: %w", err)
 		}
 

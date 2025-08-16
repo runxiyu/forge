@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -68,6 +69,9 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	}()
 
 	if err = server.gliderServer.Serve(listener); err != nil {
+		if errors.Is(err, gliderssh.ErrServerClosed) {
+			return nil
+		}
 		return fmt.Errorf("serve SSH: %w", err)
 	}
 	panic("unreachable")

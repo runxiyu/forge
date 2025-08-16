@@ -62,46 +62,38 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	errCh := make(chan error)
 
 	go func() {
-		err := server.hookServer.Run(subCtx)
-		if err == nil {
-			panic("hook server should never return nil error")
-		}
-		select {
-		case errCh <- err:
-		default:
+		if err := server.hookServer.Run(subCtx); err != nil {
+			select {
+			case errCh <- err:
+			default:
+			}
 		}
 	}()
 
 	go func() {
-		err := server.lmtpServer.Run(subCtx)
-		if err == nil {
-			panic("lmtp server should never return nil error")
-		}
-		select {
-		case errCh <- err:
-		default:
+		if err := server.lmtpServer.Run(subCtx); err != nil {
+			select {
+			case errCh <- err:
+			default:
+			}
 		}
 	}()
 
 	go func() {
-		err := server.webServer.Run(subCtx)
-		if err == nil {
-			panic("web server should never return nil error")
-		}
-		select {
-		case errCh <- err:
-		default:
+		if err := server.webServer.Run(subCtx); err != nil {
+			select {
+			case errCh <- err:
+			default:
+			}
 		}
 	}()
 
 	go func() {
-		err := server.sshServer.Run(subCtx)
-		if err == nil {
-			panic("ssh server should never return nil error")
-		}
-		select {
-		case errCh <- err:
-		default:
+		if err := server.sshServer.Run(subCtx); err != nil {
+			select {
+			case errCh <- err:
+			default:
+			}
 		}
 	}()
 
