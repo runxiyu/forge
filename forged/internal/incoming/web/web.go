@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -37,19 +38,19 @@ type Config struct {
 }
 
 func New(config Config) (server *Server) {
-	handler := &handler{}
+	httpServer := &http.Server{
+		Handler:        &handler{},
+		ReadTimeout:    time.Duration(config.ReadTimeout) * time.Second,
+		WriteTimeout:   time.Duration(config.WriteTimeout) * time.Second,
+		IdleTimeout:    time.Duration(config.IdleTimeout) * time.Second,
+		MaxHeaderBytes: config.MaxHeaderBytes,
+	} //exhaustruct:ignore
 	return &Server{
 		net:             config.Net,
 		addr:            config.Addr,
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
-		httpServer: &http.Server{
-			Handler:        handler,
-			ReadTimeout:    time.Duration(config.ReadTimeout) * time.Second,
-			WriteTimeout:   time.Duration(config.WriteTimeout) * time.Second,
-			IdleTimeout:    time.Duration(config.IdleTimeout) * time.Second,
-			MaxHeaderBytes: config.MaxHeaderBytes,
-		},
+		httpServer:      httpServer,
 	}
 }
 
@@ -72,8 +73,9 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	})
 	defer stop()
 
-	if err = server.httpServer.Serve(listener); err != nil {
-		if err == http.ErrServerClosed || ctx.Err() != nil {
+	err = server.httpServer.Serve(listener)
+	if err != nil {
+		if errors.Is(err, http.ErrServerClosed) || ctx.Err() != nil {
 			return nil
 		}
 		return fmt.Errorf("serve web: %w", err)

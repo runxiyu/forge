@@ -40,6 +40,7 @@ func New(config Config) (server *Server) {
 	return &Server{
 		socketPath:      config.Socket,
 		executablesPath: config.Execs,
+		hookMap:         cmap.Map[string, hookInfo]{},
 	}
 }
 
@@ -71,7 +72,9 @@ func (server *Server) Run(ctx context.Context) error {
 }
 
 func (server *Server) handleConn(ctx context.Context, conn net.Conn) {
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	unblock := context.AfterFunc(ctx, func() {
 		_ = conn.SetDeadline(time.Now())
 		_ = conn.Close()

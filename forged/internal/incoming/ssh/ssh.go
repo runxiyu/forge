@@ -37,15 +37,20 @@ func New(config Config) (server *Server, err error) {
 		addr:            config.Addr,
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
-	}
+	} //exhaustruct:ignore
 
 	var privkeyBytes []byte
-	if privkeyBytes, err = os.ReadFile(config.Key); err != nil {
+
+	privkeyBytes, err = os.ReadFile(config.Key)
+	if err != nil {
 		return server, fmt.Errorf("read SSH private key: %w", err)
 	}
-	if server.privkey, err = gossh.ParsePrivateKey(privkeyBytes); err != nil {
+
+	server.privkey, err = gossh.ParsePrivateKey(privkeyBytes)
+	if err != nil {
 		return server, fmt.Errorf("parse SSH private key: %w", err)
 	}
+
 	server.pubkeyString = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
 	server.pubkeyFP = gossh.FingerprintSHA256(server.privkey.PublicKey())
 
@@ -53,10 +58,10 @@ func New(config Config) (server *Server, err error) {
 		Handler:                    handle,
 		PublicKeyHandler:           func(ctx gliderssh.Context, key gliderssh.PublicKey) bool { return true },
 		KeyboardInteractiveHandler: func(ctx gliderssh.Context, challenge gossh.KeyboardInteractiveChallenge) bool { return true },
-	}
+	} //exhaustruct:ignore
 	server.gliderServer.AddHostKey(server.privkey)
 
-	return
+	return server, nil
 }
 
 func (server *Server) Run(ctx context.Context) (err error) {
@@ -76,7 +81,8 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	})
 	defer stop()
 
-	if err = server.gliderServer.Serve(listener); err != nil {
+	err = server.gliderServer.Serve(listener)
+	if err != nil {
 		if errors.Is(err, gliderssh.ErrServerClosed) || ctx.Err() != nil {
 			return nil
 		}

@@ -30,7 +30,7 @@ type Server struct {
 }
 
 func New(configPath string) (server *Server, err error) {
-	server = &Server{}
+	server = &Server{} //exhaustruct:ignore
 
 	server.config, err = config.Open(configPath)
 	if err != nil {
@@ -65,9 +65,15 @@ func (server *Server) Run(ctx context.Context) (err error) {
 	g.Go(func() error { return server.webServer.Run(gctx) })
 	g.Go(func() error { return server.sshServer.Run(gctx) })
 
-	if err := g.Wait(); err != nil {
+	err = g.Wait()
+	if err != nil {
 		return fmt.Errorf("server error: %w", err)
 	}
 
-	return ctx.Err()
+	err = ctx.Err()
+	if err != nil {
+		return fmt.Errorf("context exceeded: %w", err)
+	}
+
+	return nil
 }

@@ -18,6 +18,7 @@ linters:
     - lll
     - mnd # tmp
     - revive # tmp
+    - godox # tmp
 
 linters-settings:
   revive:
