@@ -17,7 +17,7 @@ type Server struct {
 	hookMap         cmap.Map[string, hookInfo]
 	socketPath      string
 	executablesPath string
-	globalData      *global.GlobalData
+	global          *global.Global
 }
 type hookInfo struct {
 	session      ssh.Session
@@ -32,12 +32,12 @@ type hookInfo struct {
 	contribReq   string
 }
 
-func New(config Config, globalData *global.GlobalData) (server *Server) {
+func New(config Config, global *global.Global) (server *Server) {
 	return &Server{
 		socketPath:      config.Socket,
 		executablesPath: config.Execs,
 		hookMap:         cmap.Map[string, hookInfo]{},
-		globalData:      globalData,
+		global:          global,
 	}
 }
 

@@ -17,17 +17,17 @@ type Server struct {
 	maxSize      int64
 	writeTimeout uint32
 	readTimeout  uint32
-	globalData   *global.GlobalData
+	global       *global.Global
 }
 
-func New(config Config, globalData *global.GlobalData) (server *Server) {
+func New(config Config, global *global.Global) (server *Server) {
 	return &Server{
 		socket:       config.Socket,
 		domain:       config.Domain,
 		maxSize:      config.MaxSize,
 		writeTimeout: config.WriteTimeout,
 		readTimeout:  config.ReadTimeout,
-		globalData:   globalData,
+		global:       global,
 	}
 }
 

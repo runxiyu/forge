@@ -16,8 +16,8 @@ type handler struct {
 	r *Router
 }
 
-func NewHandler(cfg Config, globalData *global.GlobalData, queries *queries.Queries) *handler {
-	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy).Global(globalData).Queries(queries)}
+func NewHandler(cfg Config, global *global.Global, queries *queries.Queries) *handler {
+	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy).Global(global).Queries(queries)}
 
 	staticFS := http.FileServer(http.Dir(cfg.StaticPath))
 	h.r.ANYHTTP("-/static/*rest",

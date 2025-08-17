@@ -24,7 +24,7 @@ type Server struct {
 	webServer  *web.Server
 	sshServer  *ssh.Server
 
-	globalData global.GlobalData
+	global global.Global
 }
 
 func New(configPath string) (server *Server, err error) {
@@ -37,13 +37,13 @@ func New(configPath string) (server *Server, err error) {
 
 	queries := queries.New(&server.database)
 
-	server.globalData.ForgeVersion = "unknown" // TODO
-	server.globalData.ForgeTitle = server.config.General.Title
+	server.global.ForgeVersion = "unknown" // TODO
+	server.global.ForgeTitle = server.config.General.Title
 
-	server.hookServer = hooks.New(server.config.Hooks, &server.globalData)
-	server.lmtpServer = lmtp.New(server.config.LMTP, &server.globalData)
-	server.webServer = web.New(server.config.Web, &server.globalData, queries)
-	server.sshServer, err = ssh.New(server.config.SSH, &server.globalData)
+	server.hookServer = hooks.New(server.config.Hooks, &server.global)
+	server.lmtpServer = lmtp.New(server.config.LMTP, &server.global)
+	server.webServer = web.New(server.config.Web, &server.global, queries)
+	server.sshServer, err = ssh.New(server.config.SSH, &server.global)
 	if err != nil {
 		return server, fmt.Errorf("create SSH server: %w", err)
 	}

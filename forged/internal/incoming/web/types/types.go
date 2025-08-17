@@ -19,7 +19,7 @@ type BaseData struct {
 	SeparatorIndex int
 	RefType        string
 	RefName        string
-	Global         *global.GlobalData
+	Global         *global.Global
 	Queries        *queries.Queries
 }
 

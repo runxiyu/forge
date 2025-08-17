@@ -60,14 +60,14 @@ type Router struct {
 	routes       []route
 	errors       ErrorRenderers
 	user         UserResolver
-	global       *global.GlobalData
+	global       *global.Global
 	reverseProxy bool
 	queries      *queries.Queries
 }
 
 func NewRouter() *Router { return &Router{} }
 
-func (r *Router) Global(g *global.GlobalData) *Router {
+func (r *Router) Global(g *global.Global) *Router {
 	r.global = g
 	return r
 }

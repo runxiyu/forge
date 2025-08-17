@@ -20,16 +20,16 @@ type Server struct {
 	addr            string
 	root            string
 	shutdownTimeout uint32
-	globalData      *global.GlobalData
+	global          *global.Global
 }
 
-func New(config Config, globalData *global.GlobalData) (server *Server, err error) {
+func New(config Config, global *global.Global) (server *Server, err error) {
 	server = &Server{
 		net:             config.Net,
 		addr:            config.Addr,
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
-		globalData:      globalData,
+		global:          global,
 	} //exhaustruct:ignore
 
 	var privkeyBytes []byte
@@ -44,8 +44,8 @@ func New(config Config, globalData *global.GlobalData) (server *Server, err erro
 		return server, fmt.Errorf("parse SSH private key: %w", err)
 	}
 
-	server.globalData.SSHPubkey = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
-	server.globalData.SSHFingerprint = gossh.FingerprintSHA256(server.privkey.PublicKey())
+	server.global.SSHPubkey = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
+	server.global.SSHFingerprint = gossh.FingerprintSHA256(server.privkey.PublicKey())
 
 	server.gliderServer = &gliderssh.Server{
 		Handler:                    handle,

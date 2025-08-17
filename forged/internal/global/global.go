@@ -1,6 +1,6 @@
 package global
 
-type GlobalData struct {
+type Global struct {
 	ForgeTitle     string
 	ForgeVersion   string
 	SSHPubkey      string

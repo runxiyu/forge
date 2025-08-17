@@ -19,12 +19,12 @@ type Server struct {
 	root            string
 	httpServer      *http.Server
 	shutdownTimeout uint32
-	globalData      *global.GlobalData
+	global          *global.Global
 }
 
-func New(config Config, globalData *global.GlobalData, queries *queries.Queries) *Server {
+func New(config Config, global *global.Global, queries *queries.Queries) *Server {
 	httpServer := &http.Server{
-		Handler:        NewHandler(config, globalData, queries),
+		Handler:        NewHandler(config, global, queries),
 		ReadTimeout:    time.Duration(config.ReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(config.WriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(config.IdleTimeout) * time.Second,
@@ -36,7 +36,7 @@ func New(config Config, globalData *global.GlobalData, queries *queries.Queries)
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
 		httpServer:      httpServer,
-		globalData:      globalData,
+		global:          global,
 	}
 }
 
