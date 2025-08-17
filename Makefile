@@ -13,9 +13,9 @@ CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 
 all: dist/forged dist/git2d dist/hookc
 
-dist/forged: $(shell git ls-files forged) $(shell git ls-files sql)
+dist/forged: $(shell git ls-files forged)
 	mkdir -p dist
-	sqlc generate
+	sqlc -f forged/sqlc.yaml generate
 	CGO_ENABLED=0 go build -o dist/forged -ldflags '-extldflags "-f no-PIC -static"' -tags 'osusergo netgo static_build' ./forged
 
 dist/git2d: $(wildcard git2d/*.c)
