@@ -4,22 +4,18 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
-	"strconv"
 	"strings"
-)
 
-type (
-	Params      map[string]any
-	HandlerFunc func(http.ResponseWriter, *http.Request, Params)
+	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
 
 type UserResolver func(*http.Request) (id int, username string, err error)
 
 type ErrorRenderers struct {
-	BadRequest      func(http.ResponseWriter, Params, string)
-	BadRequestColon func(http.ResponseWriter, Params)
-	NotFound        func(http.ResponseWriter, Params)
-	ServerError     func(http.ResponseWriter, Params, string)
+	BadRequest      func(http.ResponseWriter, *wtypes.BaseData, string)
+	BadRequestColon func(http.ResponseWriter, *wtypes.BaseData)
+	NotFound        func(http.ResponseWriter, *wtypes.BaseData)
+	ServerError     func(http.ResponseWriter, *wtypes.BaseData, string)
 }
 
 type dirPolicy int
@@ -52,7 +48,7 @@ type route struct {
 	wantDir    dirPolicy
 	ifEmptyKey string
 	segs       []patSeg
-	h          HandlerFunc
+	h          wtypes.HandlerFunc
 	hh         http.Handler
 	priority   int
 }
@@ -80,15 +76,15 @@ func WithDirIfEmpty(param string) RouteOption {
 	return func(rt *route) { rt.wantDir = dirRequireIfEmpty; rt.ifEmptyKey = param }
 }
 
-func (r *Router) GET(pattern string, f HandlerFunc, opts ...RouteOption) {
+func (r *Router) GET(pattern string, f wtypes.HandlerFunc, opts ...RouteOption) {
 	r.handle("GET", pattern, f, nil, opts...)
 }
 
-func (r *Router) POST(pattern string, f HandlerFunc, opts ...RouteOption) {
+func (r *Router) POST(pattern string, f wtypes.HandlerFunc, opts ...RouteOption) {
 	r.handle("POST", pattern, f, nil, opts...)
 }
 
-func (r *Router) ANY(pattern string, f HandlerFunc, opts ...RouteOption) {
+func (r *Router) ANY(pattern string, f wtypes.HandlerFunc, opts ...RouteOption) {
 	r.handle("", pattern, f, nil, opts...)
 }
 
@@ -96,7 +92,7 @@ func (r *Router) ANYHTTP(pattern string, hh http.Handler, opts ...RouteOption) {
 	r.handle("", pattern, nil, hh, opts...)
 }
 
-func (r *Router) handle(method, pattern string, f HandlerFunc, hh http.Handler, opts ...RouteOption) {
+func (r *Router) handle(method, pattern string, f wtypes.HandlerFunc, hh http.Handler, opts ...RouteOption) {
 	want := dirIgnore
 	if strings.HasSuffix(pattern, "/") {
 		want = dirRequire
@@ -127,50 +123,43 @@ func (r *Router) handle(method, pattern string, f HandlerFunc, hh http.Handler, 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	segments, dirMode, err := splitAndUnescapePath(req.URL.EscapedPath())
 	if err != nil {
-		r.err400(w, Params{"global": r.global}, "Error parsing request URI: "+err.Error())
+		r.err400(w, &wtypes.BaseData{Global: r.global}, "Error parsing request URI: "+err.Error())
 		return
 	}
 	for _, s := range segments {
 		if strings.Contains(s, ":") {
-			r.err400Colon(w, Params{"global": r.global})
+			r.err400Colon(w, &wtypes.BaseData{Global: r.global})
 			return
 		}
 	}
 
-	p := Params{
-		"url_segments": segments,
-		"dir_mode":     dirMode,
-		"global":       r.global,
+	// Prepare base data; vars are attached per-route below.
+	bd := &wtypes.BaseData{
+		Global:      r.global,
+		URLSegments: segments,
+		DirMode:     dirMode,
 	}
 
 	if r.user != nil {
 		uid, uname, uerr := r.user(req)
 		if uerr != nil {
-			r.err500(w, p, "Error getting user info from request: "+uerr.Error())
-			// TODO: Revamp error handling again...
+			r.err500(w, bd, "Error getting user info from request: "+uerr.Error())
 			return
 		}
-		p["user_id"] = uid
-		p["username"] = uname
-		if uid == 0 {
-			p["user_id_string"] = ""
-		} else {
-			p["user_id_string"] = strconv.Itoa(uid)
-		}
+		bd.UserID = uid
+		bd.Username = uname
 	}
 
 	method := req.Method
+	var pathMatched bool // for 405 detection
 
 	for _, rt := range r.routes {
-		if rt.method != "" &&
-			!(rt.method == method || (method == http.MethodHead && rt.method == http.MethodGet)) {
-			continue
-		}
-		// TODO: Consider returning 405 on POST/GET mismatches and the like.
 		ok, vars, sepIdx := match(rt.segs, segments)
 		if !ok {
 			continue
 		}
+		pathMatched = true
+
 		switch rt.wantDir {
 		case dirRequire:
 			if !dirMode && redirectAddSlash(w, req) {
@@ -181,33 +170,46 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 		case dirRequireIfEmpty:
-			if v, _ := vars[rt.ifEmptyKey]; v == "" && !dirMode && redirectAddSlash(w, req) {
+			if v := vars[rt.ifEmptyKey]; v == "" && !dirMode && redirectAddSlash(w, req) {
 				return
 			}
 		}
-		for k, v := range vars {
-			p[k] = v
+
+		// Derive group path and separator index on the matched request.
+		bd.SeparatorIndex = sepIdx
+		if g := vars["group"]; g == "" {
+			bd.GroupPath = []string{}
+		} else {
+			bd.GroupPath = strings.Split(g, "/")
 		}
-		// convert "group" (joined) into []string group_path
-		if g, ok := p["group"].(string); ok {
-			if g == "" {
-				p["group_path"] = []string{}
-			} else {
-				p["group_path"] = strings.Split(g, "/")
-			}
+
+		// Attach BaseData to request context.
+		req = req.WithContext(wtypes.WithBaseData(req.Context(), bd))
+
+		// Enforce method now.
+		if rt.method != "" &&
+			!(rt.method == method || (method == http.MethodHead && rt.method == http.MethodGet)) {
+			// 405 for a path that matched but wrong method
+			w.Header().Set("Allow", allowForPattern(r.routes, rt.rawPattern))
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
 		}
-		p["separator_index"] = sepIdx
 
 		if rt.h != nil {
-			rt.h(w, req, p)
+			rt.h(w, req, wtypes.Vars(vars))
 		} else if rt.hh != nil {
 			rt.hh.ServeHTTP(w, req)
 		} else {
-			r.err500(w, p, "route has no handler")
+			r.err500(w, bd, "route has no handler")
 		}
 		return
 	}
-	r.err404(w, p)
+	if pathMatched {
+		// Safety; normally handled above, but keep semantics.
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	r.err404(w, bd)
 }
 
 func compilePattern(pat string) ([]patSeg, int) {
@@ -329,33 +331,50 @@ func redirectDropSlash(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func (r *Router) err400(w http.ResponseWriter, p Params, msg string) {
+func allowForPattern(routes []route, raw string) string {
+	seen := map[string]struct{}{}
+	out := make([]string, 0, 4)
+	for _, rt := range routes {
+		if rt.rawPattern != raw || rt.method == "" {
+			continue
+		}
+		if _, ok := seen[rt.method]; ok {
+			continue
+		}
+		seen[rt.method] = struct{}{}
+		out = append(out, rt.method)
+	}
+	sort.Strings(out)
+	return strings.Join(out, ", ")
+}
+
+func (r *Router) err400(w http.ResponseWriter, b *wtypes.BaseData, msg string) {
 	if r.errors.BadRequest != nil {
-		r.errors.BadRequest(w, p, msg)
+		r.errors.BadRequest(w, b, msg)
 		return
 	}
 	http.Error(w, msg, http.StatusBadRequest)
 }
 
-func (r *Router) err400Colon(w http.ResponseWriter, p Params) {
+func (r *Router) err400Colon(w http.ResponseWriter, b *wtypes.BaseData) {
 	if r.errors.BadRequestColon != nil {
-		r.errors.BadRequestColon(w, p)
+		r.errors.BadRequestColon(w, b)
 		return
 	}
 	http.Error(w, "bad request", http.StatusBadRequest)
 }
 
-func (r *Router) err404(w http.ResponseWriter, p Params) {
+func (r *Router) err404(w http.ResponseWriter, b *wtypes.BaseData) {
 	if r.errors.NotFound != nil {
-		r.errors.NotFound(w, p)
+		r.errors.NotFound(w, b)
 		return
 	}
 	http.NotFound(w, nil)
 }
 
-func (r *Router) err500(w http.ResponseWriter, p Params, msg string) {
+func (r *Router) err500(w http.ResponseWriter, b *wtypes.BaseData, msg string) {
 	if r.errors.ServerError != nil {
-		r.errors.ServerError(w, p, msg)
+		r.errors.ServerError(w, b, msg)
 		return
 	}
 	http.Error(w, msg, http.StatusInternalServerError)

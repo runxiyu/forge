@@ -1,9 +1,11 @@
-// internal/incoming/web/handler.go
 package web
 
 import (
 	"net/http"
 	"path/filepath"
+
+	handlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers"
+	repoHandlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers/repo"
 )
 
 type handler struct {
@@ -21,24 +23,28 @@ func NewHandler(cfg Config) http.Handler {
 		WithDirIfEmpty("rest"),
 	)
 
+	// Feature handler instances
+	indexHTTP := handlers.NewIndexHTTP()
+	repoHTTP := repoHandlers.NewHTTP()
+
 	// Index
-	h.r.GET("/", h.index)
+	h.r.GET("/", indexHTTP.Index)
 
 	// Top-level utilities
 	h.r.ANY("-/login", h.notImplemented)
 	h.r.ANY("-/users", h.notImplemented)
 
-	// Group index
+	// Group index (kept local for now; migrate later)
 	h.r.GET("@group/", h.groupIndex)
 
-	// Repo index
-	h.r.GET("@group/-/repos/:repo/", h.repoIndex)
+	// Repo index (handled by repoHTTP)
+	h.r.GET("@group/-/repos/:repo/", repoHTTP.Index)
 
-	// Repo
+	// Repo (kept local for now)
 	h.r.ANY("@group/-/repos/:repo/info", h.notImplemented)
 	h.r.ANY("@group/-/repos/:repo/git-upload-pack", h.notImplemented)
 
-	// Repo features
+	// Repo features (kept local for now)
 	h.r.GET("@group/-/repos/:repo/branches/", h.notImplemented)
 	h.r.GET("@group/-/repos/:repo/log/", h.notImplemented)
 	h.r.GET("@group/-/repos/:repo/commit/:commit", h.notImplemented)
