@@ -6,6 +6,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,6 +22,9 @@ type Database struct {
 // It is run indefinitely in the background.
 func Open(ctx context.Context, config Config) (Database, error) {
 	db, err := pgxpool.New(ctx, config.Conn)
+	if err != nil {
+		err = fmt.Errorf("create pgxpool: %w", err)
+	}
 	return Database{db}, err
 }
 
