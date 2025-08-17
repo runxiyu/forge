@@ -65,7 +65,7 @@ func New(config Config) (server *Server, err error) {
 }
 
 func (server *Server) Run(ctx context.Context) (err error) {
-	listener, err := misc.Listen(server.net, server.addr)
+	listener, err := misc.Listen(ctx, server.net, server.addr)
 	if err != nil {
 		return fmt.Errorf("listen for SSH: %w", err)
 	}

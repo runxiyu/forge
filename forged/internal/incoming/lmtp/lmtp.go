@@ -37,7 +37,7 @@ func New(config Config) (server *Server) {
 }
 
 func (server *Server) Run(ctx context.Context) error {
-	listener, _, err := misc.ListenUnixSocket(server.socket)
+	listener, _, err := misc.ListenUnixSocket(ctx, server.socket)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for LMTP: %w", err)
 	}

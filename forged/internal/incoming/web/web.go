@@ -57,7 +57,7 @@ func New(config Config) (server *Server) {
 func (server *Server) Run(ctx context.Context) (err error) {
 	server.httpServer.BaseContext = func(_ net.Listener) context.Context { return ctx }
 
-	listener, err := misc.Listen(server.net, server.addr)
+	listener, err := misc.Listen(ctx, server.net, server.addr)
 	if err != nil {
 		return fmt.Errorf("listen for web: %w", err)
 	}

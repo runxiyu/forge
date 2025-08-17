@@ -45,7 +45,7 @@ func New(config Config) (server *Server) {
 }
 
 func (server *Server) Run(ctx context.Context) error {
-	listener, _, err := misc.ListenUnixSocket(server.socketPath)
+	listener, _, err := misc.ListenUnixSocket(ctx, server.socketPath)
 	if err != nil {
 		return fmt.Errorf("listen unix socket for hooks: %w", err)
 	}
