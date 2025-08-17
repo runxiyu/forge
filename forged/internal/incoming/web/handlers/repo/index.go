@@ -1,20 +1,28 @@
 package repo
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
 
-type HTTP struct{}
+type HTTP struct {
+	r templates.Renderer
+}
 
-func NewHTTP() *HTTP { return &HTTP{} }
+func NewHTTP(r templates.Renderer) *HTTP { return &HTTP{r: r} }
 
 func (h *HTTP) Index(w http.ResponseWriter, r *http.Request, v wtypes.Vars) {
 	base := wtypes.Base(r)
 	repo := v["repo"]
-	_, _ = w.Write([]byte(fmt.Sprintf("repo index: group=%q repo=%q",
-		"/"+strings.Join(base.GroupPath, "/")+"/", repo)))
+	_ = h.r.Render(w, "repo/index.html", struct {
+		Group string
+		Repo  string
+	}{
+		Group: "/" + strings.Join(base.GroupPath, "/") + "/",
+		Repo:  repo,
+	})
 }
+

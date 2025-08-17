@@ -1,11 +1,13 @@
 package web
 
 import (
+	"html/template"
 	"net/http"
-	"path/filepath"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 	handlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers"
 	repoHandlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers/repo"
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 )
 
 type handler struct {
@@ -15,18 +17,25 @@ type handler struct {
 func NewHandler(cfg Config) http.Handler {
 	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy)}
 
-	// Static files
-	staticDir := filepath.Join(cfg.Root, "static")
-	staticFS := http.FileServer(http.Dir(staticDir))
+	staticFS := http.FileServer(http.Dir(cfg.StaticPath))
 	h.r.ANYHTTP("-/static/*rest",
 		http.StripPrefix("/-/static/", staticFS),
 		WithDirIfEmpty("rest"),
 	)
 
-	// Feature handler instances
-	indexHTTP := handlers.NewIndexHTTP()
-	groupHTTP := handlers.NewGroupHTTP()
-	repoHTTP := repoHandlers.NewHTTP()
+	funcs := template.FuncMap{
+		"path_escape":       misc.PathEscape,
+		"query_escape":      misc.QueryEscape,
+		"minus":             misc.Minus,
+		"first_line":        misc.FirstLine,
+		"dereference_error": misc.DereferenceOrZero[error],
+	}
+	t := templates.MustParseDir(cfg.TemplatesPath, funcs)
+	renderer := templates.New(t)
+
+	indexHTTP := handlers.NewIndexHTTP(renderer)
+	groupHTTP := handlers.NewGroupHTTP(renderer)
+	repoHTTP := repoHandlers.NewHTTP(renderer)
 	notImpl := handlers.NewNotImplementedHTTP()
 
 	// Index

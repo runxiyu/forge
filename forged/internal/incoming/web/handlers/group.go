@@ -4,14 +4,22 @@ import (
 	"net/http"
 	"strings"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
 
-type GroupHTTP struct{}
+type GroupHTTP struct {
+	r templates.Renderer
+}
 
-func NewGroupHTTP() *GroupHTTP { return &GroupHTTP{} }
+func NewGroupHTTP(r templates.Renderer) *GroupHTTP { return &GroupHTTP{r: r} }
 
 func (h *GroupHTTP) Index(w http.ResponseWriter, r *http.Request, _ wtypes.Vars) {
 	base := wtypes.Base(r)
-	_, _ = w.Write([]byte("group index for: /" + strings.Join(base.GroupPath, "/") + "/"))
+	_ = h.r.Render(w, "group/index.html", struct {
+		GroupPath string
+	}{
+		GroupPath: "/" + strings.Join(base.GroupPath, "/") + "/",
+	})
 }
+

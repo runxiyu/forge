@@ -1,15 +1,26 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
 
-type IndexHTTP struct{}
+type IndexHTTP struct {
+	r templates.Renderer
+}
 
-func NewIndexHTTP() *IndexHTTP { return &IndexHTTP{} }
+func NewIndexHTTP(r templates.Renderer) *IndexHTTP { return &IndexHTTP{r: r} }
 
 func (h *IndexHTTP) Index(w http.ResponseWriter, _ *http.Request, _ wtypes.Vars) {
-	_, _ = w.Write([]byte("index: replace with template render"))
+	err := h.r.Render(w, "index", struct {
+		Title string
+	}{
+		Title: "Home",
+	})
+	if err != nil {
+		log.Println("failed to render index page", "error", err)
+	}
 }
