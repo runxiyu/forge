@@ -43,7 +43,7 @@ CREATE TABLE mailing_list_emails (
 	list_id BIGINT NOT NULL REFERENCES mailing_lists(id) ON DELETE CASCADE,
 	title TEXT NOT NULL,
 	sender TEXT NOT NULL,
-	date TIMESTAMPZ NOT NULL, -- everything must be in UTC
+	date TIMESTAMPTZ NOT NULL, -- everything must be in UTC
 	message_id TEXT, -- no uniqueness guarantee as it's arbitrarily set by senders
 	content BYTEA NOT NULL
 );
@@ -56,7 +56,7 @@ CREATE TABLE users (
 	username TEXT UNIQUE, -- NULL when, for example, pubkey_only
 	type user_type NOT NULL,
 	password_hash TEXT,
-	created_at TIMESTAMPZ NOT NULL DEFAULT NOW()
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE ssh_public_keys (
@@ -71,8 +71,8 @@ CREATE TABLE sessions (
 	session_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	token_hash BYTEA UNIQUE NOT NULL,
-	created_at TIMESTAMPZ NOT NULL DEFAULT now(),
-	expires_at TIMESTAMPZ NOT NULL
+	created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+	expires_at TIMESTAMPTZ NOT NULL
 );
 CREATE INDEX IF NOT EXISTS sessions_user_idx   ON sessions(user_id);
 
