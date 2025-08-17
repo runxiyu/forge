@@ -1,25 +1,24 @@
 package web
 
 import (
-	"net/http"
-	"net/url"
-	"sort"
-	"strconv"
-	"strings"
+        "net/http"
+        "net/url"
+        "sort"
+        "strings"
 )
 
 type (
-	Params      map[string]any
-	HandlerFunc func(http.ResponseWriter, *http.Request, Params)
+        Vars        map[string]string
+        HandlerFunc func(http.ResponseWriter, *http.Request, Vars)
 )
 
 type UserResolver func(*http.Request) (id int, username string, err error)
 
 type ErrorRenderers struct {
-	BadRequest      func(http.ResponseWriter, Params, string)
-	BadRequestColon func(http.ResponseWriter, Params)
-	NotFound        func(http.ResponseWriter, Params)
-	ServerError     func(http.ResponseWriter, Params, string)
+        BadRequest      func(http.ResponseWriter, *BaseData, string)
+        BadRequestColon func(http.ResponseWriter, *BaseData)
+        NotFound        func(http.ResponseWriter, *BaseData)
+        ServerError     func(http.ResponseWriter, *BaseData, string)
 }
 
 type dirPolicy int
@@ -125,89 +124,85 @@ func (r *Router) handle(method, pattern string, f HandlerFunc, hh http.Handler, 
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	segments, dirMode, err := splitAndUnescapePath(req.URL.EscapedPath())
-	if err != nil {
-		r.err400(w, Params{"global": r.global}, "Error parsing request URI: "+err.Error())
-		return
-	}
-	for _, s := range segments {
-		if strings.Contains(s, ":") {
-			r.err400Colon(w, Params{"global": r.global})
-			return
-		}
-	}
+        segments, dirMode, err := splitAndUnescapePath(req.URL.EscapedPath())
+        if err != nil {
+                bd := &BaseData{Global: r.global}
+                r.err400(w, bd, "Error parsing request URI: "+err.Error())
+                return
+        }
+        for _, s := range segments {
+                if strings.Contains(s, ":") {
+                        bd := &BaseData{Global: r.global}
+                        r.err400Colon(w, bd)
+                        return
+                }
+        }
 
-	p := Params{
-		"url_segments": segments,
-		"dir_mode":     dirMode,
-		"global":       r.global,
-	}
+        bd := &BaseData{
+                Global:      r.global,
+                URLSegments: segments,
+                DirMode:     dirMode,
+        }
+        if r.user != nil {
+                uid, uname, uerr := r.user(req)
+                if uerr != nil {
+                        r.err500(w, bd, "Error getting user info from request: "+uerr.Error())
+                        return
+                }
+                bd.UserID = uid
+                bd.Username = uname
+        }
 
-	if r.user != nil {
-		uid, uname, uerr := r.user(req)
-		if uerr != nil {
-			r.err500(w, p, "Error getting user info from request: "+uerr.Error())
-			// TODO: Revamp error handling again...
-			return
-		}
-		p["user_id"] = uid
-		p["username"] = uname
-		if uid == 0 {
-			p["user_id_string"] = ""
-		} else {
-			p["user_id_string"] = strconv.Itoa(uid)
-		}
-	}
+        req = req.WithContext(WithBaseData(req.Context(), bd))
 
-	method := req.Method
+        method := req.Method
 
-	for _, rt := range r.routes {
-		if rt.method != "" &&
-			!(rt.method == method || (method == http.MethodHead && rt.method == http.MethodGet)) {
-			continue
-		}
-		// TODO: Consider returning 405 on POST/GET mismatches and the like.
-		ok, vars, sepIdx := match(rt.segs, segments)
-		if !ok {
-			continue
-		}
-		switch rt.wantDir {
-		case dirRequire:
-			if !dirMode && redirectAddSlash(w, req) {
-				return
-			}
-		case dirForbid:
-			if dirMode && redirectDropSlash(w, req) {
-				return
-			}
-		case dirRequireIfEmpty:
-			if v, _ := vars[rt.ifEmptyKey]; v == "" && !dirMode && redirectAddSlash(w, req) {
-				return
-			}
-		}
-		for k, v := range vars {
-			p[k] = v
-		}
-		// convert "group" (joined) into []string group_path
-		if g, ok := p["group"].(string); ok {
-			if g == "" {
-				p["group_path"] = []string{}
-			} else {
-				p["group_path"] = strings.Split(g, "/")
-			}
-		}
-		p["separator_index"] = sepIdx
+        for _, rt := range r.routes {
+                if rt.method != "" &&
+                        !(rt.method == method || (method == http.MethodHead && rt.method == http.MethodGet)) {
+                        continue
+                }
+                ok, vars, sepIdx := match(rt.segs, segments)
+                if !ok {
+                        continue
+                }
+                switch rt.wantDir {
+                case dirRequire:
+                        if !dirMode && redirectAddSlash(w, req) {
+                                return
+                        }
+                case dirForbid:
+                        if dirMode && redirectDropSlash(w, req) {
+                                return
+                        }
+                case dirRequireIfEmpty:
+                        if v, _ := vars[rt.ifEmptyKey]; v == "" && !dirMode && redirectAddSlash(w, req) {
+                                return
+                        }
+                }
 
-		if rt.h != nil {
-			rt.h(w, req, p)
-		} else if rt.hh != nil {
-			rt.hh.ServeHTTP(w, req)
-		} else {
-			r.err500(w, p, "route has no handler")
-		}
-		return
-	}
-	r.err404(w, p)
+                if g, ok := vars["group"]; ok {
+                        if g == "" {
+                                bd.GroupPath = []string{}
+                        } else {
+                                bd.GroupPath = strings.Split(g, "/")
+                        }
+                        delete(vars, "group")
+                }
+                bd.SeparatorIndex = sepIdx
+
+                req = req.WithContext(WithBaseData(req.Context(), bd))
+
+                if rt.h != nil {
+                        rt.h(w, req, vars)
+                } else if rt.hh != nil {
+                        rt.hh.ServeHTTP(w, req)
+                } else {
+                        r.err500(w, bd, "route has no handler")
+                }
+                return
+        }
+        r.err404(w, bd)
 }
 
 func compilePattern(pat string) ([]patSeg, int) {
@@ -329,34 +324,34 @@ func redirectDropSlash(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func (r *Router) err400(w http.ResponseWriter, p Params, msg string) {
-	if r.errors.BadRequest != nil {
-		r.errors.BadRequest(w, p, msg)
-		return
-	}
-	http.Error(w, msg, http.StatusBadRequest)
+func (r *Router) err400(w http.ResponseWriter, b *BaseData, msg string) {
+        if r.errors.BadRequest != nil {
+                r.errors.BadRequest(w, b, msg)
+                return
+        }
+        http.Error(w, msg, http.StatusBadRequest)
 }
 
-func (r *Router) err400Colon(w http.ResponseWriter, p Params) {
-	if r.errors.BadRequestColon != nil {
-		r.errors.BadRequestColon(w, p)
-		return
-	}
-	http.Error(w, "bad request", http.StatusBadRequest)
+func (r *Router) err400Colon(w http.ResponseWriter, b *BaseData) {
+        if r.errors.BadRequestColon != nil {
+                r.errors.BadRequestColon(w, b)
+                return
+        }
+        http.Error(w, "bad request", http.StatusBadRequest)
 }
 
-func (r *Router) err404(w http.ResponseWriter, p Params) {
-	if r.errors.NotFound != nil {
-		r.errors.NotFound(w, p)
-		return
-	}
-	http.NotFound(w, nil)
+func (r *Router) err404(w http.ResponseWriter, b *BaseData) {
+        if r.errors.NotFound != nil {
+                r.errors.NotFound(w, b)
+                return
+        }
+        http.NotFound(w, nil)
 }
 
-func (r *Router) err500(w http.ResponseWriter, p Params, msg string) {
-	if r.errors.ServerError != nil {
-		r.errors.ServerError(w, p, msg)
-		return
-	}
-	http.Error(w, msg, http.StatusInternalServerError)
+func (r *Router) err500(w http.ResponseWriter, b *BaseData, msg string) {
+        if r.errors.ServerError != nil {
+                r.errors.ServerError(w, b, msg)
+                return
+        }
+        http.Error(w, msg, http.StatusInternalServerError)
 }

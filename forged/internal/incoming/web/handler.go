@@ -2,8 +2,8 @@
 package web
 
 import (
-	"net/http"
-	"path/filepath"
+        "net/http"
+        "path/filepath"
 )
 
 type handler struct {
@@ -11,43 +11,52 @@ type handler struct {
 }
 
 func NewHandler(cfg Config) http.Handler {
-	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy)}
+        h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy)}
 
-	// Static files
-	staticDir := filepath.Join(cfg.Root, "static")
-	staticFS := http.FileServer(http.Dir(staticDir))
-	h.r.ANYHTTP("-/static/*rest",
-		http.StripPrefix("/-/static/", staticFS),
-		WithDirIfEmpty("rest"),
-	)
+        // Static files
+        staticDir := filepath.Join(cfg.Root, "static")
+        staticFS := http.FileServer(http.Dir(staticDir))
+        h.r.ANYHTTP("-/static/*rest",
+                http.StripPrefix("/-/static/", staticFS),
+                WithDirIfEmpty("rest"),
+        )
 
-	// Index
-	h.r.GET("/", h.index)
+        // Handlers
+        indexHTTP := &IndexHTTP{}
+        groupHTTP := &GroupHTTP{}
+        repoHTTP := &RepoHTTP{}
 
-	// Top-level utilities
-	h.r.ANY("-/login", h.notImplemented)
-	h.r.ANY("-/users", h.notImplemented)
+        notImpl := func(w http.ResponseWriter, _ *http.Request, _ Vars) {
+                http.Error(w, "not implemented", http.StatusNotImplemented)
+        }
 
-	// Group index
-	h.r.GET("@group/", h.groupIndex)
+        // Index
+        h.r.GET("/", indexHTTP.Index)
 
-	// Repo index
-	h.r.GET("@group/-/repos/:repo/", h.repoIndex)
+        // Top-level utilities
+        h.r.ANY("-/login", notImpl)
+        h.r.ANY("-/users", notImpl)
 
-	// Repo
-	h.r.ANY("@group/-/repos/:repo/info", h.notImplemented)
-	h.r.ANY("@group/-/repos/:repo/git-upload-pack", h.notImplemented)
+        // Group index
+        h.r.GET("@group/", groupHTTP.Index)
 
-	// Repo features
-	h.r.GET("@group/-/repos/:repo/branches/", h.notImplemented)
-	h.r.GET("@group/-/repos/:repo/log/", h.notImplemented)
-	h.r.GET("@group/-/repos/:repo/commit/:commit", h.notImplemented)
-	h.r.GET("@group/-/repos/:repo/tree/*rest", h.repoTree, WithDirIfEmpty("rest"))
-	h.r.GET("@group/-/repos/:repo/raw/*rest", h.repoRaw, WithDirIfEmpty("rest"))
-	h.r.GET("@group/-/repos/:repo/contrib/", h.notImplemented)
-	h.r.GET("@group/-/repos/:repo/contrib/:mr", h.notImplemented)
+        // Repo index
+        h.r.GET("@group/-/repos/:repo/", repoHTTP.Index)
 
-	return h
+        // Repo
+        h.r.ANY("@group/-/repos/:repo/info", notImpl)
+        h.r.ANY("@group/-/repos/:repo/git-upload-pack", notImpl)
+
+        // Repo features
+        h.r.GET("@group/-/repos/:repo/branches/", notImpl)
+        h.r.GET("@group/-/repos/:repo/log/", notImpl)
+        h.r.GET("@group/-/repos/:repo/commit/:commit", notImpl)
+        h.r.GET("@group/-/repos/:repo/tree/*rest", repoHTTP.Tree, WithDirIfEmpty("rest"))
+        h.r.GET("@group/-/repos/:repo/raw/*rest", repoHTTP.Raw, WithDirIfEmpty("rest"))
+        h.r.GET("@group/-/repos/:repo/contrib/", notImpl)
+        h.r.GET("@group/-/repos/:repo/contrib/:mr", notImpl)
+
+        return h
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
