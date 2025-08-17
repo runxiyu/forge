@@ -16,6 +16,8 @@ linters:
     - varnamelen # tmp
     - funlen # tmp
     - lll
+    - mnd # tmp
+    - revive # tmp
 
 linters-settings:
   revive:

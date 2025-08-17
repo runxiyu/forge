@@ -3,4 +3,5 @@
 
 package ansiec
 
+// Reset the colors and styles
 const Reset = "\x1b[0m"

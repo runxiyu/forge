@@ -3,6 +3,7 @@
 
 package ansiec
 
+// ANSI text styles
 const (
 	Bold      = "\x1b[1m"
 	Underline = "\x1b[4m"
