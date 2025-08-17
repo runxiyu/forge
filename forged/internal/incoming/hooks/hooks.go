@@ -17,12 +17,6 @@ type Server struct {
 	socketPath      string
 	executablesPath string
 }
-
-type Config struct {
-	Socket string `scfg:"socket"`
-	Execs  string `scfg:"execs"`
-}
-
 type hookInfo struct {
 	session      ssh.Session
 	pubkey       string

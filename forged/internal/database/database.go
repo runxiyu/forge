@@ -27,7 +27,3 @@ func Open(ctx context.Context, config Config) (Database, error) {
 	}
 	return Database{db}, err
 }
-
-type Config struct {
-	Conn string `scfg:"conn"`
-}

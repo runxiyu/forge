@@ -12,14 +12,6 @@ import (
 	gossh "golang.org/x/crypto/ssh"
 )
 
-type Config struct {
-	Net             string `scfg:"net"`
-	Addr            string `scfg:"addr"`
-	Key             string `scfg:"key"`
-	Root            string `scfg:"root"`
-	ShutdownTimeout uint32 `scfg:"shutdown_timeout"`
-}
-
 type Server struct {
 	gliderServer    *gliderssh.Server
 	privkey         gossh.Signer

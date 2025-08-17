@@ -13,18 +13,6 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
-// Config contains IRC connection and identity settings for the bot.
-// This should usually be a part of the primary config struct.
-type Config struct {
-	Net   string `scfg:"net"`
-	Addr  string `scfg:"addr"`
-	TLS   bool   `scfg:"tls"`
-	SendQ uint   `scfg:"sendq"`
-	Nick  string `scfg:"nick"`
-	User  string `scfg:"user"`
-	Gecos string `scfg:"gecos"`
-}
-
 // Bot represents an IRC bot client that handles events and allows for sending messages.
 type Bot struct {
 	// TODO: Use each config field instead of embedding Config here.
