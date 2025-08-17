@@ -3,6 +3,7 @@ package web
 import (
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -112,6 +113,10 @@ func (r *Router) handle(method, pattern string, f HandlerFunc, hh http.Handler, 
 		o(&rt)
 	}
 	r.routes = append(r.routes, rt)
+
+	sort.SliceStable(r.routes, func(i, j int) bool {
+		return r.routes[i].priority > r.routes[j].priority
+	})
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -149,10 +154,14 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	method := req.Method
+
 	for _, rt := range r.routes {
-		if rt.method != "" && rt.method != req.Method {
+		if rt.method != "" &&
+			!(rt.method == method || (method == http.MethodHead && rt.method == http.MethodGet)) {
 			continue
 		}
+		// TODO: Consider returning 405 on POST/GET mismatches and the like.
 		ok, vars, sepIdx := match(rt.segs, segments)
 		if !ok {
 			continue
@@ -301,7 +310,7 @@ func splitAndUnescapePath(escaped string) ([]string, bool, error) {
 func redirectAddSlash(w http.ResponseWriter, r *http.Request) bool {
 	u := *r.URL
 	u.Path = u.EscapedPath() + "/"
-	http.Redirect(w, r, u.String(), http.StatusMovedPermanently)
+	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 	return true
 }
 
@@ -311,7 +320,7 @@ func redirectDropSlash(w http.ResponseWriter, r *http.Request) bool {
 	if u.Path == "" {
 		u.Path = "/"
 	}
-	http.Redirect(w, r, u.String(), http.StatusMovedPermanently)
+	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 	return true
 }
 
