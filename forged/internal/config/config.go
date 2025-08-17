@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -38,13 +39,19 @@ type Config struct {
 func Open(path string) (config Config, err error) {
 	var configFile *os.File
 
-	if configFile, err = os.Open(path); err != nil {
+	configFile, err = os.Open(path) //#nosec G304
+	if err != nil {
+		err = fmt.Errorf("open config file: %w", err)
 		return config, err
 	}
-	defer configFile.Close()
+	defer func() {
+		_ = configFile.Close()
+	}()
 
 	decoder := scfg.NewDecoder(bufio.NewReader(configFile))
-	if err = decoder.Decode(&config); err != nil {
+	err = decoder.Decode(&config)
+	if err != nil {
+		err = fmt.Errorf("decode config file: %w", err)
 		return config, err
 	}
 	for _, u := range decoder.UnknownDirectives() {
