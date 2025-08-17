@@ -4,15 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
-
-type HTTP struct {
-	r templates.Renderer
-}
-
-func NewHTTP(r templates.Renderer) *HTTP { return &HTTP{r: r} }
 
 func (h *HTTP) Index(w http.ResponseWriter, r *http.Request, v wtypes.Vars) {
 	base := wtypes.Base(r)
@@ -25,4 +18,3 @@ func (h *HTTP) Index(w http.ResponseWriter, r *http.Request, v wtypes.Vars) {
 		Repo:  repo,
 	})
 }
-

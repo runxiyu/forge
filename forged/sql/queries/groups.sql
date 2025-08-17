@@ -1,3 +1,6 @@
+-- name: GetRootGroups :many
+SELECT name, COALESCE(description, '') FROM groups WHERE parent_group IS NULL;
+
 -- name: GetGroupIDDescByPath :one
 WITH RECURSIVE group_path_cte AS (
 	SELECT

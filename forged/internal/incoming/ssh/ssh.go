@@ -9,26 +9,27 @@ import (
 
 	gliderssh "github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 	gossh "golang.org/x/crypto/ssh"
 )
 
 type Server struct {
 	gliderServer    *gliderssh.Server
 	privkey         gossh.Signer
-	pubkeyString    string
-	pubkeyFP        string
 	net             string
 	addr            string
 	root            string
 	shutdownTimeout uint32
+	globalData      *global.GlobalData
 }
 
-func New(config Config) (server *Server, err error) {
+func New(config Config, globalData *global.GlobalData) (server *Server, err error) {
 	server = &Server{
 		net:             config.Net,
 		addr:            config.Addr,
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
+		globalData:      globalData,
 	} //exhaustruct:ignore
 
 	var privkeyBytes []byte
@@ -43,8 +44,8 @@ func New(config Config) (server *Server, err error) {
 		return server, fmt.Errorf("parse SSH private key: %w", err)
 	}
 
-	server.pubkeyString = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
-	server.pubkeyFP = gossh.FingerprintSHA256(server.privkey.PublicKey())
+	server.globalData.SSHPubkey = misc.BytesToString(gossh.MarshalAuthorizedKey(server.privkey.PublicKey()))
+	server.globalData.SSHFingerprint = gossh.FingerprintSHA256(server.privkey.PublicKey())
 
 	server.gliderServer = &gliderssh.Server{
 		Handler:                    handle,

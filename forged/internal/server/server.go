@@ -6,6 +6,8 @@ import (
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/config"
 	"go.lindenii.runxiyu.org/forge/forged/internal/database"
+	"go.lindenii.runxiyu.org/forge/forged/internal/database/queries"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/hooks"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/lmtp"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/ssh"
@@ -22,11 +24,7 @@ type Server struct {
 	webServer  *web.Server
 	sshServer  *ssh.Server
 
-	globalData struct {
-		SSHPubkey      string
-		SSHFingerprint string
-		Version        string
-	}
+	globalData global.GlobalData
 }
 
 func New(configPath string) (server *Server, err error) {
@@ -37,10 +35,15 @@ func New(configPath string) (server *Server, err error) {
 		return server, fmt.Errorf("open config: %w", err)
 	}
 
-	server.hookServer = hooks.New(server.config.Hooks)
-	server.lmtpServer = lmtp.New(server.config.LMTP)
-	server.webServer = web.New(server.config.Web)
-	server.sshServer, err = ssh.New(server.config.SSH)
+	queries := queries.New(&server.database)
+
+	server.globalData.ForgeVersion = "unknown" // TODO
+	server.globalData.ForgeTitle = server.config.General.Title
+
+	server.hookServer = hooks.New(server.config.Hooks, &server.globalData)
+	server.lmtpServer = lmtp.New(server.config.LMTP, &server.globalData)
+	server.webServer = web.New(server.config.Web, &server.globalData, queries)
+	server.sshServer, err = ssh.New(server.config.SSH, &server.globalData)
 	if err != nil {
 		return server, fmt.Errorf("create SSH server: %w", err)
 	}

@@ -1,15 +1,18 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"sort"
 	"strings"
 
+	"go.lindenii.runxiyu.org/forge/forged/internal/database/queries"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 	wtypes "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/types"
 )
 
-type UserResolver func(*http.Request) (id int, username string, err error)
+type UserResolver func(*http.Request) (id string, username string, err error)
 
 type ErrorRenderers struct {
 	BadRequest      func(http.ResponseWriter, *wtypes.BaseData, string)
@@ -57,13 +60,21 @@ type Router struct {
 	routes       []route
 	errors       ErrorRenderers
 	user         UserResolver
-	global       any
+	global       *global.GlobalData
 	reverseProxy bool
+	queries      *queries.Queries
 }
 
 func NewRouter() *Router { return &Router{} }
 
-func (r *Router) Global(v any) *Router                { r.global = v; return r }
+func (r *Router) Global(g *global.GlobalData) *Router {
+	r.global = g
+	return r
+}
+func (r *Router) Queries(q *queries.Queries) *Router {
+	r.queries = q
+	return r
+}
 func (r *Router) ReverseProxy(enabled bool) *Router   { r.reverseProxy = enabled; return r }
 func (r *Router) Errors(e ErrorRenderers) *Router     { r.errors = e; return r }
 func (r *Router) UserResolver(u UserResolver) *Router { r.user = u; return r }
@@ -138,6 +149,13 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		Global:      r.global,
 		URLSegments: segments,
 		DirMode:     dirMode,
+		Queries:     r.queries,
+	}
+
+	bd.RefType, bd.RefName, err = GetParamRefTypeName(req)
+	if err != nil {
+		r.err400(w, bd, "Error parsing ref query parameters: "+err.Error())
+		return
 	}
 
 	if r.user != nil {
@@ -379,3 +397,38 @@ func (r *Router) err500(w http.ResponseWriter, b *wtypes.BaseData, msg string) {
 	}
 	http.Error(w, msg, http.StatusInternalServerError)
 }
+
+func GetParamRefTypeName(request *http.Request) (retRefType, retRefName string, err error) {
+	rawQuery := request.URL.RawQuery
+	queryValues, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		return
+	}
+	done := false
+	for _, refType := range []string{"commit", "branch", "tag"} {
+		refName, ok := queryValues[refType]
+		if ok {
+			if done {
+				err = errDupRefSpec
+				return
+			}
+			done = true
+			if len(refName) != 1 {
+				err = errDupRefSpec
+				return
+			}
+			retRefName = refName[0]
+			retRefType = refType
+		}
+	}
+	if !done {
+		retRefType = ""
+		retRefName = ""
+		err = nil // actually returning empty strings is enough?
+	}
+	return
+}
+
+var (
+	errDupRefSpec = fmt.Errorf("duplicate ref specifications")
+)

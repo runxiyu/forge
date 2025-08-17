@@ -12,7 +12,11 @@ type GroupHTTP struct {
 	r templates.Renderer
 }
 
-func NewGroupHTTP(r templates.Renderer) *GroupHTTP { return &GroupHTTP{r: r} }
+func NewGroupHTTP(r templates.Renderer) *GroupHTTP {
+	return &GroupHTTP{
+		r: r,
+	}
+}
 
 func (h *GroupHTTP) Index(w http.ResponseWriter, r *http.Request, _ wtypes.Vars) {
 	base := wtypes.Base(r)
@@ -22,4 +26,3 @@ func (h *GroupHTTP) Index(w http.ResponseWriter, r *http.Request, _ wtypes.Vars)
 		GroupPath: "/" + strings.Join(base.GroupPath, "/") + "/",
 	})
 }
-

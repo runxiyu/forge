@@ -3,18 +3,24 @@ package types
 import (
 	"context"
 	"net/http"
+
+	"go.lindenii.runxiyu.org/forge/forged/internal/database/queries"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 )
 
 // BaseData is per-request context computed by the router and read by handlers.
 // Keep it small and stable; page-specific data should live in view models.
 type BaseData struct {
-	Global         any
-	UserID         int
+	UserID         string
 	Username       string
 	URLSegments    []string
 	DirMode        bool
 	GroupPath      []string
 	SeparatorIndex int
+	RefType        string
+	RefName        string
+	Global         *global.GlobalData
+	Queries        *queries.Queries
 }
 
 type ctxKey struct{}

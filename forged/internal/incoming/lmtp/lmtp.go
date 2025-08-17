@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 )
 
 type Server struct {
@@ -16,15 +17,17 @@ type Server struct {
 	maxSize      int64
 	writeTimeout uint32
 	readTimeout  uint32
+	globalData   *global.GlobalData
 }
 
-func New(config Config) (server *Server) {
+func New(config Config, globalData *global.GlobalData) (server *Server) {
 	return &Server{
 		socket:       config.Socket,
 		domain:       config.Domain,
 		maxSize:      config.MaxSize,
 		writeTimeout: config.WriteTimeout,
 		readTimeout:  config.ReadTimeout,
+		globalData:   globalData,
 	}
 }
 

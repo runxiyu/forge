@@ -10,12 +10,14 @@ import (
 	"github.com/gliderlabs/ssh"
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/cmap"
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 )
 
 type Server struct {
 	hookMap         cmap.Map[string, hookInfo]
 	socketPath      string
 	executablesPath string
+	globalData      *global.GlobalData
 }
 type hookInfo struct {
 	session      ssh.Session
@@ -30,11 +32,12 @@ type hookInfo struct {
 	contribReq   string
 }
 
-func New(config Config) (server *Server) {
+func New(config Config, globalData *global.GlobalData) (server *Server) {
 	return &Server{
 		socketPath:      config.Socket,
 		executablesPath: config.Execs,
 		hookMap:         cmap.Map[string, hookInfo]{},
+		globalData:      globalData,
 	}
 }
 

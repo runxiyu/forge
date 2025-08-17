@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/database/queries"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 	handlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers"
 	repoHandlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers/repo"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
@@ -14,8 +16,8 @@ type handler struct {
 	r *Router
 }
 
-func NewHandler(cfg Config) http.Handler {
-	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy)}
+func NewHandler(cfg Config, globalData *global.GlobalData, queries *queries.Queries) *handler {
+	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy).Global(globalData).Queries(queries)}
 
 	staticFS := http.FileServer(http.Dir(cfg.StaticPath))
 	h.r.ANYHTTP("-/static/*rest",
@@ -36,7 +38,7 @@ func NewHandler(cfg Config) http.Handler {
 	indexHTTP := handlers.NewIndexHTTP(renderer)
 	groupHTTP := handlers.NewGroupHTTP(renderer)
 	repoHTTP := repoHandlers.NewHTTP(renderer)
-	notImpl := handlers.NewNotImplementedHTTP()
+	notImpl := handlers.NewNotImplementedHTTP(renderer)
 
 	// Index
 	h.r.GET("/", indexHTTP.Index)

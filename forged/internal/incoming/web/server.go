@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/database/queries"
+	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 )
 
 type Server struct {
@@ -17,11 +19,12 @@ type Server struct {
 	root            string
 	httpServer      *http.Server
 	shutdownTimeout uint32
+	globalData      *global.GlobalData
 }
 
-func New(config Config) (server *Server) {
+func New(config Config, globalData *global.GlobalData, queries *queries.Queries) *Server {
 	httpServer := &http.Server{
-		Handler:        NewHandler(config),
+		Handler:        NewHandler(config, globalData, queries),
 		ReadTimeout:    time.Duration(config.ReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(config.WriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(config.IdleTimeout) * time.Second,
@@ -33,6 +36,7 @@ func New(config Config) (server *Server) {
 		root:            config.Root,
 		shutdownTimeout: config.ShutdownTimeout,
 		httpServer:      httpServer,
+		globalData:      globalData,
 	}
 }
 
