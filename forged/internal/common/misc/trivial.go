@@ -28,13 +28,13 @@ func QueryEscape(s string) string {
 }
 
 // Dereference dereferences a pointer.
-func Dereference[T any](p *T) T {
+func Dereference[T any](p *T) T { //nolint:ireturn
 	return *p
 }
 
 // DereferenceOrZero dereferences a pointer. If the pointer is nil, the zero
 // value of its associated type is returned instead.
-func DereferenceOrZero[T any](p *T) T {
+func DereferenceOrZero[T any](p *T) T { //nolint:ireturn
 	if p != nil {
 		return *p
 	}
