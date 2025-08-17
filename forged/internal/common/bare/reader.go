@@ -10,7 +10,7 @@ import (
 	"math"
 	"unicode/utf8"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
 type byteReader interface {

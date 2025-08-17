@@ -9,7 +9,7 @@ import (
 	"io"
 	"math"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/misc"
 )
 
 // A Writer for BARE primitive types.

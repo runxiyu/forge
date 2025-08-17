@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net"
 
-	"go.lindenii.runxiyu.org/forge/forged/internal/bare"
+	"go.lindenii.runxiyu.org/forge/forged/internal/common/bare"
 )
 
 // Client represents a connection to the git2d backend daemon.
