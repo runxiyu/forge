@@ -4,6 +4,7 @@
 package git2c
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -19,8 +20,9 @@ type Client struct {
 }
 
 // NewClient establishes a connection to a git2d socket and returns a new Client.
-func NewClient(socketPath string) (*Client, error) {
-	conn, err := net.Dial("unix", socketPath)
+func NewClient(ctx context.Context, socketPath string) (*Client, error) {
+	dialer := &net.Dialer{} //exhaustruct:ignore
+	conn, err := dialer.DialContext(ctx, "unix", socketPath)
 	if err != nil {
 		return nil, fmt.Errorf("git2d connection failed: %w", err)
 	}
@@ -37,9 +39,12 @@ func NewClient(socketPath string) (*Client, error) {
 }
 
 // Close terminates the underlying socket connection.
-func (c *Client) Close() error {
+func (c *Client) Close() (err error) {
 	if c.conn != nil {
-		return c.conn.Close()
+		err = c.conn.Close()
+		if err != nil {
+			return fmt.Errorf("close underlying socket: %w", err)
+		}
 	}
 	return nil
 }

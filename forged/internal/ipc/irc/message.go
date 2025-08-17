@@ -24,18 +24,18 @@ func Parse(raw []byte) (msg Message, err error) {
 	if bytes.HasPrefix(sp[0], []byte{'@'}) { // TODO: Check size manually
 		if len(sp[0]) < 2 {
 			err = ErrMalformedMsg
-			return
+			return msg, err
 		}
 		sp[0] = sp[0][1:]
 
 		msg.Tags, err = tagsToMap(sp[0])
 		if err != nil {
-			return
+			return msg, err
 		}
 
 		if len(sp) < 2 {
 			err = ErrMalformedMsg
-			return
+			return msg, err
 		}
 		sp = sp[1:]
 	} else {
@@ -45,7 +45,7 @@ func Parse(raw []byte) (msg Message, err error) {
 	if bytes.HasPrefix(sp[0], []byte{':'}) { // TODO: Check size manually
 		if len(sp[0]) < 2 {
 			err = ErrMalformedMsg
-			return
+			return msg, err
 		}
 		sp[0] = sp[0][1:]
 
@@ -53,14 +53,14 @@ func Parse(raw []byte) (msg Message, err error) {
 
 		if len(sp) < 2 {
 			err = ErrMalformedMsg
-			return
+			return msg, err
 		}
 		sp = sp[1:]
 	}
 
 	msg.Command = misc.BytesToString(sp[0])
 	if len(sp) < 2 {
-		return
+		return msg, err
 	}
 	sp = sp[1:]
 
@@ -81,7 +81,7 @@ func Parse(raw []byte) (msg Message, err error) {
 		msg.Args = append(msg.Args, misc.BytesToString(sp[i]))
 	}
 
-	return
+	return msg, err
 }
 
 var ircv3TagEscapes = map[byte]byte{ //nolint:gochecknoglobals
@@ -97,7 +97,7 @@ func tagsToMap(raw []byte) (tags map[string]string, err error) {
 		key, value, found := bytes.Cut(rawTag, []byte{'='})
 		if !found {
 			err = ErrInvalidIRCv3Tag
-			return
+			return tags, err
 		}
 		if len(value) == 0 {
 			tags[misc.BytesToString(key)] = ""
@@ -122,5 +122,5 @@ func tagsToMap(raw []byte) (tags map[string]string, err error) {
 			}
 		}
 	}
-	return
+	return tags, err
 }

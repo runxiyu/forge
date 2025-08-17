@@ -13,6 +13,7 @@ type Source interface {
 	AsSourceString() string
 }
 
+//nolint:ireturn
 func parseSource(s []byte) Source {
 	nick, userhost, found := bytes.Cut(s, []byte{'!'})
 	if !found {

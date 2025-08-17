@@ -4,7 +4,9 @@
 package irc
 
 import (
+	"context"
 	"crypto/tls"
+	"fmt"
 	"log/slog"
 	"net"
 
@@ -25,6 +27,7 @@ type Config struct {
 
 // Bot represents an IRC bot client that handles events and allows for sending messages.
 type Bot struct {
+	// TODO: Use each config field instead of embedding Config here.
 	config            *Config
 	ircSendBuffered   chan string
 	ircSendDirectChan chan misc.ErrorBack[string]
@@ -34,24 +37,28 @@ type Bot struct {
 func NewBot(c *Config) (b *Bot) {
 	b = &Bot{
 		config: c,
-	}
+	} //exhaustruct:ignore
 	return
 }
 
 // Connect establishes a new IRC session and starts handling incoming and outgoing messages.
 // This method blocks until an error occurs or the connection is closed.
-func (b *Bot) Connect() error {
+func (b *Bot) Connect(ctx context.Context) error {
 	var err error
 	var underlyingConn net.Conn
 	if b.config.TLS {
-		underlyingConn, err = tls.Dial(b.config.Net, b.config.Addr, nil)
+		dialer := tls.Dialer{} //exhaustruct:ignore
+		underlyingConn, err = dialer.DialContext(ctx, b.config.Net, b.config.Addr)
 	} else {
-		underlyingConn, err = net.Dial(b.config.Net, b.config.Addr)
+		dialer := net.Dialer{} //exhaustruct:ignore
+		underlyingConn, err = dialer.DialContext(ctx, b.config.Net, b.config.Addr)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("dialing irc: %w", err)
 	}
-	defer underlyingConn.Close()
+	defer func() {
+		_ = underlyingConn.Close()
+	}()
 
 	conn := NewConn(underlyingConn)
 
@@ -164,12 +171,12 @@ func (b *Bot) Send(line string) {
 
 // ConnectLoop continuously attempts to maintain an IRC session.
 // If the connection drops, it automatically retries with no delay.
-func (b *Bot) ConnectLoop() {
+func (b *Bot) ConnectLoop(ctx context.Context) {
 	b.ircSendBuffered = make(chan string, b.config.SendQ)
 	b.ircSendDirectChan = make(chan misc.ErrorBack[string])
 
 	for {
-		err := b.Connect()
+		err := b.Connect(ctx)
 		slog.Error("irc session error", "error", err)
 	}
 }

@@ -2,6 +2,7 @@ package irc
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"slices"
 
@@ -41,9 +42,17 @@ func (c *Conn) ReadMessage() (msg Message, line string, err error) {
 }
 
 func (c *Conn) Write(p []byte) (n int, err error) {
-	return c.netConn.Write(p)
+	n, err = c.netConn.Write(p)
+	if err != nil {
+		err = fmt.Errorf("write to connection: %w", err)
+	}
+	return n, err
 }
 
 func (c *Conn) WriteString(s string) (n int, err error) {
-	return c.netConn.Write(misc.StringToBytes(s))
+	n, err = c.netConn.Write(misc.StringToBytes(s))
+	if err != nil {
+		err = fmt.Errorf("write to connection: %w", err)
+	}
+	return n, err
 }

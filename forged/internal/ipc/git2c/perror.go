@@ -8,7 +8,6 @@ package git2c
 import "errors"
 
 var (
-	Success            error
 	ErrUnknown         = errors.New("git2c: unknown error")
 	ErrPath            = errors.New("git2c: get tree entry by path failed")
 	ErrRevparse        = errors.New("git2c: revparse failed")
@@ -24,7 +23,7 @@ var (
 func Perror(errno uint) error {
 	switch errno {
 	case 0:
-		return Success
+		return nil
 	case 3:
 		return ErrPath
 	case 4:
