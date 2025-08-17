@@ -34,7 +34,7 @@ type Config struct {
 
 func New(config Config) (server *Server) {
 	httpServer := &http.Server{
-		Handler:        &handler{},
+		Handler:        NewHandler(config),
 		ReadTimeout:    time.Duration(config.ReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(config.WriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(config.IdleTimeout) * time.Second,

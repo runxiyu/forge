@@ -20,6 +20,7 @@ web {
 	read_timeout 120
 	write_timeout 1800
 	idle_timeout 120
+	max_header_bytes 20000
 
 	# Are we running behind a reverse proxy? If so, we will trust
 	# X-Forwarded-For headers.
@@ -68,10 +69,6 @@ general {
 }
 
 db {
-	# What type of database are we connecting to?
-	# Currently only "postgres" is supported.
-	type postgres
-
 	# What is the connection string?
 	conn postgresql:///lindenii-forge?host=/var/run/postgresql
 }
