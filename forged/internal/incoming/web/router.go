@@ -8,8 +8,10 @@ import (
 	"strings"
 )
 
-type Params map[string]any
-type HandlerFunc func(http.ResponseWriter, *http.Request, Params)
+type (
+	Params      map[string]any
+	HandlerFunc func(http.ResponseWriter, *http.Request, Params)
+)
 
 type UserResolver func(*http.Request) (id int, username string, err error)
 
@@ -81,12 +83,15 @@ func WithDirIfEmpty(param string) RouteOption {
 func (r *Router) GET(pattern string, f HandlerFunc, opts ...RouteOption) {
 	r.handle("GET", pattern, f, nil, opts...)
 }
+
 func (r *Router) POST(pattern string, f HandlerFunc, opts ...RouteOption) {
 	r.handle("POST", pattern, f, nil, opts...)
 }
+
 func (r *Router) ANY(pattern string, f HandlerFunc, opts ...RouteOption) {
 	r.handle("", pattern, f, nil, opts...)
 }
+
 func (r *Router) ANYHTTP(pattern string, hh http.Handler, opts ...RouteOption) {
 	r.handle("", pattern, nil, hh, opts...)
 }
