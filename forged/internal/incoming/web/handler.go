@@ -9,6 +9,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/global"
 	handlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers"
 	repoHandlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers/repo"
+	specialHandlers "go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/handlers/special"
 	"go.lindenii.runxiyu.org/forge/forged/internal/incoming/web/templates"
 )
 
@@ -17,7 +18,7 @@ type handler struct {
 }
 
 func NewHandler(cfg Config, global *global.Global, queries *queries.Queries) *handler {
-	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy).Global(global).Queries(queries)}
+	h := &handler{r: NewRouter().ReverseProxy(cfg.ReverseProxy).Global(global).Queries(queries).UserResolver(userResolver)}
 
 	staticFS := http.FileServer(http.Dir(cfg.StaticPath))
 	h.r.ANYHTTP("-/static/*rest",
@@ -36,6 +37,7 @@ func NewHandler(cfg Config, global *global.Global, queries *queries.Queries) *ha
 	renderer := templates.New(t)
 
 	indexHTTP := handlers.NewIndexHTTP(renderer)
+	loginHTTP := specialHandlers.NewLoginHTTP(renderer, cfg.CookieExpiry)
 	groupHTTP := handlers.NewGroupHTTP(renderer)
 	repoHTTP := repoHandlers.NewHTTP(renderer)
 	notImpl := handlers.NewNotImplementedHTTP(renderer)
@@ -44,7 +46,7 @@ func NewHandler(cfg Config, global *global.Global, queries *queries.Queries) *ha
 	h.r.GET("/", indexHTTP.Index)
 
 	// Top-level utilities
-	h.r.ANY("-/login", notImpl.Handle)
+	h.r.ANY("-/login", loginHTTP.Login)
 	h.r.ANY("-/users", notImpl.Handle)
 
 	// Group index

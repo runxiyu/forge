@@ -152,6 +152,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		Queries:     r.queries,
 	}
 
+	req = req.WithContext(wtypes.WithBaseData(req.Context(), bd))
+
 	bd.RefType, bd.RefName, err = GetParamRefTypeName(req)
 	if err != nil {
 		r.err400(w, bd, "Error parsing ref query parameters: "+err.Error())
@@ -202,7 +204,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// Attach BaseData to request context.
-		req = req.WithContext(wtypes.WithBaseData(req.Context(), bd))
+		// req = req.WithContext(wtypes.WithBaseData(req.Context(), bd))
 
 		// Enforce method now.
 		if rt.method != "" &&

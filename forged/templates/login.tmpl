@@ -7,11 +7,11 @@
 <html lang="en">
 	<head>
 		{{- template "head_common" . -}}
-		<title>Login &ndash; {{ .global.forge_title -}}</title>
+		<title>Login &ndash; {{ .BaseData.Global.ForgeTitle -}}</title>
 	</head>
 	<body class="index">
 		<main>
-			{{- .login_error -}}
+			{{- .LoginError -}}
 			<div class="padding-wrapper">
 					<form method="POST" enctype="application/x-www-form-urlencoded">
 						<table>
