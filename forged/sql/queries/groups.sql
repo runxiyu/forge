@@ -28,3 +28,9 @@ SELECT c.id, COALESCE(g.description, '')
 FROM group_path_cte c
 JOIN groups g ON g.id = c.id
 WHERE c.depth = cardinality($1::text[]);
+
+-- name: GetReposInGroup :many
+SELECT name, COALESCE(description, '') FROM repos WHERE group_id = $1;
+
+-- name: GetSubgroups :many
+SELECT name, COALESCE(description, '') FROM groups WHERE parent_group = $1;

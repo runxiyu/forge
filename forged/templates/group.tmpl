@@ -3,19 +3,19 @@
 	SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
 */}}
 {{- define "group" -}}
-{{- $group_path := .group_path -}}
+{{- $group_path := .BaseData.GroupPath -}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		{{- template "head_common" . -}}
-		<title>{{- range $i, $s := .group_path -}}{{- $s -}}{{- if ne $i (len $group_path) -}}/{{- end -}}{{- end }} &ndash; {{ .global.forge_title -}}</title>
+		<title>{{- range $i, $s := $group_path -}}{{- $s -}}{{- if ne $i (len $group_path) -}}/{{- end -}}{{- end }} &ndash; {{ .BaseData.Global.ForgeTitle -}}</title>
 	</head>
 	<body class="group">
 		{{- template "header" . -}}
 		<main>
 			<div class="padding-wrapper">
-				{{- if .description -}}
-				<p>{{- .description -}}</p>
+				{{- if .Description -}}
+				<p>{{- .Description -}}</p>
 				{{- end -}}
 				{{- template "group_view" . -}}
 			</div>
