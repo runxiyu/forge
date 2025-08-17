@@ -26,5 +26,5 @@ dist/hookc: $(wildcard hookc/*.c)
 	$(CC) $(CFLAGS) -o dist/hookc $^
 
 clean:
-	rm -rf forge hookc/hookc git2d/git2d */*.o
+	rm -rf dist
 
