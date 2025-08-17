@@ -11,4 +11,6 @@ type Config struct {
 	MaxHeaderBytes  int    `scfg:"max_header_bytes"`
 	ReverseProxy    bool   `scfg:"reverse_proxy"`
 	ShutdownTimeout uint32 `scfg:"shutdown_timeout"`
+	TemplatesPath   string `scfg:"templates_path"`
+	StaticPath      string `scfg:"static_path"`
 }

@@ -25,6 +25,9 @@ web {
 	# Are we running behind a reverse proxy? If so, we will trust
 	# X-Forwarded-For headers.
 	reverse_proxy true
+
+	templates_path /usr/share/lindenii/forge/templates
+	static_path /usr/share/lindenii/forge/static
 }
 
 irc {
