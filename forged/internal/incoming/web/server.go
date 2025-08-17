@@ -19,11 +19,6 @@ type Server struct {
 	shutdownTimeout uint32
 }
 
-type handler struct{}
-
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-}
-
 type Config struct {
 	Net             string `scfg:"net"`
 	Addr            string `scfg:"addr"`
