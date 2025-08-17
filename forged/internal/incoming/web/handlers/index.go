@@ -10,6 +10,6 @@ type IndexHTTP struct{}
 
 func NewIndexHTTP() *IndexHTTP { return &IndexHTTP{} }
 
-func (h *IndexHTTP) Index(w http.ResponseWriter, r *http.Request, _ wtypes.Vars) {
+func (h *IndexHTTP) Index(w http.ResponseWriter, _ *http.Request, _ wtypes.Vars) {
 	_, _ = w.Write([]byte("index: replace with template render"))
 }
