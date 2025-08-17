@@ -11,11 +11,9 @@
 
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_GNU_SOURCE
 
-SOURCE_FILES = $(shell git ls-files)
-
 all: dist/forged dist/git2d dist/hookc
 
-dist/forged: $(SOURCE_FILES)
+dist/forged: $(shell git ls-files forged)
 	mkdir -p dist
 	CGO_ENABLED=0 go build -o dist/forged -ldflags '-extldflags "-f no-PIC -static"' -tags 'osusergo netgo static_build' ./forged
 
