@@ -26,11 +26,13 @@ primarily designed for self-hosting by small organizations and individuals.
 ## Planned features
 
 * Further Integration with mailing list workflows
-* Ticket trackers and discussions
+* Further federated authentication
+* Ticket trackers, discussions, RFCs
   * Web interface
   * Email integration with IMAP archives
 * SSH API
 * Email access
+* CI system similar to builds.sr.ht
 
 ## License
 
