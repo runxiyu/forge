@@ -11,7 +11,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/tdewolff/minify/v2 v2.24.0
+	github.com/tdewolff/minify/v2 v2.24.3
 	github.com/yuin/goldmark v1.7.13
 	golang.org/x/crypto v0.41.0
 )
@@ -36,7 +36,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.4.0 // indirect
-	github.com/pjbgf/sha1cd v0.4.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
+	github.com/pjbgf/sha1cd v0.5.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/tdewolff/parse/v2 v2.8.3 // indirect
