@@ -20,14 +20,14 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
 )
 
-type lmtpHandler struct{}
+type lmtpHandler struct{s *Server}
 
 type lmtpSession struct {
 	from   string
 	to     []string
 	ctx    context.Context
 	cancel context.CancelFunc
-	s      Server
+	s      *Server
 }
 
 func (session *lmtpSession) Reset() {
@@ -54,17 +54,18 @@ func (session *lmtpSession) Rcpt(to string, _ *smtp.RcptOptions) error {
 	return nil
 }
 
-func (*lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
+func (h *lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	session := &lmtpSession{
 		ctx:    ctx,
 		cancel: cancel,
+		s: h.s,
 	}
 	return session, nil
 }
 
 func (s *Server) serveLMTP(listener net.Listener) error {
-	smtpServer := smtp.NewServer(&lmtpHandler{})
+	smtpServer := smtp.NewServer(&lmtpHandler{s: s})
 	smtpServer.LMTP = true
 	smtpServer.Domain = s.config.LMTP.Domain
 	smtpServer.Addr = s.config.LMTP.Socket
@@ -85,6 +86,7 @@ func (session *lmtpSession) Data(r io.Reader) error {
 		n     int64
 	)
 
+	fmt.Printf("%#v\n", session.s)
 	n, err = io.CopyN(&buf, r, session.s.config.LMTP.MaxSize)
 	switch {
 	case n == session.s.config.LMTP.MaxSize:
