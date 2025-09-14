@@ -22,6 +22,7 @@ primarily designed for self-hosting by small organizations and individuals.
 * Push to `contrib/` branches to automatically create merge requests
 * Basic federated authentication
 * Converting mailed patches to branches
+* Basic mailing lists
 
 ## Planned features
 
