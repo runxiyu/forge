@@ -36,6 +36,13 @@ CREATE TABLE mailing_list_emails (
 	content BYTEA NOT NULL
 );
 
+CREATE TABLE mailing_list_subscribers (
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	list_id INTEGER NOT NULL REFERENCES mailing_lists(id) ON DELETE CASCADE,
+	email TEXT NOT NULL,
+	UNIQUE (list_id, email)
+);
+
 CREATE TABLE users (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username TEXT UNIQUE,

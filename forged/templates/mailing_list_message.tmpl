@@ -1,0 +1,42 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+*/}}
+{{- define "mailing_list_message" -}}
+<!DOCTYPE html>
+<html lang="en">
+ 	<head>
+		{{- template "head_common" . -}}
+		<title>{{ .email_subject }} – {{ .global.forge_title -}}</title>
+	</head>
+	<body class="mailing-list-message">
+		{{- template "header" . -}}
+		<main>
+			<div class="padding-wrapper">
+				<table class="wide">
+					<thead>
+						<tr>
+							<th colspan="2" class="title-row">{{ .email_subject }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">From</th>
+							<td>{{ .email_from }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Date</th>
+							<td>{{ if .email_date.IsZero }}{{ .email_date_raw }}{{ else }}{{ .email_date }}{{ end }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="padding-wrapper">
+				<div class="readme">{{ .email_body_html }}</div>
+			</div>
+		</main>
+		<footer>
+			{{- template "footer" . -}}
+		</footer>
+	</body>
+</html>
+{{- end -}}

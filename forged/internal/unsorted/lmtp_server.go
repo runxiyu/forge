@@ -20,7 +20,7 @@ import (
 	"go.lindenii.runxiyu.org/forge/forged/internal/misc"
 )
 
-type lmtpHandler struct{s *Server}
+type lmtpHandler struct{ s *Server }
 
 type lmtpSession struct {
 	from   string
@@ -59,7 +59,7 @@ func (h *lmtpHandler) NewSession(_ *smtp.Conn) (smtp.Session, error) {
 	session := &lmtpSession{
 		ctx:    ctx,
 		cancel: cancel,
-		s: h.s,
+		s:      h.s,
 	}
 	return session, nil
 }
@@ -182,6 +182,11 @@ func (session *lmtpSession) Data(r io.Reader) error {
 			err = session.s.lmtpHandlePatch(session, groupPath, moduleName, &mbox)
 			if err != nil {
 				slog.Error("error handling patch", "error", err)
+				goto end
+			}
+		case "lists":
+			if err = session.s.lmtpHandleMailingList(session, groupPath, moduleName, email, data, from); err != nil {
+				slog.Error("error handling mailing list message", "error", err)
 				goto end
 			}
 		default:

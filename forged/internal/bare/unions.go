@@ -21,8 +21,10 @@ type UnionTags struct {
 	types map[uint64]reflect.Type
 }
 
-var unionInterface = reflect.TypeOf((*Union)(nil)).Elem()
-var unionRegistry map[reflect.Type]*UnionTags
+var (
+	unionInterface = reflect.TypeOf((*Union)(nil)).Elem()
+	unionRegistry  map[reflect.Type]*UnionTags
+)
 
 func init() {
 	unionRegistry = make(map[reflect.Type]*UnionTags)

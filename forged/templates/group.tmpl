@@ -31,6 +31,7 @@
 								</tr>
 							</thead>
 							<tbody>
+								<input type="hidden" name="op" value="create_repo" />
 								<tr>
 									<th scope="row">Name</th>
 									<td class="tdinput">
@@ -53,6 +54,47 @@
 											<option value="registered_user">Registered user</option>
 											<option value="closed">Closed</option>
 										</select>
+									</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td class="th-like" colspan="2">
+										<div class="flex-justify">
+											<div class="left">
+											</div>
+											<div class="right">
+												<input class="btn-primary" type="submit" value="Create" />
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</form>
+				</div>
+				<div class="padding-wrapper">
+					<form method="POST" enctype="application/x-www-form-urlencoded">
+						<table>
+							<thead>
+								<tr>
+									<th class="title-row" colspan="2">
+										Create mailing list
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<input type="hidden" name="op" value="create_list" />
+								<tr>
+									<th scope="row">Name</th>
+									<td class="tdinput">
+										<input id="list-name-input" name="list_name" type="text" />
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">Description</th>
+									<td class="tdinput">
+										<input id="list-desc-input" name="list_desc" type="text" />
 									</td>
 								</tr>
 							</tbody>

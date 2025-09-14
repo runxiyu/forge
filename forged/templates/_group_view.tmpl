@@ -53,4 +53,29 @@
 	</tbody>
 </table>
 {{- end -}}
+{{- if .mailing_lists -}}
+	<table class="wide">
+		<thead>
+			<tr>
+				<th colspan="2" class="title-row">Mailing lists</th>
+			</tr>
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{- range .mailing_lists -}}
+			<tr>
+				<td>
+					<a href="-/lists/{{- .Name | path_escape -}}/">{{- .Name -}}</a>
+				</td>
+				<td>
+					{{- .Description -}}
+				</td>
+			</tr>
+			{{- end -}}
+		</tbody>
+	</table>
+{{- end -}}
 {{- end -}}

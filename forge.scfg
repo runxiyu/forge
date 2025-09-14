@@ -99,6 +99,28 @@ lmtp {
 	write_timeout 300
 }
 
+smtp {
+	# Outbound SMTP relay configuration for mailing list delivery
+
+	# What network transport to use (e.g. tcp, tcp4, tcp6)?
+	net tcp
+
+	# Relay address
+	addr 127.0.0.1:25
+
+	hello_name forge.example.org
+
+	# One of "plain", "tls", "starttls".
+	transport plain
+
+	# Allow invalid certs
+	tls_insecure false
+
+	# SMTP auth credentials
+	username ""
+	password ""
+}
+
 pprof {
 	# What network to listen on for pprof?
 	net tcp

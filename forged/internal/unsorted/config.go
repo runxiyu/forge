@@ -36,6 +36,15 @@ type Config struct {
 		WriteTimeout uint32 `scfg:"write_timeout"`
 		ReadTimeout  uint32 `scfg:"read_timeout"`
 	} `scfg:"lmtp"`
+	SMTP struct {
+		Net         string `scfg:"net"`
+		Addr        string `scfg:"addr"`
+		HelloName   string `scfg:"hello_name"`
+		Transport   string `scfg:"transport"` // plain, tls, starttls
+		TLSInsecure bool   `scfg:"tls_insecure"`
+		Username    string `scfg:"username"`
+		Password    string `scfg:"password"`
+	} `scfg:"smtp"`
 	Git struct {
 		RepoDir    string `scfg:"repo_dir"`
 		Socket     string `scfg:"socket"`

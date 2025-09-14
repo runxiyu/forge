@@ -88,52 +88,72 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 			return
 		}
 
-		repoName := request.FormValue("repo_name")
-		repoDesc := request.FormValue("repo_desc")
-		contribReq := request.FormValue("repo_contrib")
-		if repoName == "" {
-			web.ErrorPage400(s.templates, writer, params, "Repo name is required")
+		switch request.FormValue("op") {
+		case "create_repo":
+			repoName := request.FormValue("repo_name")
+			repoDesc := request.FormValue("repo_desc")
+			contribReq := request.FormValue("repo_contrib")
+			if repoName == "" {
+				web.ErrorPage400(s.templates, writer, params, "Repo name is required")
+				return
+			}
+
+			var newRepoID int
+			err := s.database.QueryRow(
+				request.Context(),
+				`INSERT INTO repos (name, description, group_id, contrib_requirements) VALUES ($1, $2, $3, $4) RETURNING id`,
+				repoName,
+				repoDesc,
+				groupID,
+				contribReq,
+			).Scan(&newRepoID)
+			if err != nil {
+				web.ErrorPage500(s.templates, writer, params, "Error creating repo: "+err.Error())
+				return
+			}
+
+			filePath := filepath.Join(s.config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
+
+			_, err = s.database.Exec(
+				request.Context(),
+				`UPDATE repos SET filesystem_path = $1 WHERE id = $2`,
+				filePath,
+				newRepoID,
+			)
+			if err != nil {
+				web.ErrorPage500(s.templates, writer, params, "Error updating repo path: "+err.Error())
+				return
+			}
+
+			if err = s.gitInit(filePath); err != nil {
+				web.ErrorPage500(s.templates, writer, params, "Error initializing repo: "+err.Error())
+				return
+			}
+
+			misc.RedirectUnconditionally(writer, request)
+			return
+		case "create_list":
+			listName := request.FormValue("list_name")
+			listDesc := request.FormValue("list_desc")
+			if listName == "" {
+				web.ErrorPage400(s.templates, writer, params, "List name is required")
+				return
+			}
+
+			if _, err := s.database.Exec(
+				request.Context(),
+				`INSERT INTO mailing_lists (name, description, group_id) VALUES ($1, $2, $3)`,
+				listName, listDesc, groupID,
+			); err != nil {
+				web.ErrorPage500(s.templates, writer, params, "Error creating mailing list: "+err.Error())
+				return
+			}
+			misc.RedirectUnconditionally(writer, request)
+			return
+		default:
+			web.ErrorPage400(s.templates, writer, params, "Unknown operation")
 			return
 		}
-
-		var newRepoID int
-		err := s.database.QueryRow(
-			request.Context(),
-			`INSERT INTO repos (name, description, group_id, contrib_requirements)
-	 VALUES ($1, $2, $3, $4)
-	 RETURNING id`,
-			repoName,
-			repoDesc,
-			groupID,
-			contribReq,
-		).Scan(&newRepoID)
-		if err != nil {
-			web.ErrorPage500(s.templates, writer, params, "Error creating repo: "+err.Error())
-			return
-		}
-
-		filePath := filepath.Join(s.config.Git.RepoDir, strconv.Itoa(newRepoID)+".git")
-
-		_, err = s.database.Exec(
-			request.Context(),
-			`UPDATE repos
-	 SET filesystem_path = $1
-	 WHERE id = $2`,
-			filePath,
-			newRepoID,
-		)
-		if err != nil {
-			web.ErrorPage500(s.templates, writer, params, "Error updating repo path: "+err.Error())
-			return
-		}
-
-		if err = s.gitInit(filePath); err != nil {
-			web.ErrorPage500(s.templates, writer, params, "Error initializing repo: "+err.Error())
-			return
-		}
-
-		misc.RedirectUnconditionally(writer, request)
-		return
 	}
 
 	// Repos
@@ -187,7 +207,32 @@ func (s *Server) httpHandleGroupIndex(writer http.ResponseWriter, request *http.
 		return
 	}
 
+	// Mailing lists
+	var lists []nameDesc
+	{
+		var rows2 pgx.Rows
+		rows2, err = s.database.Query(request.Context(), `SELECT name, COALESCE(description, '') FROM mailing_lists WHERE group_id = $1`, groupID)
+		if err != nil {
+			web.ErrorPage500(s.templates, writer, params, "Error getting mailing lists: "+err.Error())
+			return
+		}
+		defer rows2.Close()
+		for rows2.Next() {
+			var name, description string
+			if err = rows2.Scan(&name, &description); err != nil {
+				web.ErrorPage500(s.templates, writer, params, "Error getting mailing lists: "+err.Error())
+				return
+			}
+			lists = append(lists, nameDesc{name, description})
+		}
+		if err = rows2.Err(); err != nil {
+			web.ErrorPage500(s.templates, writer, params, "Error getting mailing lists: "+err.Error())
+			return
+		}
+	}
+
 	params["repos"] = repos
+	params["mailing_lists"] = lists
 	params["subgroups"] = subgroups
 	params["description"] = groupDesc
 	params["direct_access"] = directAccess

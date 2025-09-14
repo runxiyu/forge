@@ -1,0 +1,56 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "mailing_list" -}}
+<!DOCTYPE html>
+<html lang="en">
+ 	<head>
+		{{- template "head_common" . -}}
+		<title>{{- index .group_path 0 -}}{{- range $i, $s := .group_path -}}{{- if gt $i 0 -}}/{{- $s -}}{{- end -}}{{- end }}/-/lists/{{ .list_name }} – {{ .global.forge_title -}}</title>
+	</head>
+	<body class="mailing-list">
+		{{- template "header" . -}}
+		<main>
+			<div class="padding-wrapper">
+				<h2>{{ .list_name }}</h2>
+				{{- if .list_description -}}
+				<p>{{ .list_description }}</p>
+				{{- end -}}
+				<p><strong>Address:</strong> <code>{{ .list_email_address }}</code></p>
+				{{- if .direct_access -}}
+				<p><a href="subscribers/">Manage subscribers</a></p>
+				{{- end -}}
+			</div>
+			<div class="padding-wrapper">
+				<table class="wide">
+					<thead>
+						<tr>
+							<th colspan="4" class="title-row">Archive</th>
+						</tr>
+						<tr>
+							<th scope="col">Title</th>
+							<th scope="col">Sender</th>
+							<th scope="col">Date</th>
+							<th scope="col">Raw</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{- range .list_emails -}}
+						<tr>
+							<td><a href="message/{{ .id }}">{{ .title }}</a></td>
+							<td>{{ .sender }}</td>
+							<td>{{ .date }}</td>
+							<td><a href="raw/{{ .id }}">download</a></td>
+						</tr>
+						{{- end -}}
+					</tbody>
+				</table>
+			</div>
+		</main>
+		<footer>
+			{{- template "footer" . -}}
+		</footer>
+	</body>
+</html>
+{{- end -}}

@@ -268,6 +268,55 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 				web.ErrorPage404(s.templates, writer, params)
 				return
 			}
+		case "lists":
+			params["list_name"] = moduleName
+
+			if len(segments) == sepIndex+3 {
+				if misc.RedirectDir(writer, request) {
+					return
+				}
+				s.httpHandleMailingListIndex(writer, request, params)
+				return
+			}
+
+			feature := segments[sepIndex+3]
+			switch feature {
+			case "raw":
+				if len(segments) != sepIndex+5 {
+					web.ErrorPage400(s.templates, writer, params, "Incorrect number of parameters")
+					return
+				}
+				if misc.RedirectNoDir(writer, request) {
+					return
+				}
+				params["email_id"] = segments[sepIndex+4]
+				s.httpHandleMailingListRaw(writer, request, params)
+				return
+			case "message":
+				if len(segments) != sepIndex+5 {
+					web.ErrorPage400(s.templates, writer, params, "Incorrect number of parameters")
+					return
+				}
+				if misc.RedirectNoDir(writer, request) {
+					return
+				}
+				params["email_id"] = segments[sepIndex+4]
+				s.httpHandleMailingListMessage(writer, request, params)
+				return
+			case "subscribers":
+				if len(segments) != sepIndex+4 {
+					web.ErrorPage400(s.templates, writer, params, "Incorrect number of parameters")
+					return
+				}
+				if misc.RedirectDir(writer, request) {
+					return
+				}
+				s.httpHandleMailingListSubscribers(writer, request, params)
+				return
+			default:
+				web.ErrorPage404(s.templates, writer, params)
+				return
+			}
 		default:
 			web.ErrorPage404(s.templates, writer, params)
 			return

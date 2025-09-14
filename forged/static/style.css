@@ -544,11 +544,11 @@ td > ul {
 
 .repo-header > .nav-tabs-standalone {
 	border: none;
-  margin: 0;
-  flex-grow: 1;
-  display: inline-flex;
-  flex-wrap: nowrap;
-  padding: 0;
+	margin: 0;
+	flex-grow: 1;
+	display: inline-flex;
+	flex-wrap: nowrap;
+	padding: 0;
 }
 
 .repo-header {

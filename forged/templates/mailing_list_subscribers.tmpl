@@ -1,0 +1,82 @@
+{{/*
+	SPDX-License-Identifier: AGPL-3.0-only
+	SPDX-FileCopyrightText: Copyright (c) 2025 Runxi Yu <https://runxiyu.org>
+*/}}
+{{- define "mailing_list_subscribers" -}}
+<!DOCTYPE html>
+<html lang="en">
+ 	<head>
+		{{- template "head_common" . -}}
+		<title>{{ .list_name }} subscribers – {{ .global.forge_title -}}</title>
+	</head>
+	<body class="mailing-list-subscribers">
+		{{- template "header" . -}}
+		<main>
+			<div class="padding-wrapper">
+				<table class="wide">
+					<thead>
+						<tr>
+							<th colspan="2" class="title-row">Subscribers for {{ .list_name }}</th>
+						</tr>
+						<tr>
+							<th scope="col">Email</th>
+							<th scope="col">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{- range .subscribers -}}
+						<tr>
+							<td>{{ .email }}</td>
+							<td>
+								{{- if $.direct_access -}}
+								<form method="POST" enctype="application/x-www-form-urlencoded">
+									<input type="hidden" name="op" value="remove" />
+									<input type="hidden" name="id" value="{{ .id }}" />
+									<input class="btn-danger" type="submit" value="Remove" />
+								</form>
+								{{- end -}}
+							</td>
+						</tr>
+						{{- end -}}
+					</tbody>
+				</table>
+			</div>
+			{{- if .direct_access -}}
+			<div class="padding-wrapper">
+				<form method="POST" enctype="application/x-www-form-urlencoded">
+					<table>
+						<thead>
+							<tr>
+								<th class="title-row" colspan="2">Add subscriber</th>
+							</tr>
+						</thead>
+						<tbody>
+							<input type="hidden" name="op" value="add" />
+							<tr>
+								<th scope="row">Email</th>
+								<td class="tdinput"><input id="subscriber-email" name="email" type="email" /></td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td class="th-like" colspan="2">
+									<div class="flex-justify">
+										<div class="left"></div>
+										<div class="right">
+											<input class="btn-primary" type="submit" value="Add" />
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</form>
+			</div>
+			{{- end -}}
+		</main>
+		<footer>
+			{{- template "footer" . -}}
+		</footer>
+	</body>
+</html>
+{{- end -}}
