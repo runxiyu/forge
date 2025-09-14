@@ -9,11 +9,11 @@ require (
 	github.com/emersion/go-smtp v0.24.0
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-git/go-git/v5 v5.16.2
-	github.com/jackc/pgx/v5 v5.7.5
+	github.com/jackc/pgx/v5 v5.7.6
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.24.3
 	github.com/yuin/goldmark v1.7.13
-	golang.org/x/crypto v0.41.0
+	golang.org/x/crypto v0.42.0
 )
 
 require (
@@ -43,9 +43,9 @@ require (
 	github.com/tdewolff/parse/v2 v2.8.3 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
